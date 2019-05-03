@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">TrainingLog</string>
+    <string name="filter_title">Training Log</string>
+    <string name="distance">Distance</string>
+    <string name="number_of_repetitions">Number of repetitions</string>
+    <string name="number_of_sets">Number of sets</string>
+    <string name="description">Description</string>
+    <string name="submit">submit</string>
+    <string name="WarningSomeEmpty">Please Fill All the Details</string>
 </resources>

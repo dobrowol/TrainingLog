@@ -10,13 +10,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <intent-filter android:label="@string/filter_title">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data android:scheme="http"
+                    android:host="www.example.com"
+                    android:pathPrefix="/dobrowol" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+                <!-- Accepts URIs that begin with "example://dobrowol” -->
+                <data android:scheme="example"
+                    android:host="dobrowol" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".adding_exercise.AddExercise" android:theme="@style/Theme.Transparent">
+        <activity android:name=".adding_exercise.AddExercise" android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.AddExercie" />
 

@@ -9,12 +9,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dobrowol.traininglog.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_exercise.Exercise;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener {
@@ -25,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private MyRecyclerViewAdapter generalAdapter;
     private MyRecyclerViewAdapter specificAdapter;
     private MyRecyclerViewAdapter competitiveAdapter;
-    private RecyclerView currentRecyclerView;
+    private MyRecyclerViewAdapter currentAdapter;
     List<Exercise> exerciseList;
 
     @Override
@@ -45,21 +48,21 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
 
         generalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        generalAdapter = new MyRecyclerViewAdapter(getApplicationContext());
+        generalAdapter = new MyRecyclerViewAdapter();
         generalAdapter.setOnItemClickListener(this);
         generalRecyclerView.setAdapter(generalAdapter);
 
         specificRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        specificAdapter = new MyRecyclerViewAdapter(getApplicationContext());
+        specificAdapter = new MyRecyclerViewAdapter();
         specificAdapter.setOnItemClickListener(this);
         specificRecyclerView.setAdapter(specificAdapter);
 
         competitiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        competitiveAdapter = new MyRecyclerViewAdapter(getApplicationContext());
+        competitiveAdapter = new MyRecyclerViewAdapter();
         competitiveAdapter.setOnItemClickListener(this);
         competitiveRecyclerView.setAdapter(competitiveAdapter);
 
-        currentRecyclerView=generalRecyclerView;
+        currentAdapter=generalAdapter;
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
@@ -71,19 +74,19 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (view.getId()){
             case R.id.general_rv:
-                currentRecyclerView = generalRecyclerView;
+                currentAdapter = generalAdapter;
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
             case R.id.specific_rv:
-                currentRecyclerView = specificRecyclerView;
+                currentAdapter = specificAdapter;
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
             case R.id.competitive_rv:
-                currentRecyclerView = competitiveRecyclerView;
+                currentAdapter = competitiveAdapter;
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
@@ -107,9 +110,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if(resultCode == RESULT_OK){
-            Exercise exercise = (Exercise) data.getExtras().getSerializable(AddExercise.REQUESTED_CODE);
-            exerciseList.add(exercise);
-            generalAdapter.setExerciseList(exerciseList);
+            try {
+                Exercise exercise = (Exercise) data.getExtras().getSerializable(AddExercise.REQUESTED_CODE);
+                exerciseList.add(exercise);
+                currentAdapter.setExerciseList(exerciseList);
+                currentAdapter.notifyDataSetChanged();
+            }catch (NullPointerException e){System.err.print(e.getStackTrace());}
         }
 
     }

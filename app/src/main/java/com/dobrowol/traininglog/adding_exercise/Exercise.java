@@ -1,6 +1,8 @@
 package com.dobrowol.traininglog.adding_exercise;
 
-public class Exercise{
+import java.io.Serializable;
+
+public class Exercise implements Serializable {
 public String description;
 public ExerciseType type;
 public int totalDistance;

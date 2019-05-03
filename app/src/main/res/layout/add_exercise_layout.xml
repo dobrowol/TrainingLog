@@ -2,14 +2,15 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <EditText
         android:id="@+id/txtDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+
         android:ems="10"
-        android:hint="Distance"
+        android:hint="@string/distance"
         android:inputType="number"
         android:selectAllOnFocus="true" />
     <EditText
@@ -17,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Number of repetitions"
+        android:hint="@string/number_of_repetitions"
         android:inputType="number" />
 
     <EditText
@@ -25,29 +26,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:hint="@string/number_of_sets"
+        android:inputType="number" />
     <EditText
-        android:id="@+id/txtNumberOfSeries"
+        android:id="@+id/txtDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editText3"
+
         android:ems="10"
-        android:hint="Date"
-        android:inputType="date" />
-    <EditText
-        android:id="@+id/txtPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Phone Number"
-        android:inputType="phone"
-        android:textColorHint="#FE8DAB"/>
+        android:hint="@string/description"
+        android:inputType="text" />
+
     <Button
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="submit"
+        android:text="@string/submit"
         android:textSize="16sp"
         android:textStyle="normal|bold" />
     <TextView
@@ -55,6 +49,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/resultView"
         android:layout_marginTop="25dp"
-        android:textSize="15dp"/>
+        android:textSize="15sp"/>
 
 </LinearLayout>

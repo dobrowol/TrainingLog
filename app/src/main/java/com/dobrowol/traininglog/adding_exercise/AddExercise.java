@@ -1,5 +1,6 @@
 package com.dobrowol.traininglog.adding_exercise;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,35 +10,46 @@ import android.widget.TextView;
 
 import com.dobrowol.traininglog.R;
 
-public class AddExercise extends AppCompatActivity {
+public class AddExercise extends AppCompatActivity implements View.OnClickListener {
     public static final String REQUESTED_CODE = "exercise";
     public static int CREATE_EXERCISE=1;
     Button btnSubmit;
-    EditText name, password, email, dob, phoneno;
+    EditText distance, numberOfRepetitions, numberOfSets, description;
     TextView result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        name=(EditText)findViewById(R.id.txtDistance);
-        password = (EditText)findViewById(R.id.txtNumberOfRepetitions);
-        email = (EditText)findViewById(R.id.txtNumberOfSets);
-        dob = (EditText)findViewById(R.id.txtNumberOfSeries);
-        phoneno= (EditText)findViewById(R.id.txtPhone);
-        btnSubmit = (Button)findViewById(R.id.btnSend);
-        result = (TextView)findViewById(R.id.resultView);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (name.getText().toString().isEmpty() || password.getText().toString().isEmpty() || email.getText().toString().isEmpty() || dob.getText().toString().isEmpty()
-                        || phoneno.getText().toString().isEmpty()) {
-                    result.setText("Please Fill All the Details");
-                } else {
-                    result.setText("Name -  " + name.getText().toString() + " \n" + "Password -  " + password.getText().toString()
-                            + " \n" + "E-Mail -  " + email.getText().toString() + " \n" + "DOB -  " + dob.getText().toString()
-                            + " \n" + "Contact -  " + phoneno.getText().toString());
-                }
-            }
-        });
+        setContentView(R.layout.add_exercise_layout);
+        distance = findViewById(R.id.txtDistance);
+        numberOfRepetitions = findViewById(R.id.txtNumberOfRepetitions);
+        numberOfSets = findViewById(R.id.txtNumberOfSets);
+        description = findViewById(R.id.txtDescription);
+
+        btnSubmit = findViewById(R.id.btnSend);
+        result = findViewById(R.id.resultView);
+        btnSubmit.setOnClickListener(this);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (distance.getText().toString().isEmpty() || numberOfRepetitions.getText().toString().isEmpty() || numberOfSets.getText().toString().isEmpty() || description.getText().toString().isEmpty()) {
+            result.setText(R.string.WarningSomeEmpty);
+        } else {
+            result.setText(R.string.distance + distance.getText().toString() + " \n" + R.string.number_of_repetitions + numberOfRepetitions.getText().toString()
+                    + " \n" + R.string.number_of_sets + numberOfSets.getText().toString() + " \n" + R.string.description + description.getText().toString()
+                    + " \n");
+            Exercise exercise = new Exercise();
+            exercise.description=description.getText().toString();
+            exercise.distance=Integer.valueOf(distance.getText().toString());
+            exercise.numberOfRepetitionsInSet=Integer.valueOf(numberOfRepetitions.getText().toString());
+            exercise.numberOfSetsInSeries=Integer.valueOf(numberOfSets.getText().toString());
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(REQUESTED_CODE,exercise);
+            intent.putExtras(bundle);
+            setResult(RESULT_OK,intent);
+            finish();
+        }
     }
 }

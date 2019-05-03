@@ -1,8 +1,6 @@
 package com.dobrowol.traininglog;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,38 +16,24 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
     private List<Exercise> exerciseList;
-    private Context mContext;
 
-    public MyRecyclerViewAdapter(Context context) {
-        this.mContext = context;
+    MyRecyclerViewAdapter() {
     }
 
     public void setExerciseList(List<Exercise> exerciseList){
         this.exerciseList = exerciseList;
+
     }
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
-        CustomViewHolder viewHolder = new CustomViewHolder(view);
-        return viewHolder;
+        return new CustomViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
-        final Exercise exercise = exerciseList.get(i);
-
-        //Setting text view title
-        customViewHolder.descriptionText.setText(Html.fromHtml(exercise.description +" "+
-                exercise.numberOfSeries +"x( " + exercise.numberOfSetsInSeries +"x"+exercise.distance+"m )"));
-
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClickListener.onItemClick(exercise);
-            }
-        };
-        customViewHolder.descriptionText.setOnClickListener(listener);
-
+        Exercise textAtPosition = exerciseList.get(i);
+        customViewHolder.fillView(textAtPosition);
     }
 
     @Override
@@ -59,11 +43,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        protected TextView descriptionText;
+        TextView descriptionText;
 
-        public CustomViewHolder(View view) {
-            super(view);;
+        CustomViewHolder(View view) {
+            super(view);
             this.descriptionText = view.findViewById(R.id.description);
+        }
+
+        void fillView(Exercise textAtPosition) {
+            descriptionText.setText(textAtPosition.numberOfSetsInSeries +
+                    "x( "+textAtPosition.numberOfRepetitionsInSet +" x "+textAtPosition.distance+")");
         }
     }
 
