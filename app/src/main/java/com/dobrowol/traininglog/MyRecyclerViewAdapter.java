@@ -19,6 +19,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private ArrayList<Exercise> exerciseList;
 
     MyRecyclerViewAdapter() {
+        exerciseList = new ArrayList<>();
     }
 
     public void setExerciseList(ArrayList<Exercise> exerciseList){

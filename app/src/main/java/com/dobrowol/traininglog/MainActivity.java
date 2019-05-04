@@ -75,18 +75,21 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         switch (view.getId()){
             case R.id.general_rv:
                 currentAdapter = generalAdapter;
+                exerciseList = generalAdapter.getExerciseList();
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
             case R.id.specific_rv:
                 currentAdapter = specificAdapter;
+                exerciseList = specificAdapter.getExerciseList();
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
             case R.id.competitive_rv:
                 currentAdapter = competitiveAdapter;
+                exerciseList = competitiveAdapter.getExerciseList();
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
