@@ -8,21 +8,25 @@ import android.widget.TextView;
 
 import com.dobrowol.traininglog.adding_exercise.Exercise;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
     }
 
-    private List<Exercise> exerciseList;
+    private ArrayList<Exercise> exerciseList;
 
     MyRecyclerViewAdapter() {
     }
 
-    public void setExerciseList(List<Exercise> exerciseList){
+    public void setExerciseList(ArrayList<Exercise> exerciseList){
         this.exerciseList = exerciseList;
+    }
 
+    public ArrayList<Exercise> getExerciseList(){
+        return exerciseList;
     }
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -51,8 +55,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         }
 
         void fillView(Exercise textAtPosition) {
-            descriptionText.setText(textAtPosition.numberOfSetsInSeries +
-                    "x( "+textAtPosition.numberOfRepetitionsInSet +" x "+textAtPosition.distance+")");
+
+            descriptionText.setText(String.format(Locale.ENGLISH,"%dx( %d x %dm) + %s",
+                    textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
+                    textAtPosition.description));
         }
     }
 

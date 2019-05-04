@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private MyRecyclerViewAdapter specificAdapter;
     private MyRecyclerViewAdapter competitiveAdapter;
     private MyRecyclerViewAdapter currentAdapter;
-    List<Exercise> exerciseList;
+    ArrayList<Exercise> exerciseList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,5 +123,20 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void onItemClick(Exercise item) {
 
+    }
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("generalExerciseList", generalAdapter.getExerciseList());
+        outState.putParcelableArrayList("specificExerciseList", specificAdapter.getExerciseList());
+        outState.putParcelableArrayList("competitiveExerciseList", competitiveAdapter.getExerciseList());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle inState){
+        super.onRestoreInstanceState(inState);
+        generalAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("generalExerciseList"));
+        specificAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("specificExerciseList"));
+        competitiveAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("competitiveExerciseList"));
+        currentAdapter=generalAdapter;
     }
 }
