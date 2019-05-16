@@ -33,6 +33,13 @@
 
             </intent-filter>
         </activity>
+
+        <activity android:name=".adding_exercise.AddExerciseDescription" android:theme="@style/Theme.AppCompat">
+            <intent-filter>
+                <action android:name="android.intent.action.AddExercie" />
+
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

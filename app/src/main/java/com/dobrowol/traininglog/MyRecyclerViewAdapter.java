@@ -1,42 +1,55 @@
 package com.dobrowol.traininglog;
 
-import android.support.v7.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.dobrowol.traininglog.adding_exercise.Exercise;
+import com.dobrowol.traininglog.adding_exercise.ExerciseDescription;
+import com.dobrowol.traininglog.adding_exercise.ExerciseDescriptionViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
+    private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
+    void setExerciseDescriptions(ArrayList<ExerciseDescription> exerciseDescriptions) {
+        exerciseDescriptionList = exerciseDescriptions;
+    }
+
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
     }
 
     private ArrayList<Exercise> exerciseList;
+    private ArrayList<ExerciseDescription> exerciseDescriptionList;
 
     MyRecyclerViewAdapter() {
         exerciseList = new ArrayList<>();
+        exerciseDescriptionList = new ArrayList<>();
     }
 
-    public void setExerciseList(ArrayList<Exercise> exerciseList){
+    void setExerciseList(ArrayList<Exercise> exerciseList){
         this.exerciseList = exerciseList;
     }
 
-    public ArrayList<Exercise> getExerciseList(){
+    ArrayList<Exercise> getExerciseList(){
         return exerciseList;
     }
     @Override
-    public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
         return new CustomViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
+    public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int i) {
         Exercise textAtPosition = exerciseList.get(i);
         customViewHolder.fillView(textAtPosition);
     }
@@ -56,10 +69,18 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         }
 
         void fillView(Exercise textAtPosition) {
-
-            descriptionText.setText(String.format(Locale.ENGLISH,"%dx( %d x %dm) + %s",
-                    textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
-                    textAtPosition.description));
+            ExerciseDescription ed = null;
+            for(int i = 0; i < exerciseDescriptionList.size(); i++){
+                if(exerciseDescriptionList.get(i).eid == textAtPosition.exerciseDescriptionId){
+                    ed = exerciseDescriptionList.get(i);
+                }
+            }
+            if(ed != null) {
+                descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) + %s",
+                        textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
+                        ed.description
+                ));
+            }
         }
     }
 
@@ -68,7 +89,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return onItemClickListener;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 }

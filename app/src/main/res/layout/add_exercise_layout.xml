@@ -28,7 +28,10 @@
         android:ems="10"
         android:hint="@string/number_of_sets"
         android:inputType="number" />
-    <EditText
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <AutoCompleteTextView
         android:id="@+id/txtDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,7 +39,12 @@
         android:ems="10"
         android:hint="@string/description"
         android:inputType="text" />
-
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnAddDescription"
+            android:background="@android:drawable/ic_input_add"/>
+    </LinearLayout>
     <Button
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
