@@ -1,10 +1,12 @@
-package com.dobrowol.traininglog.adding_exercise;
+package com.dobrowol.traininglog.adding_training.adding_exercise;
 
 
 import android.app.Application;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+
+import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class ExerciseRepository {
     private LiveData<List<Exercise>> mAllExercises;
 
     ExerciseRepository(Application application) {
-        ExerciseRoomDatabase db = ExerciseRoomDatabase.getDatabase(application);
+        TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
         mExerciseDao = db.exerciseDAO();
         mAllExercises = mExerciseDao.getAll();
     }

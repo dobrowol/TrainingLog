@@ -9,19 +9,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.dobrowol.traininglog.adding_exercise.Exercise;
-import com.dobrowol.traininglog.adding_exercise.ExerciseDescription;
-import com.dobrowol.traininglog.adding_exercise.ExerciseDescriptionViewModel;
+import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
-    private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
-    void setExerciseDescriptions(ArrayList<ExerciseDescription> exerciseDescriptions) {
-        exerciseDescriptionList = exerciseDescriptions;
-    }
 
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
@@ -37,6 +31,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     void setExerciseList(ArrayList<Exercise> exerciseList){
         this.exerciseList = exerciseList;
+    }
+
+    void setExerciseDescriptionList(ArrayList<ExerciseDescription> exerciseList){
+        this.exerciseDescriptionList = exerciseList;
     }
 
     ArrayList<Exercise> getExerciseList(){
@@ -71,7 +69,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         void fillView(Exercise textAtPosition) {
             ExerciseDescription ed = null;
             for(int i = 0; i < exerciseDescriptionList.size(); i++){
-                if(exerciseDescriptionList.get(i).eid == textAtPosition.exerciseDescriptionId){
+                if(exerciseDescriptionList.get(i).eid.equalsIgnoreCase(textAtPosition.exerciseDescriptionId)){
                     ed = exerciseDescriptionList.get(i);
                 }
             }

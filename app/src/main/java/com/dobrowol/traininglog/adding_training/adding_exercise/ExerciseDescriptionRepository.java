@@ -1,10 +1,12 @@
-package com.dobrowol.traininglog.adding_exercise;
+package com.dobrowol.traininglog.adding_training.adding_exercise;
 
 
 import android.app.Application;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+
+import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class ExerciseDescriptionRepository {
     private LiveData<List<ExerciseDescription>> mAllExercisesDescriptions;
 
     ExerciseDescriptionRepository(Application application) {
-        ExerciseRoomDatabase db = ExerciseRoomDatabase.getDatabase(application);
+        TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
         mExercisesDescriptionsDao = db.exerciseDescriptionDAO();
         mAllExercisesDescriptions = mExercisesDescriptionsDao.getAll();
     }
@@ -27,8 +29,12 @@ public class ExerciseDescriptionRepository {
         return mExercisesDescriptionsDao.findByDescription(description);
     }
 
-    public void insert (ExerciseDescription word) {
-        new insertAsyncTask(mExercisesDescriptionsDao).execute(word);
+    LiveData<ExerciseDescription> getExerciseDescriptionById(String id) {
+        return mExercisesDescriptionsDao.findById(id);
+    }
+
+    public void insert (ExerciseDescription exerciseDescription) {
+        new insertAsyncTask(mExercisesDescriptionsDao).execute(exerciseDescription);
     }
 
     private static class insertAsyncTask extends AsyncTask<ExerciseDescription, Void, Void> {

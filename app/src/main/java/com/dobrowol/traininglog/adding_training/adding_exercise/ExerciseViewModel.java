@@ -1,4 +1,4 @@
-package com.dobrowol.traininglog.adding_exercise;
+package com.dobrowol.traininglog.adding_training.adding_exercise;
 
 import android.app.Application;
 

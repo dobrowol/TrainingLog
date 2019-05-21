@@ -1,4 +1,4 @@
-package com.dobrowol.traininglog.adding_exercise;
+package com.dobrowol.traininglog.adding_training.adding_exercise;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -6,7 +6,6 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -29,4 +28,7 @@ public interface ExerciseDescriptionDAO {
 
     @Delete
     void delete(ExerciseDescription exerciseDescription);
+
+    @Query("SELECT * FROM exercise_description_table WHERE eid=:id")
+    LiveData<ExerciseDescription> findById(String id);
 }
