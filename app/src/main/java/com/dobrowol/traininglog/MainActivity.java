@@ -1,15 +1,29 @@
 package com.dobrowol.traininglog;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,19 +37,25 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionViewModel;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 
-public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
+        DatePickerDialog.OnDateSetListener{
 
     public static final String TRAINING_ID = "training_id";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
+    public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView generalRecyclerView;
     private RecyclerView specificRecyclerView;
     private RecyclerView competitiveRecyclerView;
@@ -43,19 +63,22 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private MyRecyclerViewAdapter specificAdapter;
     private MyRecyclerViewAdapter competitiveAdapter;
     private MyRecyclerViewAdapter currentAdapter;
+    private TextView dateTxt;
+    private TextView timeTxt;
     ArrayList<Exercise> exerciseList;
     private ExerciseViewModel exerciseViewModel;
     private TrainingViewModel trainingViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private Training training;
     private int numberOfExercises;
-    private ExerciseDescriptionViewModel exerciseDescrptionViewModel;
-
+    private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
         generalRecyclerView = findViewById(R.id.general_rv);
         specificRecyclerView = findViewById(R.id.specific_rv);
@@ -68,30 +91,32 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
-        exerciseDescrptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
+        exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
 
         generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
         specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
         competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
 
         generalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        generalAdapter = new MyRecyclerViewAdapter();
+        generalAdapter = new MyRecyclerViewAdapter(ExerciseType.General);
         generalAdapter.setOnItemClickListener(this);
         generalRecyclerView.setAdapter(generalAdapter);
 
         specificRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        specificAdapter = new MyRecyclerViewAdapter();
+        specificAdapter = new MyRecyclerViewAdapter(ExerciseType.Specific);
         specificAdapter.setOnItemClickListener(this);
         specificRecyclerView.setAdapter(specificAdapter);
 
         competitiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        competitiveAdapter = new MyRecyclerViewAdapter();
+        competitiveAdapter = new MyRecyclerViewAdapter(ExerciseType.Competitive);
         competitiveAdapter.setOnItemClickListener(this);
         competitiveRecyclerView.setAdapter(competitiveAdapter);
 
         currentAdapter=generalAdapter;
 
         initializeTraining();
+        initializeDate();
+        initializeTime();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -101,7 +126,24 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         exerciseList = new ArrayList<>();
     }
+    private void initializeDate(){
+        dateTxt = findViewById(R.id.dateTxt);
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
+        String date = simpleDateFormat.format(new Date());
+        dateTxt.setText(date);
+        dateTxt.setOnClickListener(this);
+    }
+    private void initializeTime(){
+        timeTxt = findViewById(R.id.timeTxt);
+        String pattern = "HH:mm";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        String time = simpleDateFormat.format(new Date());
+        timeTxt.setText(time);
+        timeTxt.setOnClickListener(this);
+    }
     private void initializeTraining(){
         training = new Training();
         training.date = new Date();
@@ -119,17 +161,19 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 }
             }
         });
-        exerciseDescrptionViewModel.getAllExercisesDescriptions().observe(this, new Observer<List<ExerciseDescription>>() {
+        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, new Observer<List<ExerciseDescription>>() {
             @Override
             public void onChanged(@Nullable final List<ExerciseDescription> exercises) {
                 if (exercises != null) {
                     // Update the cached copy of the exercises in the adapter.
                     ArrayList<ExerciseDescription> array = new ArrayList<>(exercises);
-                    currentAdapter.setExerciseDescriptionList(array);
+                    generalAdapter.setExerciseDescriptionList(array);
+                    specificAdapter.setExerciseDescriptionList(array);
+                    competitiveAdapter.setExerciseDescriptionList(array);
                 }
             }
         });
-        trainingViewModel.insert(training);
+
         numberOfExercises = 0;
     }
 
@@ -163,18 +207,35 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.fab:
+                trainingViewModel.insert(training);
                 Intent intent = new Intent(this,AddExercise.class);
                 Bundle bundle = new Bundle();
                 bundle.putString(TRAINING_ID,training.id);
                 bundle.putInt(NUMBER_OF_EXERCISES, numberOfExercises);
+                bundle.putInt(EXERCISE_TYPE, currentAdapter.getExerciseType().ordinal());
                 intent.putExtras(bundle);
                 startActivityForResult(intent,AddExercise.CREATE_EXERCISE);
                 break;
             case R.id.fabSave:
+                String date = dateTxt.getText().toString() +" "+ timeTxt.getText().toString();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                try {
+                    training.date = simpleDateFormat.parse(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 trainingViewModel.update(training);
                 initializeTraining();
                 exerciseList.clear();
                 Toast.makeText(getApplicationContext(),"training saved",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.timeTxt:
+                DialogFragment timePickerFragment = new TimePickerFragment(this);
+                timePickerFragment.show(getSupportFragmentManager(), "timePicker");
+                break;
+            case R.id.dateTxt:
+                DialogFragment datePickerFragment = new DatePickerFragment(this);
+                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
                 break;
         }
 
@@ -210,4 +271,127 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
-}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_list:
+                TrainingList details = new TrainingList();
+                details.show(getSupportFragmentManager(), "timePicker");
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            this.finish();
+        } else {
+            getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.app_bar, menu);
+
+        return true;
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        String time = String.format("%02d::%02d", hourOfDay, minute);
+        timeTxt.setText(time);
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        String date = String.format("%04d-%02d-%02d", year, month, dayOfMonth);
+        dateTxt.setText(date);
+    }
+
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        TimePickerDialog.OnTimeSetListener listener;
+        TimePickerFragment(TimePickerDialog.OnTimeSetListener listener){
+            this.listener = listener;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    android.text.format.DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            listener.onTimeSet(view,hourOfDay,minute);
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        private DatePickerDialog.OnDateSetListener listener;
+
+        DatePickerFragment(DatePickerDialog.OnDateSetListener listener){
+            this.listener = listener;
+        }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            listener.onDateSet(view, year, month, day);
+        }
+    }
+
+    public static class TrainingList extends DialogFragment implements Observer<List<Training>> {
+        private TrainingViewModel trainingViewModel;
+        private ListView trainingListRv;
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.training_list_fragment, container, false);
+
+            trainingListRv = v.findViewById(R.id.training_list_rv);
+            trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
+            trainingViewModel.getAllTrainings().observe(this, this);
+            // Do all the stuff to initialize your custom view
+
+            return v;
+        }
+
+        @Override
+        public void onChanged(List<Training> trainings) {
+                String []dates = new String[trainings.size()];
+                int i = 0;
+                for (Training training : trainings){
+                    String pattern = "yyyy-MM-dd";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+                    dates[i++] = simpleDateFormat.format(training.date);
+                }
+                trainingListRv.setAdapter(new ArrayAdapter<>(getActivity(),
+                        android.R.layout.simple_list_item_activated_1, dates));
+            }
+        }
+    }
+
+

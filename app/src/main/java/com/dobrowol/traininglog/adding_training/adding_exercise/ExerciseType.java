@@ -1,5 +1,5 @@
 package com.dobrowol.traininglog.adding_training.adding_exercise;
 
-enum ExerciseType {
+public enum ExerciseType {
     General, Specific, Competitive
 }

@@ -38,6 +38,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private String exerciseDescriptionId;
     private String trainingId;
     private int numberOfExercises;
+    private ExerciseType exerciseType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +63,18 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
         trainingId = "";
         numberOfExercises = 0;
+        exerciseType = ExerciseType.General;
         Intent intent = getIntent();
-        if (intent != null & intent.hasExtra(MainActivity.TRAINING_ID)) {
-            trainingId = intent.getExtras().getString(MainActivity.TRAINING_ID);
-            numberOfExercises = intent.getExtras().getInt(MainActivity.NUMBER_OF_EXERCISES);
+        if (intent != null ) {
+            if(intent.hasExtra(MainActivity.TRAINING_ID)) {
+                trainingId = intent.getExtras().getString(MainActivity.TRAINING_ID);
+            }
+            if(intent.hasExtra(MainActivity.NUMBER_OF_EXERCISES)){
+                numberOfExercises = intent.getExtras().getInt(MainActivity.NUMBER_OF_EXERCISES);
+            }
+            if(intent.hasExtra(MainActivity.EXERCISE_TYPE)){
+                exerciseType = ExerciseType.values()[intent.getExtras().getInt(MainActivity.EXERCISE_TYPE)];
+            }
         }
     }
 
@@ -79,6 +88,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
             } else {
                 Exercise exercise = new Exercise();
                 exercise.id = UUID.randomUUID().toString();
+                exercise.type = exerciseType;
                 exercise.exerciseDescriptionId = exerciseDescriptionId;
                 exercise.distance = Integer.valueOf(distance.getText().toString());
 

@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
+    private ExerciseType exerciseType;
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
     }
@@ -24,13 +27,20 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private ArrayList<Exercise> exerciseList;
     private ArrayList<ExerciseDescription> exerciseDescriptionList;
 
-    MyRecyclerViewAdapter() {
+    MyRecyclerViewAdapter(ExerciseType exerciseType) {
+        this.exerciseType = exerciseType;
         exerciseList = new ArrayList<>();
         exerciseDescriptionList = new ArrayList<>();
     }
 
     void setExerciseList(ArrayList<Exercise> exerciseList){
-        this.exerciseList = exerciseList;
+        this.exerciseList.clear();
+        for(Exercise ex : exerciseList){
+            if(ex.type.equals(exerciseType)) {
+                this.exerciseList.add(ex);
+            }
+        }
+
     }
 
     void setExerciseDescriptionList(ArrayList<ExerciseDescription> exerciseList){
@@ -56,7 +66,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         return (null != exerciseList ? exerciseList.size() : 0);
     }
-
+    public ExerciseType getExerciseType(){
+        return exerciseType;
+    }
     class CustomViewHolder extends RecyclerView.ViewHolder {
 
         TextView descriptionText;
