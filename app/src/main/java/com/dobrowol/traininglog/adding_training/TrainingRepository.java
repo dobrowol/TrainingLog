@@ -43,6 +43,12 @@ public class TrainingRepository {
         new updateAsyncTask(trainingDAO).execute(training);
     }
 
+    public void delete(Training training) {
+
+        new deleteAsyncTask(trainingDAO).execute(training);
+
+    }
+
     private static class insertAsyncTask extends AsyncTask<Training, Void, Void> {
 
         private TrainingDAO mAsyncTaskDao;
@@ -69,6 +75,21 @@ public class TrainingRepository {
         @Override
         protected Void doInBackground(final Training... params) {
             mAsyncTaskDao.updateTask(params[0]);
+            return null;
+        }
+    }
+
+    private static class deleteAsyncTask extends AsyncTask<Training, Void, Void> {
+
+        private TrainingDAO mAsyncTaskDao;
+
+        deleteAsyncTask(TrainingDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Training... params) {
+            mAsyncTaskDao.delete(params[0]);
             return null;
         }
     }

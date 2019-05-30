@@ -23,6 +23,8 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
 
     public interface OnItemClickListener {
         void onItemClick(Training item);
+
+        void onItemRemove(Training training);
     }
 
     private OnItemClickListener listener;
@@ -73,7 +75,9 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
             this.descriptionText = view.findViewById(R.id.description);
             this.btnRemove = view.findViewById(R.id.btnAction);
             btnRemove.setVisibility(View.VISIBLE);
+            btnRemove.setText("Remove");
             view.setOnClickListener(this);
+            btnRemove.setOnClickListener(this);
         }
 
         void fillView(Training textAtPosition) {
@@ -85,7 +89,15 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
 
         @Override
         public void onClick(View v) {
-            listener.onItemClick(training);
+            switch (v.getId()){
+                case R.id.description:
+                    listener.onItemClick(training);
+                    break;
+                case R.id.btnAction:
+                    listener.onItemRemove(training);
+                    break;
+            }
+
         }
     }
 

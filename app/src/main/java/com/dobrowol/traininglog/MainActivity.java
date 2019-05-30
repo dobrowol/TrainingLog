@@ -318,8 +318,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void onItemClick(Training item) {
         detailsDialog.dismiss();
-        Toast.makeText(getApplicationContext(),"here we go again", Toast.LENGTH_SHORT).show();
         trainingExerciseJoinViewModel.getAllExercisesForTraining(item.id).observe(this, this);
+    }
+
+    @Override
+    public void onItemRemove(Training training) {
+        detailsDialog.dismiss();
+        trainingViewModel.delete(training);
     }
 
     @Override

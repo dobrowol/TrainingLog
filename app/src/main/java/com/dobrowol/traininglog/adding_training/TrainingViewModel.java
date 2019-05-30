@@ -29,5 +29,9 @@ public class TrainingViewModel extends AndroidViewModel {
     public void update(Training training) { mRepository.update(training);
 
     }
+
+    public void delete(Training training) {
+        mRepository.delete(training);
+    }
 }
 
