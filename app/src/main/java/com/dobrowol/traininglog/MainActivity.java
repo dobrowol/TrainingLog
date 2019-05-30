@@ -51,7 +51,7 @@ import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener{
+        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>> {
 
     public static final String TRAINING_ID = "training_id";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private Training training;
     private int numberOfExercises;
+    TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,8 +277,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_list:
-                TrainingList details = new TrainingList();
-                details.show(getSupportFragmentManager(), "timePicker");
+                detailsDialog = new TrainingList(this);
+                detailsDialog.show(getSupportFragmentManager(), "timePicker");
                 return true;
 
             default:
@@ -312,6 +313,21 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         String date = String.format("%04d-%02d-%02d", year, month, dayOfMonth);
         dateTxt.setText(date);
+    }
+
+    @Override
+    public void onItemClick(Training item) {
+        detailsDialog.dismiss();
+        Toast.makeText(getApplicationContext(),"here we go again", Toast.LENGTH_SHORT).show();
+        trainingExerciseJoinViewModel.getAllExercisesForTraining(item.id).observe(this, this);
+    }
+
+    @Override
+    public void onChanged(List<Exercise> exercises) {
+       ArrayList ex = new ArrayList(exercises);
+        generalAdapter.setExerciseList(ex);
+        specificAdapter.setExerciseList(ex);
+        competitiveAdapter.setExerciseList(ex);
     }
 
     public static class TimePickerFragment extends DialogFragment
@@ -360,7 +376,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     public static class TrainingList extends DialogFragment implements Observer<List<Training>> {
         private TrainingViewModel trainingViewModel;
-        private ListView trainingListRv;
+        private RecyclerView trainingListRv;
+        private TrainingListViewAdapter.OnItemClickListener listener;
+
+        TrainingList(TrainingListViewAdapter.OnItemClickListener listener){
+            this.listener = listener;
+        }
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -380,16 +401,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         @Override
         public void onChanged(List<Training> trainings) {
-                String []dates = new String[trainings.size()];
-                int i = 0;
-                for (Training training : trainings){
-                    String pattern = "yyyy-MM-dd";
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-                    dates[i++] = simpleDateFormat.format(training.date);
-                }
-                trainingListRv.setAdapter(new ArrayAdapter<>(getActivity(),
-                        android.R.layout.simple_list_item_activated_1, dates));
+            trainingListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+            TrainingListViewAdapter generalAdapter = new TrainingListViewAdapter(listener);
+            generalAdapter.setOnItemClickListener(listener);
+            generalAdapter.setTrainings(new ArrayList<>(trainings));
+            trainingListRv.setAdapter(generalAdapter);
             }
         }
     }

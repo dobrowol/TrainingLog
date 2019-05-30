@@ -1,6 +1,5 @@
 package com.dobrowol.traininglog;
 
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.function.Predicate;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
