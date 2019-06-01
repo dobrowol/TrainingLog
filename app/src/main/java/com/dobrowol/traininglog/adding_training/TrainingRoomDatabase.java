@@ -13,7 +13,7 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDAO;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionDAO;
 
-@Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class}, version = 3)
+@Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class}, version = 4)
 @TypeConverters({Converters.class})
 public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract ExerciseDescriptionDAO exerciseDescriptionDAO();

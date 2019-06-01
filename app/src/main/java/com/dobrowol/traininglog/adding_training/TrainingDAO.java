@@ -28,5 +28,8 @@ public interface TrainingDAO {
 
     @Update
     void updateTask(Training training);
+
+    @Query("SELECT * FROM training_table WHERE id=:trainingId")
+    LiveData<Training> findTrainingById(String trainingId);
 }
 

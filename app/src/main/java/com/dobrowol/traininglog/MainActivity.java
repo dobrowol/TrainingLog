@@ -39,7 +39,6 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.ParseException;
@@ -54,7 +53,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
         DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>> {
 
-    public static final String TRAINING_ID = "training_id";
+    public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
     public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView generalRecyclerView;
@@ -78,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
 
         generalRecyclerView = findViewById(R.id.general_rv);
         specificRecyclerView = findViewById(R.id.specific_rv);
@@ -155,8 +152,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 if (exercises != null) {
                     ArrayList<Exercise> array = new ArrayList<>(exercises);
                     numberOfExercises = array.size();
-                    currentAdapter.setExerciseList(array);
-                    currentAdapter.notifyDataSetChanged();
+                    generalAdapter.setExerciseList(array);
+                    specificAdapter.setExerciseList(array);
+                    competitiveAdapter.setExerciseList(array);
+
+                    generalAdapter.notifyDataSetChanged();
+                    specificAdapter.notifyDataSetChanged();
+                    competitiveAdapter.notifyDataSetChanged();
 
                 }
             }
@@ -212,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
                 Intent intent = new Intent(this,AddExercise.class);
                 Bundle bundle = new Bundle();
-                bundle.putString(TRAINING_ID,training.id);
+                bundle.putSerializable(TRAINING,training);
                 bundle.putInt(NUMBER_OF_EXERCISES, numberOfExercises);
                 bundle.putInt(EXERCISE_TYPE, currentAdapter.getExerciseType().ordinal());
                 intent.putExtras(bundle);

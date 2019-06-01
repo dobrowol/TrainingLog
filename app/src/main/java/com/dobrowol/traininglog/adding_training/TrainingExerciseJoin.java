@@ -7,14 +7,18 @@ import androidx.room.Index;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
+import static androidx.room.ForeignKey.CASCADE;
+
 @Entity(indices = {@Index("exerciseId"), @Index("trainingId")},
         tableName = "training_exercise_join",
         primaryKeys = { "exerciseId", "trainingId" },
         foreignKeys = {
-                @ForeignKey(entity = Exercise.class,
+                @ForeignKey(onDelete = CASCADE,
+                        entity = Exercise.class,
                         parentColumns = "id",
                         childColumns = "exerciseId"),
-                @ForeignKey(entity = Training.class,
+                @ForeignKey(onDelete = CASCADE,
+                        entity = Training.class,
                         parentColumns = "id",
                         childColumns = "trainingId")
         })

@@ -62,6 +62,7 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
     public int getItemCount() {
         return (null != trainings ? trainings.size() : 0);
     }
+
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView descriptionText;
@@ -91,6 +92,7 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.description:
+                case R.id.list_row:
                     listener.onItemClick(training);
                     break;
                 case R.id.btnAction:

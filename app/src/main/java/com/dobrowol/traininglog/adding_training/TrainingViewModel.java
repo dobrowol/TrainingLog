@@ -33,5 +33,9 @@ public class TrainingViewModel extends AndroidViewModel {
     public void delete(Training training) {
         mRepository.delete(training);
     }
+
+    public LiveData<Training> getTraining(String trainingId) {
+        return mRepository.getTrainingById(trainingId);
+    }
 }
 

@@ -10,15 +10,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.MainActivity;
 import com.dobrowol.traininglog.R;
+import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoin;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +34,15 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     AutoCompleteTextView description;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
+    private TrainingViewModel trainingViewModel;
     private ExerciseViewModel exerciseViewModel;
     private ArrayList<ExerciseDescription> exerciseDescription;
     private String exerciseDescriptionId;
-    private String trainingId;
+    private Training training;
     private int numberOfExercises;
     private ExerciseType exerciseType;
+    private TrainingExerciseJoin trainingExerciseJoin;
+    private Exercise exercise;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +62,17 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
+        trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
 
         exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, this);
 
-        trainingId = "";
+        training = new Training();
         numberOfExercises = 0;
         exerciseType = ExerciseType.General;
         Intent intent = getIntent();
         if (intent != null ) {
-            if(intent.hasExtra(MainActivity.TRAINING_ID)) {
-                trainingId = intent.getExtras().getString(MainActivity.TRAINING_ID);
+            if(intent.hasExtra(MainActivity.TRAINING)) {
+                training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
             }
             if(intent.hasExtra(MainActivity.NUMBER_OF_EXERCISES)){
                 numberOfExercises = intent.getExtras().getInt(MainActivity.NUMBER_OF_EXERCISES);
@@ -86,7 +91,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
             if (distance.getText().toString().isEmpty() || numberOfRepetitions.getText().toString().isEmpty()  || description.getText().toString().isEmpty()) {
                 result.setText(R.string.WarningSomeEmpty);
             } else {
-                Exercise exercise = new Exercise();
+                exercise = new Exercise();
                 exercise.id = UUID.randomUUID().toString();
                 exercise.type = exerciseType;
                 exercise.exerciseDescriptionId = exerciseDescriptionId;
@@ -98,15 +103,26 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                 }
                 exerciseViewModel.insert(exercise);
                 int nextExercise = numberOfExercises+1;
-                TrainingExerciseJoin trainingExerciseJoin = new TrainingExerciseJoin(exercise.id, trainingId, nextExercise);
+                trainingExerciseJoin = new TrainingExerciseJoin(exercise.id, training.id, nextExercise);
+                trainingViewModel.getTraining(training.id).observe(this, new Observer<Training>() {
+                    @Override
+                    public void onChanged(Training t) {
+                        if(t == null){
+                            trainingViewModel.insert(training);
+                        }
+                        trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
+                        Intent intent = new Intent();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(REQUESTED_CODE, exercise);
+                        intent.putExtras(bundle);
+                        setResult(RESULT_OK, intent);
+                        finish();
 
-                trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
-                Intent intent = new Intent();
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(REQUESTED_CODE, exercise);
-                intent.putExtras(bundle);
-                setResult(RESULT_OK, intent);
-                finish();
+                    }
+                });
+
+
+
             }
             break;
             case R.id.btnAddDescription:
@@ -145,5 +161,10 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         exerciseDescriptionId = exerciseDescription.get(position).eid;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }
