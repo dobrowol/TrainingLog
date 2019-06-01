@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private TextView dateTxt;
     private TextView timeTxt;
     ArrayList<Exercise> exerciseList;
-    private ExerciseViewModel exerciseViewModel;
     private TrainingViewModel trainingViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private Training training;
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         specificRecyclerView.setOnTouchListener(this);
         competitiveRecyclerView.setOnTouchListener(this);
 
-        exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
@@ -176,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         });
 
         numberOfExercises = 0;
+        trainingViewModel.insert(training);
     }
 
     @Override
@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 break;
         }
         exerciseList = currentAdapter.getExerciseList();
+        view.performClick();
         return false;
     }
 
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.fab:
-                trainingViewModel.insert(training);
+
                 Intent intent = new Intent(this,AddExercise.class);
                 Bundle bundle = new Bundle();
                 bundle.putString(TRAINING_ID,training.id);
@@ -329,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onChanged(List<Exercise> exercises) {
-       ArrayList ex = new ArrayList(exercises);
+       ArrayList<Exercise> ex = new ArrayList(exercises);
         generalAdapter.setExerciseList(ex);
         specificAdapter.setExerciseList(ex);
         competitiveAdapter.setExerciseList(ex);
@@ -365,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             this.listener = listener;
         }
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
+        public Dialog onCreateDialog( Bundle savedInstanceState) {
             final Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
@@ -393,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.training_list_fragment, container, false);
 
             trainingListRv = v.findViewById(R.id.training_list_rv);

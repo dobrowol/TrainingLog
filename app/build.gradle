@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.chaquo.python'
 
 android {
     compileSdkVersion 28
@@ -14,9 +13,6 @@ android {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
-        }
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
         }
     }
     buildTypes {
