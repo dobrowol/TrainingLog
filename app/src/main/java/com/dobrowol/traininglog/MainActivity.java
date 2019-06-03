@@ -152,13 +152,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 if (exercises != null) {
                     ArrayList<Exercise> array = new ArrayList<>(exercises);
                     numberOfExercises = array.size();
-                    generalAdapter.setExerciseList(array);
-                    specificAdapter.setExerciseList(array);
-                    competitiveAdapter.setExerciseList(array);
-
-                    generalAdapter.notifyDataSetChanged();
-                    specificAdapter.notifyDataSetChanged();
-                    competitiveAdapter.notifyDataSetChanged();
+                    setExercises(array);
 
                 }
             }
@@ -326,16 +320,23 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onItemRemove(Training training) {
-        detailsDialog.dismiss();
         trainingViewModel.delete(training);
     }
 
     @Override
     public void onChanged(List<Exercise> exercises) {
        ArrayList<Exercise> ex = new ArrayList(exercises);
+        setExercises(ex);
+    }
+
+    private void setExercises(ArrayList<Exercise> ex) {
         generalAdapter.setExerciseList(ex);
         specificAdapter.setExerciseList(ex);
         competitiveAdapter.setExerciseList(ex);
+
+        generalAdapter.notifyDataSetChanged();
+        specificAdapter.notifyDataSetChanged();
+        competitiveAdapter.notifyDataSetChanged();
     }
 
     public static class TimePickerFragment extends DialogFragment

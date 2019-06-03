@@ -29,6 +29,7 @@ public class TrainingExerciseJoin {
     @NonNull
     public String trainingId;
     public int order;
+    public int value;
 
     public TrainingExerciseJoin(String exerciseId, String trainingId, int order) {
         this.exerciseId = exerciseId;

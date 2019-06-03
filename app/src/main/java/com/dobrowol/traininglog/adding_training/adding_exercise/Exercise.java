@@ -30,7 +30,7 @@ public class Exercise implements Serializable, Parcelable {
     public ExerciseType type;
     public int totalDistance;
     public int distance;
-    public int intensity;
+    public Intensity intensity;
     public int restBetweenSets;
     public int restBetweenSeries;
     public int workInterval;
@@ -44,7 +44,7 @@ public class Exercise implements Serializable, Parcelable {
         exerciseDescriptionId = in.readString();
         type = (ExerciseType) in.readSerializable();
         distance = in.readInt();
-        intensity = in.readInt();
+        intensity = (Intensity) in.readSerializable();
         totalDistance = in.readInt();
         restBetweenSets = in.readInt();
         restBetweenSeries = in.readInt();
@@ -77,7 +77,7 @@ public class Exercise implements Serializable, Parcelable {
         parcel.writeString(exerciseDescriptionId);
         parcel.writeSerializable(type);
         parcel.writeInt(distance);
-        parcel.writeInt(intensity);
+        parcel.writeSerializable(intensity);
         parcel.writeInt(totalDistance);
         parcel.writeInt(restBetweenSets);
         parcel.writeInt(restBetweenSeries);

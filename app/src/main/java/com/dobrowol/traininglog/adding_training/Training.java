@@ -19,10 +19,18 @@ public class Training implements Serializable, Parcelable {
 
     public Date date;
 
+    public Integer general_load;
+
+    public Integer specific_load;
+
+    public Integer competitive_load;
+
     protected Training(Parcel in) {
         id = in.readString();
         date = (Date) in.readSerializable();
-
+        general_load = in.readInt();
+        specific_load = in.readInt();
+        competitive_load = in.readInt();
     }
 
     public static final Creator<Training> CREATOR = new Creator<Training>() {
@@ -46,6 +54,9 @@ public class Training implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeSerializable(date);
+        parcel.writeInt(general_load);
+        parcel.writeInt(specific_load);
+        parcel.writeInt(competitive_load);
 
     }
     public Training(){
