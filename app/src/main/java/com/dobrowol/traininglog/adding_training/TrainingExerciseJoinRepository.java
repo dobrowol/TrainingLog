@@ -27,6 +27,9 @@ public class TrainingExerciseJoinRepository {
         return trainingExerciseJoinDAO.getExercisesForTraining(trainingId);
     }
 
+    LiveData<List<Training>> getAllTrainingsForExercise(String exerciseId) {
+        return trainingExerciseJoinDAO.getTrainingsForExercise(exerciseId);
+    }
 
     public void insert (TrainingExerciseJoin exercise) {
         new insertAsyncTask(trainingExerciseJoinDAO).execute(exercise);

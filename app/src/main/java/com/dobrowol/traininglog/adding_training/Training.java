@@ -4,11 +4,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity(tableName = "training_table")
@@ -19,12 +24,22 @@ public class Training implements Serializable, Parcelable {
 
     public Date date;
 
+    @ColumnInfo(name = "general_load")
     public Integer general_load;
 
+    @ColumnInfo(name = "specific_load")
     public Integer specific_load;
 
+    @ColumnInfo(name = "competitive_load")
     public Integer competitive_load;
 
+    public Training(String id, Date date, Integer general_load, Integer specific_load, Integer competitive_load){
+        this.id = id;
+        this.date = date;
+        this.general_load = general_load;
+        this.specific_load = specific_load;
+        this.competitive_load = competitive_load;
+    }
     protected Training(Parcel in) {
         id = in.readString();
         date = (Date) in.readSerializable();
@@ -60,5 +75,26 @@ public class Training implements Serializable, Parcelable {
 
     }
     public Training(){
+    }
+
+    public void calculateLoads(List<Exercise> exerciseList){
+
+        general_load = 0;
+        specific_load = 0;
+        competitive_load = 0;
+        for(Exercise exercise : exerciseList){
+            switch (exercise.type){
+                case General:
+                    general_load += exercise.loadValue;
+                    break;
+                case Specific:
+                    specific_load += exercise.loadValue;
+                    break;
+                case Competitive:
+                    competitive_load += exercise.loadValue;
+            }
+
+        }
+
     }
 }

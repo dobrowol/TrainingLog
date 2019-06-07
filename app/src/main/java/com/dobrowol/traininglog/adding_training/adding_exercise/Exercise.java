@@ -11,6 +11,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import static androidx.room.ForeignKey.CASCADE;
 
@@ -37,8 +38,31 @@ public class Exercise implements Serializable, Parcelable {
     public int numberOfRepetitionsInSet;
     public int numberOfSetsInSeries;
     public int numberOfSeries;
+    public int loadValue;
+    public Date startDate;
 
+    public Exercise(String id, ExerciseType type, int distance, Intensity intensity, String descritpionId, int numberOfRepetitionsInSet,
+                    int numberOfSetsInSeries, Date startDate){
+        this.id = id;
+        this.type = type;
+        this.distance = distance;
+        this.intensity = intensity;
+        this.exerciseDescriptionId = descritpionId;
+        this.numberOfRepetitionsInSet = numberOfRepetitionsInSet;
+        this.numberOfSetsInSeries = numberOfSetsInSeries;
+        this.startDate = startDate;
 
+        if (numberOfSeries <= 0){numberOfSeries = 1;}
+        if(this.numberOfRepetitionsInSet <= 0){this.numberOfRepetitionsInSet = 1;}
+        if(this.numberOfSetsInSeries <=0){this.numberOfSetsInSeries = 1;}
+    }
+
+    public void calculateLoad(){
+        loadValue = this.distance*this.numberOfSeries*this.numberOfSetsInSeries*numberOfRepetitionsInSet *(this.intensity.ordinal()+1);
+    }
+    public void neurologicalBoost(){
+        loadValue *= 8;
+    }
     protected Exercise(Parcel in) {
         id = in.readString();
         exerciseDescriptionId = in.readString();
@@ -52,6 +76,8 @@ public class Exercise implements Serializable, Parcelable {
         numberOfRepetitionsInSet = in.readInt();
         numberOfSetsInSeries = in.readInt();
         numberOfSeries = in.readInt();
+        loadValue = in.readInt();
+        startDate = (Date) in.readSerializable();
     }
 
     public static final Creator<Exercise> CREATOR = new Creator<Exercise>() {
@@ -85,6 +111,8 @@ public class Exercise implements Serializable, Parcelable {
         parcel.writeInt(numberOfRepetitionsInSet);
         parcel.writeInt(numberOfSetsInSeries);
         parcel.writeInt(numberOfSeries);
+        parcel.writeInt(loadValue);
+        parcel.writeSerializable(startDate);
 
     }
     public Exercise(){

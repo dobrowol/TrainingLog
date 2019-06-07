@@ -7,12 +7,12 @@ import java.util.Date;
 public class Converters {
     public static final String DATE_FORMAT="YYYY-mm-dd";
     @TypeConverter
-    public static Specificity fromTimestamp(Integer value) {
+    private static Specificity fromTimestamp(Integer value) {
         return value == null ? null : Specificity.values()[value];
     }
 
     @TypeConverter
-    public static Integer dateToTimestamp(Specificity specificity) {
+    private static Integer dateToTimestamp(Specificity specificity) {
         return specificity == null ? null : specificity.ordinal();
     }
 
@@ -22,7 +22,7 @@ public class Converters {
     }
 
     @TypeConverter
-    public static Integer fromExerciseTypeToInteger(ExerciseType exerciseType) {
+    private static Integer fromExerciseTypeToInteger(ExerciseType exerciseType) {
         return exerciseType == null ? null : exerciseType.ordinal();
     }
 
@@ -34,5 +34,15 @@ public class Converters {
     @TypeConverter
     public static Long dateToTimestamp(Date date) {
         return date == null ? null : date.getTime();
+    }
+
+    @TypeConverter
+    public static Intensity fromIntegerToIntensity(Integer value) {
+        return value == null ? null : Intensity.values()[value];
+    }
+
+    @TypeConverter
+    public static Integer fromIntensityToInteger(Intensity intensity) {
+        return intensity == null ? null : intensity.ordinal();
     }
 }

@@ -7,7 +7,6 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,9 +19,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -39,6 +36,9 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
+import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
+import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.ParseException;
@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private int numberOfExercises;
     TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
+    private ExerciseViewModel exerciseViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
+        exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
+
 
         generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
         specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
@@ -153,7 +156,9 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                     ArrayList<Exercise> array = new ArrayList<>(exercises);
                     numberOfExercises = array.size();
                     setExercises(array);
-
+                    TrainingLoad trainingLoad = new TrainingLoad(training, trainingViewModel,
+                            exerciseViewModel, trainingExerciseJoinViewModel, MainActivity.this);
+                    trainingLoad.calculate(exercises);
                 }
             }
         });
@@ -240,12 +245,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-
-    }
-
-    @Override
     public void onItemClick(Exercise item) {
 
     }
@@ -277,7 +276,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 detailsDialog = new TrainingList(this);
                 detailsDialog.show(getSupportFragmentManager(), "timePicker");
                 return true;
-
+            case R.id.action_chart:
+                Intent intent = new Intent(this, ChartActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 

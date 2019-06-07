@@ -3,7 +3,7 @@
     package="com.dobrowol.traininglog">
 
     <application
-        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        android:theme="@style/Theme.AppCompat"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,17 +18,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".adding_training.adding_exercise.AddExercise" android:theme="@style/Theme.AppCompat">
-            <intent-filter>
-                <action android:name="android.intent.action.AddExercie" />
 
-            </intent-filter>
         </activity>
 
         <activity android:name=".adding_training.adding_exercise.AddExerciseDescription" android:theme="@style/Theme.AppCompat">
-            <intent-filter>
-                <action android:name="android.intent.action.AddExercie" />
 
-            </intent-filter>
+        </activity>
+
+        <activity android:name=".training_load.displaying.ChartActivity" android:theme="@style/Theme.AppCompat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
         </activity>
     </application>
 

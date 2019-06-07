@@ -12,14 +12,16 @@
         android:ems="10"
         android:hint="@string/distance"
         android:inputType="number"
-        android:selectAllOnFocus="true" />
+        android:selectAllOnFocus="true"
+        android:importantForAutofill="no" />
     <EditText
         android:id="@+id/txtNumberOfRepetitions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/number_of_repetitions"
-        android:inputType="number" />
+        android:inputType="number"
+        android:importantForAutofill="no" />
 
     <EditText
         android:id="@+id/txtNumberOfSets"
@@ -27,7 +29,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/number_of_sets"
-        android:inputType="number" />
+        android:inputType="number"
+        android:importantForAutofill="no" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -45,6 +48,14 @@
             android:id="@+id/btnAddDescription"
             android:background="@android:drawable/ic_input_add"/>
     </LinearLayout>
+    <EditText
+        android:id="@+id/txtIntensity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/intensity_from_1_to_5"
+        android:inputType="number"
+        android:importantForAutofill="no" />
     <Button
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
@@ -52,11 +63,6 @@
         android:text="@string/submit"
         android:textSize="16sp"
         android:textStyle="normal|bold" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/resultView"
-        android:layout_marginTop="25dp"
-        android:textSize="15sp"/>
+
 
 </LinearLayout>

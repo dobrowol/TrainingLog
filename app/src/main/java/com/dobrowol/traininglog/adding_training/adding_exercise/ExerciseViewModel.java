@@ -24,5 +24,8 @@ public class ExerciseViewModel extends AndroidViewModel {
     public LiveData<ExerciseDescription> getExerciseDescription(String description) {return mRepository.getExerciseDescription(description);}
 
     public void insert(Exercise exercise) { mRepository.insert(exercise); }
+
+    public void update(Exercise exercise) { mRepository.update(exercise); }
+
 }
 

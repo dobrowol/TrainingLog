@@ -33,6 +33,10 @@ public class ExerciseRepository {
         new insertAsyncTask(mExerciseDao).execute(exercise);
     }
 
+    public void update(Exercise exercise) {
+        new updateAsyncTask(mExerciseDao).execute(exercise);
+    }
+
     private static class insertAsyncTask extends AsyncTask<Exercise, Void, Void> {
 
         private ExerciseDAO mAsyncTaskDao;
@@ -44,6 +48,20 @@ public class ExerciseRepository {
         @Override
         protected Void doInBackground(final Exercise... params) {
             mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+    private static class updateAsyncTask extends AsyncTask<Exercise, Void, Void> {
+
+        private ExerciseDAO mAsyncTaskDao;
+
+        updateAsyncTask(ExerciseDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Exercise... params) {
+            mAsyncTaskDao.update(params[0]);
             return null;
         }
     }
