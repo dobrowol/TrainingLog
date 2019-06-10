@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.dobrowol.traininglog.R;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.dobrowol.traininglog.holt_winters.HoltWinters;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -49,6 +50,8 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
     private SeekBar seekBarX, seekBarY;
     private TextView tvX, tvY;
     private TrainingViewModel trainingViewModel;
+    private HoltWinters holtWinters;
+    private int seasonLength;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         trainingViewModel.getAllGeneralLoads().observe(this, new Observer<List<Integer>>() {
             @Override
             public void onChanged(List<Integer> integers) {
-                setData(integers);
+                setData(integers, "General Load");
             }
         });
 
@@ -180,16 +183,29 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
         // draw legend entries as lines
         l.setForm(Legend.LegendForm.LINE);
+
+        seasonLength = 12;
+        holtWinters = new HoltWinters(new ArrayList<Double>(), seasonLength);
     }
 
-    private void setData(List<Integer> integers) {
+    private void setData(List<Integer> integers, String load_name) {
 
         ArrayList<Entry> values = new ArrayList<>();
+        ArrayList<Double> forecastedValues = new ArrayList<>();
+        ArrayList<Entry> forecastedEntries = new ArrayList<>();
 
         for (int i = 0; i < integers.size(); i++) {
             values.add(new Entry(i, integers.get(i), getResources().getDrawable(R.drawable.star)));
         }
+        if(integers.size() >= seasonLength){
+            holtWinters.setSeries(integers);
+            forecastedValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
+            for (int i = integers.size(); i < integers.size() + forecastedValues.size(); i++) {
+                forecastedEntries.add(new Entry(i, forecastedValues.get(i).floatValue(), getResources().getDrawable(R.drawable.star)));
+            }
+        }
         LineDataSet set1;
+        LineDataSet forecastedSet;
 
         if (chart.getData() != null &&
                 chart.getData().getDataSetCount() > 0) {
@@ -200,62 +216,72 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
             chart.notifyDataSetChanged();
         } else {
             // create a dataset and give it a type
-            set1 = new LineDataSet(values, "DataSet 1");
+            set1 = getLineDataSet(load_name, values);
 
-
-
-            // draw dashed line
-            set1.enableDashedLine(10f, 5f, 0f);
-
-            // black lines and points
-            set1.setColor(Color.BLACK);
-            set1.setCircleColor(Color.BLACK);
-
-            // line thickness and point size
-            set1.setLineWidth(1f);
-            set1.setCircleRadius(3f);
-
-            // draw points as solid circles
-            set1.setDrawCircleHole(false);
-
-            // customize legend entry
-            set1.setFormLineWidth(1f);
-            set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
-            set1.setFormSize(15.f);
-
-            // text size of values
-            set1.setValueTextSize(9f);
-
-            // draw selection line as dashed
-            set1.enableDashedHighlightLine(10f, 5f, 0f);
-
-            // set the filled area
-            set1.setDrawFilled(true);
-            set1.setFillFormatter(new IFillFormatter() {
-                @Override
-                public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                    return chart.getAxisLeft().getAxisMinimum();
-                }
-            });
-
-            // set color of filled area
-            if (Utils.getSDKInt() >= 18) {
-                // drawables only supported on api level 18 and above
-                Drawable drawable = ContextCompat.getDrawable(this, R.drawable.fade_red);
-                set1.setFillDrawable(drawable);
-            } else {
-                set1.setFillColor(Color.BLACK);
-            }
 
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the data sets
 
+            if(!forecastedValues.isEmpty()){
+                forecastedSet = getLineDataSet("Forecasted Load", forecastedEntries);
+                dataSets.add(forecastedSet);
+            }
             // create a data object with the data sets
             LineData data = new LineData(dataSets);
 
             // set data
             chart.setData(data);
         }
+    }
+
+    private LineDataSet getLineDataSet(String load_name, ArrayList<Entry> values) {
+        LineDataSet set1;
+        set1 = new LineDataSet(values, load_name);
+
+
+        // draw dashed line
+        set1.enableDashedLine(10f, 5f, 0f);
+
+        // black lines and points
+        set1.setColor(Color.BLACK);
+        set1.setCircleColor(Color.BLACK);
+
+        // line thickness and point size
+        set1.setLineWidth(1f);
+        set1.setCircleRadius(3f);
+
+        // draw points as solid circles
+        set1.setDrawCircleHole(false);
+
+        // customize legend entry
+        set1.setFormLineWidth(1f);
+        set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
+        set1.setFormSize(15.f);
+
+        // text size of values
+        set1.setValueTextSize(9f);
+
+        // draw selection line as dashed
+        set1.enableDashedHighlightLine(10f, 5f, 0f);
+
+        // set the filled area
+        set1.setDrawFilled(true);
+        set1.setFillFormatter(new IFillFormatter() {
+            @Override
+            public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+                return chart.getAxisLeft().getAxisMinimum();
+            }
+        });
+
+        // set color of filled area
+        if (Utils.getSDKInt() >= 18) {
+            // drawables only supported on api level 18 and above
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.fade_red);
+            set1.setFillDrawable(drawable);
+        } else {
+            set1.setFillColor(Color.BLACK);
+        }
+        return set1;
     }
 
     @Override

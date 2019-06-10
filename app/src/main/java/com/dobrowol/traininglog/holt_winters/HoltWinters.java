@@ -1,7 +1,9 @@
 package com.dobrowol.traininglog.holt_winters;
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HoltWinters {
 
@@ -74,5 +76,11 @@ public class HoltWinters {
 
         }
         return result;
+    }
+
+    public void setSeries(List<Integer> integers) {
+        for(Integer integer : integers){
+            series.add(Double.valueOf(integer));
+        }
     }
 }

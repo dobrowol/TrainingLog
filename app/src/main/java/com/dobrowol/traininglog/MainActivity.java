@@ -121,9 +121,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
-        FloatingActionButton fabSave = findViewById(R.id.fabSave);
-        fabSave.setOnClickListener(this);
-
         exerciseList = new ArrayList<>();
     }
     private void initializeDate(){
@@ -219,19 +216,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 intent.putExtras(bundle);
                 startActivityForResult(intent,AddExercise.CREATE_EXERCISE);
                 break;
-            case R.id.fabSave:
-                String date = dateTxt.getText().toString() +" "+ timeTxt.getText().toString();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                try {
-                    training.date = simpleDateFormat.parse(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                trainingViewModel.update(training);
-                initializeTraining();
-                exerciseList.clear();
-                Toast.makeText(getApplicationContext(),"training saved",Toast.LENGTH_SHORT).show();
-                break;
+
             case R.id.timeTxt:
                 DialogFragment timePickerFragment = new TimePickerFragment(this);
                 timePickerFragment.show(getSupportFragmentManager(), "timePicker");
@@ -280,6 +265,9 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 Intent intent = new Intent(this, ChartActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.new_training:
+                initializeTraining();
+                exerciseList.clear();
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -306,12 +294,25 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         String time = String.format("%02d::%02d", hourOfDay, minute);
         timeTxt.setText(time);
+        updateTrainingDate();
+    }
+
+    private void updateTrainingDate() {
+        String date = dateTxt.getText().toString() +" "+ timeTxt.getText().toString();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            training.date = simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        trainingViewModel.update(training);
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         String date = String.format("%04d-%02d-%02d", year, month, dayOfMonth);
         dateTxt.setText(date);
+        updateTrainingDate();
     }
 
     @Override

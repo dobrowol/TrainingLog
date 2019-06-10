@@ -9,7 +9,6 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 
 import java.io.Serializable;
 import java.util.Date;

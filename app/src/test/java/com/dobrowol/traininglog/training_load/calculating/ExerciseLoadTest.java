@@ -66,7 +66,7 @@ public class ExerciseLoadTest {
         exerciseLoad.calculate(list);
 
         int neurologicalBoost = 8;
-        Integer expected = exerciseDistance*exerciseRepetitions*exerciseSeries*neurologicalBoost * intensity.ordinal()+1;
-        assertEquals (exerciseDistance*exerciseRepetitions*exerciseSeries*neurologicalBoost, exercise.loadValue );
+        int expected = exerciseDistance*exerciseRepetitions*exerciseSeries*neurologicalBoost * intensity.ordinal()+1;
+        assertEquals (expected, exercise.loadValue);
     }
 }
