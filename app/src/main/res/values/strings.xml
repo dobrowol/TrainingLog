@@ -55,4 +55,5 @@
     <string name="actionToggleHighlightCircle">Toggle Highlight Circle</string>
     <string name="actionToggleRotation">Toggle Rotation</string>
     <string name="actionToggleSpin">Spin Animation</string>
+    <string name="create_training">Create Training</string>
 </resources>

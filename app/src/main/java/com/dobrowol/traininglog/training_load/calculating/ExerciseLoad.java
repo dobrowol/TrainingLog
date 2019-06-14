@@ -1,9 +1,7 @@
 package com.dobrowol.traininglog.training_load.calculating;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
@@ -38,7 +36,8 @@ public class ExerciseLoad implements LoadCalculator<Training>{
             long diffInMillies = Math.abs(trainings.get(0).date.getTime() - firstDateOfOccurrence.getTime());
             long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-            if (daysFromFirstOccurence <= 21){
+            int neurologicalBoostPeriod = 21;
+            if (daysFromFirstOccurence <= neurologicalBoostPeriod){
                 exercise.neurologicalBoost();
             }
         }
@@ -51,11 +50,11 @@ public class ExerciseLoad implements LoadCalculator<Training>{
 }
 class ExerciseLoadDataProvider {
 
-    private LoadCalculator loadCalculator;
+    private LoadCalculator<Training> loadCalculator;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private LifecycleOwner owner;
     private Exercise exercise;
-    public ExerciseLoadDataProvider(Exercise exercise, LoadCalculator exerciseLoad, TrainingExerciseJoinViewModel trainingExerciseJoinViewModel, LifecycleOwner owner) {
+    public ExerciseLoadDataProvider(Exercise exercise, LoadCalculator<Training> exerciseLoad, TrainingExerciseJoinViewModel trainingExerciseJoinViewModel, LifecycleOwner owner) {
         this.exercise = exercise;
         loadCalculator = exerciseLoad;
         this.trainingExerciseJoinViewModel = trainingExerciseJoinViewModel;
@@ -64,13 +63,10 @@ class ExerciseLoadDataProvider {
 
     public void getData(){
         LiveData<List<Training>> listLiveData = trainingExerciseJoinViewModel.getAllTrainingsForExercise(exercise.id);
-        listLiveData.observe(owner, new Observer<List<Training>>() {
-            @Override
-            public void onChanged(@Nullable final List<Training> trainings) {
-                // Update the cached copy of the trainings in the adapter.
-               loadCalculator.calculate(trainings);
+        listLiveData.observe(owner, trainings -> {
+            // Update the cached copy of the trainings in the adapter.
+           loadCalculator.calculate(trainings);
 
-            }
         });
 
     }

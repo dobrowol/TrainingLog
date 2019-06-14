@@ -64,12 +64,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
 
-        trainingViewModel.getAllGeneralLoads().observe(this, new Observer<List<Integer>>() {
-            @Override
-            public void onChanged(List<Integer> integers) {
-                setData(integers, "General Load");
-            }
-        });
+        trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
 
         tvX = findViewById(R.id.tvXMax);
         tvY = findViewById(R.id.tvYMax);
@@ -185,23 +180,28 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         l.setForm(Legend.LegendForm.LINE);
 
         seasonLength = 12;
-        holtWinters = new HoltWinters(new ArrayList<Double>(), seasonLength);
+        holtWinters = new HoltWinters(new ArrayList<>(), seasonLength);
     }
 
     private void setData(List<Integer> integers, String load_name) {
 
         ArrayList<Entry> values = new ArrayList<>();
-        ArrayList<Double> forecastedValues = new ArrayList<>();
-        ArrayList<Entry> forecastedEntries = new ArrayList<>();
+        ArrayList<Double> forecastValues = new ArrayList<>();
+        ArrayList<Entry> forecastEntries = new ArrayList<>();
 
-        for (int i = 0; i < integers.size(); i++) {
-            values.add(new Entry(i, integers.get(i), getResources().getDrawable(R.drawable.star)));
+        int i = 0;
+        for (Integer integer : integers) {
+            if(integer!=null) {
+                values.add(new Entry(i++, integer, getResources().getDrawable(R.drawable.star)));
+            }
         }
         if(integers.size() >= seasonLength){
             holtWinters.setSeries(integers);
-            forecastedValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
-            for (int i = integers.size(); i < integers.size() + forecastedValues.size(); i++) {
-                forecastedEntries.add(new Entry(i, forecastedValues.get(i).floatValue(), getResources().getDrawable(R.drawable.star)));
+            forecastValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
+            for (Double forecast :  forecastValues) {
+                if(forecast != null) {
+                    forecastEntries.add(new Entry(i++, forecast.floatValue(), getResources().getDrawable(R.drawable.star)));
+                }
             }
         }
         LineDataSet set1;
@@ -222,8 +222,8 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the data sets
 
-            if(!forecastedValues.isEmpty()){
-                forecastedSet = getLineDataSet("Forecasted Load", forecastedEntries);
+            if(!forecastValues.isEmpty()){
+                forecastedSet = getLineDataSet("Forecasted Load", forecastEntries);
                 dataSets.add(forecastedSet);
             }
             // create a data object with the data sets
@@ -266,12 +266,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
         // set the filled area
         set1.setDrawFilled(true);
-        set1.setFillFormatter(new IFillFormatter() {
-            @Override
-            public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-                return chart.getAxisLeft().getAxisMinimum();
-            }
-        });
+        set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
 
         // set color of filled area
         if (Utils.getSDKInt() >= 18) {

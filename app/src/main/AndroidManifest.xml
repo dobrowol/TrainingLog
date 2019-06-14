@@ -31,6 +31,12 @@
                 android:value=".MainActivity" />
 
         </activity>
+        <activity android:name=".new_training.DateTimeActivity" android:theme="@style/Theme.AppCompat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
+        </activity>
     </application>
 
 </manifest>

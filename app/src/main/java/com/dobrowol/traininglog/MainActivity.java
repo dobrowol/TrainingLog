@@ -8,6 +8,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +38,7 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
+import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private ExerciseViewModel exerciseViewModel;
+    private LiveData<List<Exercise>> listLiveData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         currentAdapter=generalAdapter;
 
         initializeTraining();
+        initializeObservers();
         initializeDate();
         initializeTime();
 
@@ -141,24 +146,9 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         timeTxt.setText(time);
         timeTxt.setOnClickListener(this);
     }
-    private void initializeTraining(){
-        training = new Training();
-        training.date = new Date();
-        training.id = UUID.randomUUID().toString();
-        trainingExerciseJoinViewModel.getAllExercisesForTraining(training.id).observe(this, new Observer<List<Exercise>>() {
-            @Override
-            public void onChanged(@Nullable final List<Exercise> exercises) {
-                // Update the cached copy of the exercises in the adapter.
-                if (exercises != null) {
-                    ArrayList<Exercise> array = new ArrayList<>(exercises);
-                    numberOfExercises = array.size();
-                    setExercises(array);
-                    TrainingLoad trainingLoad = new TrainingLoad(training, trainingViewModel,
-                            exerciseViewModel, trainingExerciseJoinViewModel, MainActivity.this);
-                    trainingLoad.calculate(exercises);
-                }
-            }
-        });
+    private void initializeObservers(){
+        trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
+
         exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, new Observer<List<ExerciseDescription>>() {
             @Override
             public void onChanged(@Nullable final List<ExerciseDescription> exercises) {
@@ -171,9 +161,15 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 }
             }
         });
+    }
+    private void initializeTraining(){
+        training = new Training();
+        training.date = new Date();
+        training.id = UUID.randomUUID().toString();
+
 
         numberOfExercises = 0;
-        trainingViewModel.insert(training);
+       // trainingViewModel.insert(training);
     }
 
     @Override
@@ -243,9 +239,9 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     protected void onRestoreInstanceState(Bundle inState){
         super.onRestoreInstanceState(inState);
-        generalAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("generalExerciseList"));
-        specificAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("specificExerciseList"));
-        competitiveAdapter.setExerciseList(inState.<Exercise>getParcelableArrayList("competitiveExerciseList"));
+        generalAdapter.setExerciseList(inState.getParcelableArrayList("generalExerciseList"));
+        specificAdapter.setExerciseList(inState.getParcelableArrayList("specificExerciseList"));
+        competitiveAdapter.setExerciseList(inState.getParcelableArrayList("competitiveExerciseList"));
         currentAdapter=generalAdapter;
     }
 
@@ -268,6 +264,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             case R.id.new_training:
                 initializeTraining();
                 exerciseList.clear();
+                Intent dateTimeIntent = new Intent(this, DateTimeActivity.class);
+                startActivity(dateTimeIntent);
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -302,10 +300,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             training.date = simpleDateFormat.parse(date);
+            trainingViewModel.update(training);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        trainingViewModel.update(training);
+
     }
 
     @Override
@@ -318,7 +317,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void onItemClick(Training item) {
         detailsDialog.dismiss();
-        trainingExerciseJoinViewModel.getAllExercisesForTraining(item.id).observe(this, this);
+        trainingExerciseJoinViewModel.getExercisesByTrainingId(item.id);
+
     }
 
     @Override
@@ -328,18 +328,26 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onChanged(List<Exercise> exercises) {
-       ArrayList<Exercise> ex = new ArrayList(exercises);
-        setExercises(ex);
+        if (exercises != null) {
+            ArrayList<Exercise> array = new ArrayList<>(exercises);
+            numberOfExercises = array.size();
+            setExercises(array);
+            TrainingLoad trainingLoad = new TrainingLoad(training, trainingViewModel,
+                    exerciseViewModel, trainingExerciseJoinViewModel, MainActivity.this);
+            trainingLoad.calculate(exercises);
+        }
     }
 
     private void setExercises(ArrayList<Exercise> ex) {
-        generalAdapter.setExerciseList(ex);
-        specificAdapter.setExerciseList(ex);
-        competitiveAdapter.setExerciseList(ex);
 
-        generalAdapter.notifyDataSetChanged();
-        specificAdapter.notifyDataSetChanged();
-        competitiveAdapter.notifyDataSetChanged();
+            generalAdapter.setExerciseList(ex);
+            specificAdapter.setExerciseList(ex);
+            competitiveAdapter.setExerciseList(ex);
+
+            generalAdapter.notifyDataSetChanged();
+            specificAdapter.notifyDataSetChanged();
+            competitiveAdapter.notifyDataSetChanged();
+
     }
 
     public static class TimePickerFragment extends DialogFragment

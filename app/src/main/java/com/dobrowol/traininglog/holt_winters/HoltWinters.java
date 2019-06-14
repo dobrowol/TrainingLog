@@ -50,6 +50,9 @@ public class HoltWinters {
 
     public ArrayList<Double> triple_exponential_smoothing(double alpha, double beta, double gamma, int number_of_predictions) {
         ArrayList<Double> result = new ArrayList<>();
+        if(series.size() < 2* seasonLength){
+            return result;
+        }
         ArrayList<Double> seasonals = initial_seasonal_components();
         double smooth = series.get(0);
         double trend = calculate_initial_trend();
@@ -80,7 +83,9 @@ public class HoltWinters {
 
     public void setSeries(List<Integer> integers) {
         for(Integer integer : integers){
-            series.add(Double.valueOf(integer));
+            if(integer != null) {
+                series.add(Double.valueOf(integer));
+            }
         }
     }
 }
