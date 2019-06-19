@@ -29,8 +29,6 @@ public class TrainingExerciseJoinViewModel extends AndroidViewModel {
         mRepository = new TrainingExerciseJoinRepository(application);
     }
 
-    public LiveData<List<Exercise>> getAllExercisesForTraining(String trainingId) { return mRepository.getAllExercisesForTraining(trainingId); }
-
     public LiveData<List<Training>> getAllTrainingsForExercise(String exerciseId) { return mRepository.getAllTrainingsForExercise(exerciseId); }
 
     public void insert(TrainingExerciseJoin trainingExerciseJoin) { mRepository.insert(trainingExerciseJoin); }

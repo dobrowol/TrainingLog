@@ -56,4 +56,7 @@
     <string name="actionToggleRotation">Toggle Rotation</string>
     <string name="actionToggleSpin">Spin Animation</string>
     <string name="create_training">Create Training</string>
+    <string name="specific">SPECIFIC</string>
+    <string name="competitive">COMPETITIVE</string>
+    <string name="general">GENERAL</string>
 </resources>

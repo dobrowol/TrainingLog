@@ -31,13 +31,32 @@ public class TrainingLoad {
 
         this.exercises = exercises;
         for (Exercise exercise : exercises) {
+            int old_load = exercise.loadValue;
             ExerciseLoad exerciseLoad = new ExerciseLoad(exercise, training.date, trainingExerciseJoinViewModel, owner);
             exerciseLoad.calculate();
-            exerciseViewModel.update(exercise);
+            if (old_load != exercise.loadValue) {
+                exerciseViewModel.update(exercise);
+            }
+        }
+        int general_load = 0;
+        int specific_load = 0;
+        int competitive_load = 0;
+        if (training.general_load != null) {
+            general_load = training.general_load;
+        }
+        if (training.specific_load != null){
+            specific_load = training.specific_load;
+        }
+        if (training.competitive_load != null){
+             competitive_load = training.competitive_load;
         }
 
         training.calculateLoads(exercises);
-        trainingViewModel.update(training);
+
+        if(general_load != training.general_load || specific_load != training.specific_load ||
+        competitive_load != training.competitive_load) {
+            trainingViewModel.update(training);
+        }
     }
 }
 

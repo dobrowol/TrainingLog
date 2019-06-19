@@ -74,6 +74,9 @@ public class Training implements Serializable, Parcelable {
 
     }
     public Training(){
+        general_load = 0;
+        specific_load = 0;
+        competitive_load = 0;
     }
 
     public void calculateLoads(List<Exercise> exerciseList){

@@ -36,8 +36,10 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
     }
 
     void setTrainings(ArrayList<Training> trainings){
-        this.trainings.clear();
-        this.trainings = trainings;
+        if(trainings != null && this.trainings != null && trainings.size() != this.trainings.size()) {
+            this.trainings.clear();
+            this.trainings = trainings;
+        }
 
     }
 

@@ -23,14 +23,13 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
+import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionViewModel;
@@ -49,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private ExerciseViewModel exerciseViewModel;
-    private LiveData<List<Exercise>> listLiveData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +129,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
     private void initializeDate(){
         dateTxt = findViewById(R.id.dateTxt);
-        String pattern = "yyyy-MM-dd";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT, Locale.ENGLISH);
 
         String date = simpleDateFormat.format(new Date());
         dateTxt.setText(date);
@@ -139,8 +137,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
     private void initializeTime(){
         timeTxt = findViewById(R.id.timeTxt);
-        String pattern = "HH:mm";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.TIME_FORMAT, Locale.ENGLISH);
 
         String time = simpleDateFormat.format(new Date());
         timeTxt.setText(time);
@@ -149,16 +146,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, new Observer<List<ExerciseDescription>>() {
-            @Override
-            public void onChanged(@Nullable final List<ExerciseDescription> exercises) {
-                if (exercises != null) {
-                    // Update the cached copy of the exercises in the adapter.
-                    ArrayList<ExerciseDescription> array = new ArrayList<>(exercises);
-                    generalAdapter.setExerciseDescriptionList(array);
-                    specificAdapter.setExerciseDescriptionList(array);
-                    competitiveAdapter.setExerciseDescriptionList(array);
-                }
+        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exercises -> {
+            if (exercises != null) {
+                // Update the cached copy of the exercises in the adapter.
+                ArrayList<ExerciseDescription> array = new ArrayList<>(exercises);
+                generalAdapter.setExerciseDescriptionList(array);
+                specificAdapter.setExerciseDescriptionList(array);
+                competitiveAdapter.setExerciseDescriptionList(array);
             }
         });
     }
@@ -169,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
 
         numberOfExercises = 0;
+
+        trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
        // trainingViewModel.insert(training);
     }
 
@@ -225,6 +221,16 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK)
+        if (requestCode == AddExercise.CREATE_EXERCISE ){
+
+        }
+
+    }
     @Override
     public void onItemClick(Exercise item) {
 
@@ -290,14 +296,14 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        String time = String.format("%02d::%02d", hourOfDay, minute);
+        String time = String.format(Locale.ENGLISH,"%02d:%02d", hourOfDay, minute);
         timeTxt.setText(time);
         updateTrainingDate();
     }
 
     private void updateTrainingDate() {
         String date = dateTxt.getText().toString() +" "+ timeTxt.getText().toString();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT + " " + Converters.TIME_FORMAT, Locale.ENGLISH);
         try {
             training.date = simpleDateFormat.parse(date);
             trainingViewModel.update(training);
@@ -309,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        String date = String.format("%04d-%02d-%02d", year, month, dayOfMonth);
+        String date = String.format(Locale.ENGLISH,"%04d-%02d-%02d", year, month, dayOfMonth);
         dateTxt.setText(date);
         updateTrainingDate();
     }
@@ -318,6 +324,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onItemClick(Training item) {
         detailsDialog.dismiss();
         trainingExerciseJoinViewModel.getExercisesByTrainingId(item.id);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT, Locale.ENGLISH);
+        String stringDate = simpleDateFormat.format(item.date);
+        dateTxt.setText(stringDate);
+        simpleDateFormat = new SimpleDateFormat(Converters.TIME_FORMAT, Locale.ENGLISH);
+        stringDate = simpleDateFormat.format(item.date);
+        timeTxt.setText(stringDate);
+        training = item;
 
     }
 
@@ -413,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
             trainingListRv = v.findViewById(R.id.training_list_rv);
             trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
-            trainingViewModel.getAllTrainings().observe(this, this);
+            trainingViewModel.getAllTrainings().observe(getViewLifecycleOwner(), this);
             // Do all the stuff to initialize your custom view
 
             return v;

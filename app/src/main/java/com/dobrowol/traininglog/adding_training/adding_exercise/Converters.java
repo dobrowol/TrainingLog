@@ -5,7 +5,8 @@ import androidx.room.TypeConverter;
 import java.util.Date;
 
 public class Converters {
-    public static final String DATE_FORMAT="YYYY-mm-dd";
+    public static final String DATE_FORMAT="YYYY-MM-dd";
+    public static final String TIME_FORMAT="HH:mm";
     @TypeConverter
     public static Specificity fromTimestamp(Integer value) {
         return value == null ? null : Specificity.values()[value];

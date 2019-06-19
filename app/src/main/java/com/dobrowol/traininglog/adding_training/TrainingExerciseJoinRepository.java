@@ -17,7 +17,6 @@ import java.util.List;
 public class TrainingExerciseJoinRepository {
 
     private TrainingExerciseJoinDAO trainingExerciseJoinDAO;
-    private LiveData<List<TrainingExerciseJoin>> mAllExercises;
 
     TrainingExerciseJoinRepository(Application application) {
         TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);

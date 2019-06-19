@@ -15,13 +15,10 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.R;
-import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.holt_winters.HoltWinters;
 import com.github.mikephil.charting.animation.Easing;
@@ -33,9 +30,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
@@ -215,15 +210,13 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
             chart.getData().notifyDataChanged();
             chart.notifyDataSetChanged();
         } else {
-            // create a dataset and give it a type
-            set1 = getLineDataSet(load_name, values);
-
+            set1 = getLineDataSet(load_name, values, R.drawable.fade_red);
 
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the data sets
 
             if(!forecastValues.isEmpty()){
-                forecastedSet = getLineDataSet("Forecasted Load", forecastEntries);
+                forecastedSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
                 dataSets.add(forecastedSet);
             }
             // create a data object with the data sets
@@ -234,7 +227,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         }
     }
 
-    private LineDataSet getLineDataSet(String load_name, ArrayList<Entry> values) {
+    private LineDataSet getLineDataSet(String load_name, ArrayList<Entry> values, int set_colour) {
         LineDataSet set1;
         set1 = new LineDataSet(values, load_name);
 
@@ -271,7 +264,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         // set color of filled area
         if (Utils.getSDKInt() >= 18) {
             // drawables only supported on api level 18 and above
-            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.fade_red);
+            Drawable drawable = ContextCompat.getDrawable(this, set_colour);
             set1.setFillDrawable(drawable);
         } else {
             set1.setFillColor(Color.BLACK);
