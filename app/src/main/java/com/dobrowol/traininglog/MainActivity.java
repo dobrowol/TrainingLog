@@ -8,7 +8,6 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +19,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
     public static final String EXERCISE_TYPE = "exercise_type";
-    private RecyclerView generalRecyclerView;
+    private RecyclerView goalRecyclerView;
     private RecyclerView specificRecyclerView;
     private RecyclerView competitiveRecyclerView;
     private MyRecyclerViewAdapter generalAdapter;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private ExerciseViewModel exerciseViewModel;
+    private TextView generalTextView;
+    private static int oneColumn = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,67 +85,41 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         setContentView(R.layout.activity_main);
 
-        generalRecyclerView = findViewById(R.id.general_rv);
-        specificRecyclerView = findViewById(R.id.specific_rv);
-        competitiveRecyclerView = findViewById(R.id.competitive_rv);
+        goalRecyclerView = findViewById(R.id.goal_rv);
 
-        generalRecyclerView.setOnTouchListener(this);
-        specificRecyclerView.setOnTouchListener(this);
-        competitiveRecyclerView.setOnTouchListener(this);
+        goalRecyclerView.setOnTouchListener(this);
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
-
-        generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
-        specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-        competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-
-        generalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        goalRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
         generalAdapter = new MyRecyclerViewAdapter(ExerciseType.General);
         generalAdapter.setOnItemClickListener(this);
-        generalRecyclerView.setAdapter(generalAdapter);
-
-        specificRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        specificAdapter = new MyRecyclerViewAdapter(ExerciseType.Specific);
-        specificAdapter.setOnItemClickListener(this);
-        specificRecyclerView.setAdapter(specificAdapter);
-
-        competitiveRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        competitiveAdapter = new MyRecyclerViewAdapter(ExerciseType.Competitive);
-        competitiveAdapter.setOnItemClickListener(this);
-        competitiveRecyclerView.setAdapter(competitiveAdapter);
+        goalRecyclerView.setAdapter(generalAdapter);
 
         currentAdapter=generalAdapter;
 
-        initializeTraining();
+
         initializeObservers();
-        initializeDate();
-        initializeTime();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
+        Intent intent = getIntent();
+        if(intent != null) {
+                if (intent.hasExtra(MainActivity.TRAINING)) {
+                    training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
+                }
+                else{
+                    initializeTraining();
+                }
+        }
+
         exerciseList = new ArrayList<>();
     }
-    private void initializeDate(){
-        dateTxt = findViewById(R.id.dateTxt);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT, Locale.ENGLISH);
 
-        String date = simpleDateFormat.format(new Date());
-        dateTxt.setText(date);
-        dateTxt.setOnClickListener(this);
-    }
-    private void initializeTime(){
-        timeTxt = findViewById(R.id.timeTxt);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.TIME_FORMAT, Locale.ENGLISH);
-
-        String time = simpleDateFormat.format(new Date());
-        timeTxt.setText(time);
-        timeTxt.setOnClickListener(this);
-    }
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
@@ -161,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         training.date = new Date();
         training.id = UUID.randomUUID().toString();
 
-
         numberOfExercises = 0;
 
         trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
@@ -173,22 +149,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         switch (view.getId()){
             case R.id.general_rv:
                 currentAdapter = generalAdapter;
-                generalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
+                goalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
-            case R.id.specific_rv:
-                currentAdapter = specificAdapter;
-                specificRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
-                generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                break;
-            case R.id.competitive_rv:
-                currentAdapter = competitiveAdapter;
-                competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
-                specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                generalRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                break;
+
         }
         exerciseList = currentAdapter.getExerciseList();
         view.performClick();
@@ -207,15 +172,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 bundle.putInt(EXERCISE_TYPE, currentAdapter.getExerciseType().ordinal());
                 intent.putExtras(bundle);
                 startActivityForResult(intent,AddExercise.CREATE_EXERCISE);
-                break;
-
-            case R.id.timeTxt:
-                DialogFragment timePickerFragment = new TimePickerFragment(this);
-                timePickerFragment.show(getSupportFragmentManager(), "timePicker");
-                break;
-            case R.id.dateTxt:
-                DialogFragment datePickerFragment = new DatePickerFragment(this);
-                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
                 break;
         }
 

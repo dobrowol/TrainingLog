@@ -11,7 +11,7 @@ import java.util.List;
 
 @Dao
 public interface TrainingDAO {
-    @Query("SELECT * FROM training_table")
+    @Query("SELECT * FROM training_table ORDER BY date")
     LiveData<List<Training>> getAll();
 
     @Query("SELECT * FROM training_table WHERE id IN (:ids)")

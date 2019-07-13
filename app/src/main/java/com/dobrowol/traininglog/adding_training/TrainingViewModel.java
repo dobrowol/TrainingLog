@@ -17,7 +17,7 @@ public class TrainingViewModel extends AndroidViewModel {
     public TrainingViewModel(Application application) {
         super(application);
         mRepository = new TrainingRepository(application);
-        mAllTrainings = mRepository.getAllExercises();
+        mAllTrainings = mRepository.getAllTrainings();
     }
 
     public LiveData<List<Training>> getAllTrainings() { return mAllTrainings; }

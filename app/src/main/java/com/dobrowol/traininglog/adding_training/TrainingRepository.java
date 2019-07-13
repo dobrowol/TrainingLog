@@ -23,7 +23,7 @@ public class TrainingRepository {
         mAllTrainings = trainingDAO.getAll();
     }
 
-    LiveData<List<Training>> getAllExercises() {
+    LiveData<List<Training>> getAllTrainings() {
         return mAllTrainings;
     }
 

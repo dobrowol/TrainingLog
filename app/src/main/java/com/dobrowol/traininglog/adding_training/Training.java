@@ -74,6 +74,7 @@ public class Training implements Serializable, Parcelable {
 
     }
     public Training(){
+        date = new Date();
         general_load = 0;
         specific_load = 0;
         competitive_load = 0;
