@@ -44,13 +44,6 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
     public void getUniqueGoalsForTraining( String trainingId){
         query1.setValue(trainingId); }
 
-    private MutableLiveData<String> query2  = new MutableLiveData<>();
-    public LiveData<List<GoalExercisePair>> trainingGoalsExercises = Transformations.switchMap(query2,
-            trainingId ->
-                    mRepository.getExerciseGoalsForTraining(trainingId)
-    );
-    public void getExerciseGoalsForTraining( String trainingId){
-        query2.setValue(trainingId); }
 
     public TrainingGoalExerciseJoinViewModel(Application application) {
         super(application);

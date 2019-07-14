@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Training} and makes a call to the
@@ -120,7 +121,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         }
 
         public void setDate(Date date){
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
             String formatted = sdf.format(date);
             mIdView.setText(formatted);
         }

@@ -35,9 +35,6 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getUniqueGoalsForTraining(trainingId);
     }
 
-    LiveData<List<GoalExercisePair>> getExerciseGoalsForTraining(final String trainingId){
-        return trainingGoalExerciseJoinDAO.getGoalsAndExercisesForTraining(trainingId);
-    }
 
     public void insert (TrainingGoalExerciseJoin exercise) {
         new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);

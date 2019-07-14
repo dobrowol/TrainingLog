@@ -20,6 +20,8 @@ import java.util.Map;
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
 
+    public Goal emptyGoal = new Goal("Dodaj cel ");
+
     public interface OnItemClickListener {
         void onItemClick(Goal item);
 
@@ -41,6 +43,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.goals.clear();
             this.goals = goals;
         }
+
+        this.goals.add(emptyGoal);
     }
 
     void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
@@ -75,19 +79,18 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView descriptionText;
-        Button btnRemove;
+        RecyclerView exercisesRecyclerView;
+        TextView addExercise;
         OnItemClickListener listener;
         Goal goal;
 
         public CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
             this.listener = listener;
-            this.descriptionText = view.findViewById(R.id.description);
-            this.btnRemove = view.findViewById(R.id.btnAction);
-            btnRemove.setVisibility(View.VISIBLE);
-            btnRemove.setText("Remove");
+            this.descriptionText = view.findViewById(R.id.generalTextView);
+            this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
+            this.addExercise = view.findViewById(R.id.addingExercise);
             view.setOnClickListener(this);
-            btnRemove.setOnClickListener(this);
         }
 
         void fillView(Goal textAtPosition) {
@@ -99,8 +102,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.description:
-                case R.id.list_row:
+                case R.id.generalTextView:
+                case R.id.exercises_rv:
                     listener.onItemClick(goal);
                     break;
                 case R.id.btnAction:

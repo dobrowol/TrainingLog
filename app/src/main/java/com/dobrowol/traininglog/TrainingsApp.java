@@ -3,6 +3,7 @@ package com.dobrowol.traininglog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -14,6 +15,7 @@ import androidx.lifecycle.Observer;
 
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener}
  * interface.
  */
-public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener {
+public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener, View.OnClickListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -73,6 +75,9 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         trainingViewModel.getAllTrainings().observe(this, this);
+
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
+        floatingActionButton.setOnClickListener(this);
     }
 
     @Override
@@ -84,6 +89,18 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
     @Override
     public void onListFragmentInteraction(Training item) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab_add_training:
+                Intent intent = new Intent(this,MainActivity.class);
+
+                startActivity(intent);
+                break;
+
+        }
     }
 
     /**

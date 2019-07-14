@@ -45,12 +45,16 @@ public class Goal implements Parcelable {
         }
     };
 
+    public Goal(String description) {
+        this.description = description;
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
-    Goal(Parcel in){
+    public Goal(Parcel in){
         id = in.readString();
         description = in.readString();
         priority = in.readInt();

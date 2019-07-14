@@ -25,9 +25,6 @@ public interface TrainingGoalExerciseJoinDAO {
         @Query("SELECT exercise_table.* FROM exercise_table  INNER JOIN training_goal_exercise_join ON exercise_table.id=training_goal_exercise_join.exerciseId WHERE training_goal_exercise_join.trainingId=:trainingId AND training_goal_exercise_join.goalId=:goalId")
         LiveData<List<Exercise>> getExercisesForTrainingAndGoal(final String goalId, final String trainingId);
 
-        @Query("SELECT goal_table.*, exercise_table.*  FROM goal_table, exercise_table INNER JOIN training_goal_exercise_join ON exercise_table.id=training_goal_exercise_join.exerciseId INNER JOIN training_goal_exercise_join ON goal_table.id = training_goal_exercise_join.goalId" +
-                " WHERE training_goal_exercise_join.trainingId=:trainingId")
-        LiveData<List<GoalExercisePair>> getGoalsAndExercisesForTraining(final String trainingId);
 
         @Query("SELECT DISTINCT goal_table.* FROM goal_table  INNER JOIN training_goal_exercise_join ON goal_table.id=training_goal_exercise_join.goalId WHERE training_goal_exercise_join.trainingId=:trainingId ")
         LiveData<List<Goal>> getUniqueGoalsForTraining(final String trainingId);

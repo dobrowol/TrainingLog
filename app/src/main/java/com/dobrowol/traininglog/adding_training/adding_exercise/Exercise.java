@@ -22,11 +22,7 @@ import static androidx.room.ForeignKey.CASCADE;
         foreignKeys = {@ForeignKey(entity = ExerciseDescription.class,
         parentColumns = "eid",
         childColumns = "exerciseDescriptionId",
-        onDelete = CASCADE),
-        @ForeignKey(entity = Goal.class,
-                parentColumns = "id",
-                childColumns = "goalId",
-                onDelete = CASCADE)})
+        onDelete = CASCADE)})
 public class Exercise implements Serializable, Parcelable {
     @PrimaryKey
     @NonNull

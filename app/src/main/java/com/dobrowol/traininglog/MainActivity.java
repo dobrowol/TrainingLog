@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +41,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
@@ -65,9 +67,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private RecyclerView specificRecyclerView;
     private RecyclerView competitiveRecyclerView;
     private GoalListViewAdapter generalAdapter;
-    private MyRecyclerViewAdapter specificAdapter;
-    private MyRecyclerViewAdapter competitiveAdapter;
-    private MyRecyclerViewAdapter currentAdapter;
+
     private TextView dateTxt;
     private TextView timeTxt;
     ArrayList<Exercise> exerciseList;
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private GoalViewModel goalViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
+    private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
     private Training training;
     private int numberOfExercises;
     TrainingList detailsDialog;
@@ -97,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
+
+        trainingGoalJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
@@ -115,22 +118,25 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 if (intent.hasExtra(MainActivity.TRAINING)) {
                     training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
                 }
-                else{
-                    initializeTraining();
-                }
+
+
+        }
+        if (training == null){
+            initializeTraining();
         }
 
+        setAppBarTitle();
         exerciseList = new ArrayList<>();
     }
 
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        trainingGoalExerciseJoinViewModel.trainingGoalsExercises.observe(this, goals -> {
+        trainingGoalJoinViewModel.trainingGoals.observe(this, goals -> {
             if (goals != null) {
                 // Update the cached copy of the exercises in the adapter.
-                ArrayList<GoalExercisePair> array = new ArrayList<>(goals);
-                generalAdapter.setGoalsExercises(array);
+                ArrayList<Goal> array = new ArrayList<>(goals);
+                generalAdapter.setGoals(array);
             }
         });
 
@@ -143,21 +149,36 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         numberOfExercises = 0;
 
         trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
-        trainingGoalExerciseJoinViewModel.getExerciseGoalsForTraining(training.id);
-       // trainingViewModel.insert(goal);
+        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
+
+
+        // trainingViewModel.insert(goal);
+    }
+
+    private void setAppBarTitle() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
+        String formatted = sdf.format(training.date);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(formatted);
+        }else{
+            android.app.ActionBar actionBar1 = getActionBar();
+            if(actionBar1 != null){
+                actionBar1.setTitle(formatted);
+            }
+        }
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (view.getId()){
-            case R.id.general_rv:
+            case R.id.goal_rv:
                 goalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 break;
 
         }
-        exerciseList = currentAdapter.getExerciseList();
         view.performClick();
         return false;
     }
@@ -171,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(TRAINING,training);
                 bundle.putInt(NUMBER_OF_EXERCISES, numberOfExercises);
-                bundle.putInt(EXERCISE_TYPE, currentAdapter.getExerciseType().ordinal());
                 intent.putExtras(bundle);
                 startActivityForResult(intent,AddExercise.CREATE_EXERCISE);
                 break;
@@ -196,16 +216,14 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("generalExerciseList", generalAdapter.getGoals());
-        outState.putParcelableArrayList("specificExerciseList", specificAdapter.getExerciseList());
-        outState.putParcelableArrayList("competitiveExerciseList", competitiveAdapter.getExerciseList());
+
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle inState){
         super.onRestoreInstanceState(inState);
         generalAdapter.setGoals(inState.getParcelableArrayList("generalExerciseList"));
-        specificAdapter.setExerciseList(inState.getParcelableArrayList("specificExerciseList"));
-        competitiveAdapter.setExerciseList(inState.getParcelableArrayList("competitiveExerciseList"));
+
 
     }
 
@@ -311,14 +329,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     private void setExercises(ArrayList<Exercise> ex) {
 
-
-            specificAdapter.setExerciseList(ex);
-            competitiveAdapter.setExerciseList(ex);
-
             generalAdapter.notifyDataSetChanged();
-            specificAdapter.notifyDataSetChanged();
-            competitiveAdapter.notifyDataSetChanged();
-
     }
 
     @Override
