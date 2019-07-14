@@ -15,55 +15,51 @@ import java.util.List;
 
 public class GoalRepository {
 
-    private ExerciseDAO mExerciseDao;
-    private LiveData<List<Exercise>> mAllExercises;
+    private GoalDAO goalDAO;
+    private LiveData<List<Goal>> allGoals;
 
     GoalRepository(Application application) {
         TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
-        mExerciseDao = db.exerciseDAO();
-        mAllExercises = mExerciseDao.getAll();
+        goalDAO = db.goalDAO();
+        allGoals = goalDAO.getAll();
     }
 
-    LiveData<List<Exercise>> getAllExercises() {
-        return mAllExercises;
+    LiveData<List<Goal>> getAllGoals() {
+        return allGoals;
     }
 
-    LiveData<ExerciseDescription> getExerciseDescription(String description) {
-        return mExerciseDao.findExerciseDescriptonByDescription(description);
+    public void insert (Goal goal) {
+        new insertAsyncTask(goalDAO).execute(goal);
     }
 
-    public void insert (Exercise exercise) {
-        new insertAsyncTask(mExerciseDao).execute(exercise);
+    public void update(Goal goal) {
+        new updateAsyncTask(goalDAO).execute(goal);
     }
 
-    public void update(Exercise exercise) {
-        new updateAsyncTask(mExerciseDao).execute(exercise);
-    }
+    private static class insertAsyncTask extends AsyncTask<Goal, Void, Void> {
 
-    private static class insertAsyncTask extends AsyncTask<Exercise, Void, Void> {
+        private GoalDAO mAsyncTaskDao;
 
-        private ExerciseDAO mAsyncTaskDao;
-
-        insertAsyncTask(ExerciseDAO dao) {
+        insertAsyncTask(GoalDAO dao) {
             mAsyncTaskDao = dao;
         }
 
         @Override
-        protected Void doInBackground(final Exercise... params) {
+        protected Void doInBackground(final Goal... params) {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
     }
-    private static class updateAsyncTask extends AsyncTask<Exercise, Void, Void> {
+    private static class updateAsyncTask extends AsyncTask<Goal, Void, Void> {
 
-        private ExerciseDAO mAsyncTaskDao;
+        private GoalDAO mAsyncTaskDao;
 
-        updateAsyncTask(ExerciseDAO dao) {
+        updateAsyncTask(GoalDAO dao) {
             mAsyncTaskDao = dao;
         }
 
         @Override
-        protected Void doInBackground(final Exercise... params) {
+        protected Void doInBackground(final Goal... params) {
             mAsyncTaskDao.update(params[0]);
             return null;
         }

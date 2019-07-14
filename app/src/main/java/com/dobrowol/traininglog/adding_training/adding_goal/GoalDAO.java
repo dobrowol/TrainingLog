@@ -20,6 +20,9 @@ public interface GoalDAO {
     @Query("SELECT * FROM goal_table WHERE id IN (:eIds)")
     List<Goal> loadAllByIds(int[] eIds);
 
+    @Query("SELECT * FROM goal_table WHERE description=:eDescription LIMIT 1")
+    Goal getByDescription(String eDescription);
+
     @Insert
     void insert(Goal exercise);
 

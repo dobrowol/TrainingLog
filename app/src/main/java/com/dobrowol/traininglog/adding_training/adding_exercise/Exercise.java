@@ -10,6 +10,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,10 +19,14 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(indices = {@Index("exerciseDescriptionId")},
         tableName = "exercise_table",
-        foreignKeys = @ForeignKey(entity = ExerciseDescription.class,
+        foreignKeys = {@ForeignKey(entity = ExerciseDescription.class,
         parentColumns = "eid",
         childColumns = "exerciseDescriptionId",
-        onDelete = CASCADE))
+        onDelete = CASCADE),
+        @ForeignKey(entity = Goal.class,
+                parentColumns = "id",
+                childColumns = "goalId",
+                onDelete = CASCADE)})
 public class Exercise implements Serializable, Parcelable {
     @PrimaryKey
     @NonNull

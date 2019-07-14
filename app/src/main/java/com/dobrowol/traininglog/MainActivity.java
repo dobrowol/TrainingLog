@@ -19,8 +19,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -38,6 +36,10 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
@@ -54,15 +56,15 @@ import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>> {
+        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
-    public static final String TRAINING = "training";
+    public static final String TRAINING = "goal";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
     public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView goalRecyclerView;
     private RecyclerView specificRecyclerView;
     private RecyclerView competitiveRecyclerView;
-    private MyRecyclerViewAdapter generalAdapter;
+    private GoalListViewAdapter generalAdapter;
     private MyRecyclerViewAdapter specificAdapter;
     private MyRecyclerViewAdapter competitiveAdapter;
     private MyRecyclerViewAdapter currentAdapter;
@@ -70,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private TextView timeTxt;
     ArrayList<Exercise> exerciseList;
     private TrainingViewModel trainingViewModel;
+    private GoalViewModel goalViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
+    private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     private Training training;
     private int numberOfExercises;
     TrainingList detailsDialog;
@@ -90,17 +94,16 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         goalRecyclerView.setOnTouchListener(this);
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
+        goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
+        trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
         goalRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
-        generalAdapter = new MyRecyclerViewAdapter(ExerciseType.General);
+        generalAdapter = new GoalListViewAdapter(this);
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
-
-        currentAdapter=generalAdapter;
-
 
         initializeObservers();
 
@@ -123,15 +126,14 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exercises -> {
-            if (exercises != null) {
+        trainingGoalExerciseJoinViewModel.trainingGoalsExercises.observe(this, goals -> {
+            if (goals != null) {
                 // Update the cached copy of the exercises in the adapter.
-                ArrayList<ExerciseDescription> array = new ArrayList<>(exercises);
-                generalAdapter.setExerciseDescriptionList(array);
-                specificAdapter.setExerciseDescriptionList(array);
-                competitiveAdapter.setExerciseDescriptionList(array);
+                ArrayList<GoalExercisePair> array = new ArrayList<>(goals);
+                generalAdapter.setGoalsExercises(array);
             }
         });
+
     }
     private void initializeTraining(){
         training = new Training();
@@ -141,14 +143,14 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         numberOfExercises = 0;
 
         trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
-       // trainingViewModel.insert(training);
+        trainingGoalExerciseJoinViewModel.getExerciseGoalsForTraining(training.id);
+       // trainingViewModel.insert(goal);
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (view.getId()){
             case R.id.general_rv:
-                currentAdapter = generalAdapter;
                 goalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
                 specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
                 competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
@@ -193,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("generalExerciseList", generalAdapter.getExerciseList());
+        outState.putParcelableArrayList("generalExerciseList", generalAdapter.getGoals());
         outState.putParcelableArrayList("specificExerciseList", specificAdapter.getExerciseList());
         outState.putParcelableArrayList("competitiveExerciseList", competitiveAdapter.getExerciseList());
     }
@@ -201,10 +203,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     protected void onRestoreInstanceState(Bundle inState){
         super.onRestoreInstanceState(inState);
-        generalAdapter.setExerciseList(inState.getParcelableArrayList("generalExerciseList"));
+        generalAdapter.setGoals(inState.getParcelableArrayList("generalExerciseList"));
         specificAdapter.setExerciseList(inState.getParcelableArrayList("specificExerciseList"));
         competitiveAdapter.setExerciseList(inState.getParcelableArrayList("competitiveExerciseList"));
-        currentAdapter=generalAdapter;
+
     }
 
     @Override
@@ -309,13 +311,23 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     private void setExercises(ArrayList<Exercise> ex) {
 
-            generalAdapter.setExerciseList(ex);
+
             specificAdapter.setExerciseList(ex);
             competitiveAdapter.setExerciseList(ex);
 
             generalAdapter.notifyDataSetChanged();
             specificAdapter.notifyDataSetChanged();
             competitiveAdapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onItemClick(Goal item) {
+
+    }
+
+    @Override
+    public void onItemRemove(Goal goal) {
 
     }
 
