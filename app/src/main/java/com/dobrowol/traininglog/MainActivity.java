@@ -64,8 +64,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
     public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView goalRecyclerView;
-    private RecyclerView specificRecyclerView;
-    private RecyclerView competitiveRecyclerView;
+
     private GoalListViewAdapter generalAdapter;
 
     private TextView dateTxt;
@@ -92,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         goalRecyclerView = findViewById(R.id.goal_rv);
 
-        goalRecyclerView.setOnTouchListener(this);
-
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
@@ -110,16 +107,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         initializeObservers();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(this);
-
         Intent intent = getIntent();
         if(intent != null) {
                 if (intent.hasExtra(MainActivity.TRAINING)) {
                     training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
                 }
-
-
         }
         if (training == null){
             initializeTraining();
@@ -171,31 +163,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        switch (view.getId()){
-            case R.id.goal_rv:
-                goalRecyclerView.setBackgroundResource(R.drawable.edit_text_general_background);
-                specificRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                competitiveRecyclerView.setBackgroundResource(R.drawable.edit_text_no_focus_background);
-                break;
-
-        }
-        view.performClick();
         return false;
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.fab:
 
-                Intent intent = new Intent(this,AddExercise.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(TRAINING,training);
-                bundle.putInt(NUMBER_OF_EXERCISES, numberOfExercises);
-                intent.putExtras(bundle);
-                startActivityForResult(intent,AddExercise.CREATE_EXERCISE);
-                break;
-        }
 
     }
 
