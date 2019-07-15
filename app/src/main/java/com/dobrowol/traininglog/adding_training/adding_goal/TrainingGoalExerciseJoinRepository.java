@@ -19,22 +19,9 @@ public class TrainingGoalExerciseJoinRepository {
         TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
         trainingGoalExerciseJoinDAO = db.goalExerciseJoinDAO();
     }
-
-    LiveData<List<Exercise>> getAllExercisesForGoal(String goalId) {
-        return trainingGoalExerciseJoinDAO.getExercisesForGoal(goalId);
+    LiveData<List<Exercise>> getExercisesForTrainingAndGoal(final String trainingGoalId){
+        return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingGoalId);
     }
-
-    LiveData<List<Goal>> getAllGoalsForExercise(String exerciseId) {
-        return trainingGoalExerciseJoinDAO.getGoalsForExercise(exerciseId);
-    }
-    LiveData<List<Exercise>> getExercisesForTrainingAndGoal(final String goalId, final String trainingId){
-        return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(goalId, trainingId);
-    }
-
-    LiveData<List<Goal>> getUniqueGoalsForTraining(final String trainingId){
-        return trainingGoalExerciseJoinDAO.getUniqueGoalsForTraining(trainingId);
-    }
-
 
     public void insert (TrainingGoalExerciseJoin exercise) {
         new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);

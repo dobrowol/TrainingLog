@@ -88,6 +88,12 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
 
     @Override
     public void onListFragmentInteraction(Training item) {
+        Intent intent = new Intent(this,MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MainActivity.TRAINING, item);
+        intent.putExtras(bundle);
+
+        startActivity(intent);
 
     }
 

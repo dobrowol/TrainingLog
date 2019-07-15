@@ -45,7 +45,8 @@ public class Goal implements Parcelable {
         }
     };
 
-    public Goal(String description) {
+    public Goal(String id, String description) {
+        this.id = id;
         this.description = description;
     }
 

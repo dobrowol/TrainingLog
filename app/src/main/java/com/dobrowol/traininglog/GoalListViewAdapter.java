@@ -1,9 +1,10 @@
 package com.dobrowol.traininglog;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +23,7 @@ import java.util.Map;
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
 
-    public Goal emptyGoal = new Goal("Dodaj cel ");
+    public static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
 
     public interface OnItemClickListener {
         void onItemClick(Goal item);
@@ -44,7 +47,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.goals = goals;
         }
 
-        this.goals.add(emptyGoal);
+        this.goals.add(EMPTY_GOAL);
     }
 
     void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
@@ -84,6 +87,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         OnItemClickListener listener;
         Goal goal;
 
+
         public CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
             this.listener = listener;
@@ -91,18 +95,33 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
             this.addExercise = view.findViewById(R.id.addingExercise);
             view.setOnClickListener(this);
+            //descriptionText.setEnabled(false);
+            //addExercise.setEnabled(false);
+            descriptionText.setOnClickListener(this);
+            addExercise.setOnClickListener(this);
         }
 
         void fillView(Goal textAtPosition) {
 
             this.goal = textAtPosition;
             descriptionText.setText(textAtPosition.description);
+            if(this.goal.id.equals(GoalListViewAdapter.EMPTY_GOAL.id)){
+                addExercise.setVisibility(TextView.INVISIBLE);
+                exercisesRecyclerView.setVisibility(RecyclerView.INVISIBLE);
+            }
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.generalTextView:
+                    descriptionText.setEnabled(true);
+                    descriptionText.setText("");
+                    descriptionText.setCursorVisible(true);
+                    descriptionText.setFocusableInTouchMode(true);
+                    descriptionText.setInputType(InputType.TYPE_CLASS_TEXT);
+                    descriptionText.requestFocus();
+                    break;
                 case R.id.exercises_rv:
                     listener.onItemClick(goal);
                     break;

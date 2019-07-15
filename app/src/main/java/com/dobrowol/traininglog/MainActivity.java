@@ -60,7 +60,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
         DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
-    public static final String TRAINING = "goal";
+    public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
     public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView goalRecyclerView;
@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
 
-        initializeObservers();
 
         Intent intent = getIntent();
         if(intent != null) {
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         if (training == null){
             initializeTraining();
         }
-
+        initializeObservers();
         setAppBarTitle();
         exerciseList = new ArrayList<>();
     }
@@ -129,8 +128,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 // Update the cached copy of the exercises in the adapter.
                 ArrayList<Goal> array = new ArrayList<>(goals);
                 generalAdapter.setGoals(array);
+                generalAdapter.notifyDataSetChanged();
             }
         });
+        trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
+        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
 
     }
     private void initializeTraining(){
@@ -140,11 +142,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         numberOfExercises = 0;
 
-        trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
-        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
-
-
-        // trainingViewModel.insert(goal);
+         trainingViewModel.insert(training);
     }
 
     private void setAppBarTitle() {
@@ -168,6 +166,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onClick(View view) {
+        switch (view.getId()){
+            default:
+                break;
+        }
 
 
     }

@@ -17,7 +17,8 @@
             android:layout_marginStart="0dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
-            android:id="@+id/goal_rv" />
+            android:id="@+id/goal_rv"
+            android:background="@drawable/recycler_view_background"/>
 
 
     </android.support.constraint.ConstraintLayout>

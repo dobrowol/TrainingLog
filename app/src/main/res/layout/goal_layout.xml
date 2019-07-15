@@ -9,11 +9,11 @@
 
     <TextView
         android:id="@+id/generalTextView"
-        android:layout_width="401dp"
+        android:layout_width="300dp"
         android:layout_height="63dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/edit_text_general_background"
         android:foregroundGravity="fill_vertical"
         android:gravity="center|center_vertical"
@@ -33,17 +33,18 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exercises_rv"
-        android:layout_width="0dp"
+        android:layout_width="300dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/addingExercise"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_top" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_top"
+        android:background="@drawable/recycler_view_background"/>
 
     <TextView
         android:id="@+id/addingExercise"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_width="300dp"
+        android:layout_height="63dp"
         android:text="@string/add_exercise"
         android:gravity="center|center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"

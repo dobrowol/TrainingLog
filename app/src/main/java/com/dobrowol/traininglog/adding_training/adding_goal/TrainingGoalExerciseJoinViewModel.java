@@ -17,40 +17,22 @@ import java.util.List;
 public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
 
     private TrainingGoalExerciseJoinRepository mRepository;
-    private class TrainingGoal{
-        public String trainingId;
-        public String goalId;
 
-        public TrainingGoal(String trainingId, String goalId) {
-            this.trainingId = trainingId;
-            this.goalId = goalId;
-        }
-    }
-    private MutableLiveData<TrainingGoal> query  = new MutableLiveData<>();
+    private MutableLiveData<String> query  = new MutableLiveData<>();
     public LiveData<List<Exercise>> goalTrainingExercises = Transformations.switchMap(query,
-            trainingGoal ->
-            mRepository.getExercisesForTrainingAndGoal(trainingGoal.goalId, trainingGoal.trainingId)
+            trainingGoalId ->
+            mRepository.getExercisesForTrainingAndGoal(trainingGoalId)
     );
 
-    public void getExercisesByTrainingIdGoalId( String trainingId, String goalId){ TrainingGoal trainingGoal = new TrainingGoal(trainingId, goalId);
-        query.setValue(trainingGoal); }
-
-
-    private MutableLiveData<String> query1  = new MutableLiveData<>();
-    public LiveData<List<Goal>> trainingGoals = Transformations.switchMap(query1,
-            trainingId ->
-                    mRepository.getUniqueGoalsForTraining(trainingId)
-    );
-    public void getUniqueGoalsForTraining( String trainingId){
-        query1.setValue(trainingId); }
+    public void getExercisesByTrainingIdGoalId( String trainingGoalId){
+        query.setValue(trainingGoalId);
+    }
 
 
     public TrainingGoalExerciseJoinViewModel(Application application) {
         super(application);
         mRepository = new TrainingGoalExerciseJoinRepository(application);
     }
-
-
 
     public void insert(TrainingGoalExerciseJoin trainingGoalExerciseJoin) { mRepository.insert(trainingGoalExerciseJoin); }
 }

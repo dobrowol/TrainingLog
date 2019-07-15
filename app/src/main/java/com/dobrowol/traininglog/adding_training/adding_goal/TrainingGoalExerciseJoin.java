@@ -11,17 +11,13 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(indices = {@Index("trainingId"), @Index("goalId"), @Index("exerciseId")},
+@Entity(indices = {@Index("trainingGoalId"), @Index("exerciseId")},
         tableName = "training_goal_exercise_join",
         foreignKeys = {
                 @ForeignKey(onDelete = CASCADE,
-                        entity = Training.class,
+                        entity = TrainingGoalJoin.class,
                         parentColumns = "id",
-                        childColumns = "trainingId"),
-                @ForeignKey(onDelete = CASCADE,
-                        entity = Goal.class,
-                        parentColumns = "id",
-                        childColumns = "goalId"),
+                        childColumns = "trainingGoalId"),
                 @ForeignKey(onDelete = CASCADE,
                         entity = Exercise.class,
                         parentColumns = "id",
@@ -33,17 +29,14 @@ public class TrainingGoalExerciseJoin {
     @NonNull
     public String id;
     @NonNull
-    public String trainingId;
-    @NonNull
-    public String goalId;
+    public String trainingGoalId;
     @NonNull
     public String exerciseId;
     public int order;
 
-    public TrainingGoalExerciseJoin(String id, String trainingId, String goalId, String exerciseId, int order) {
+    public TrainingGoalExerciseJoin(@NonNull String id, @NonNull String trainingGoalId, @NonNull String exerciseId, int order) {
         this.id = id;
-        this.trainingId = trainingId;
-        this.goalId = goalId;
+        this.trainingGoalId = trainingGoalId;
         this.exerciseId = exerciseId;
         this.order = order;
     }
