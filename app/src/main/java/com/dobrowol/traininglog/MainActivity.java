@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 
+import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import android.widget.TimePicker;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.dobrowol.traininglog.adding_training.TrainingExerciseJoin;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
@@ -41,6 +43,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
@@ -57,7 +60,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 
-public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener,View.OnTouchListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
+public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
         DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
     public static final String TRAINING = "training";
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private ExerciseViewModel exerciseViewModel;
     private TextView generalTextView;
     private static int oneColumn = 1;
+    private ActionMode actionMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,11 +164,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        return false;
-    }
-
-    @Override
     public void onClick(View view) {
         switch (view.getId()){
             default:
@@ -188,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onItemClick(Exercise item) {
 
     }
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("generalExerciseList", generalAdapter.getGoals());
 
@@ -303,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     private void setExercises(ArrayList<Exercise> ex) {
-
             generalAdapter.notifyDataSetChanged();
     }
 
@@ -317,6 +315,34 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     }
 
+    @Override
+    public void onNewGoalEnter() {
+        enableActionMode("Dodaj nowy cel");
+    }
+
+    @Override
+    public void onExistingGoalEdit() {
+        enableActionMode("Edytuj cel");
+    }
+
+    @Override
+    public void onNewExerciseEnter() {
+        enableActionMode("Dodaj nowe cwiczenie");
+    }
+
+    @Override
+    public void insertGoal(Goal goal) {
+        goalViewModel.insert(goal);
+        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(),training.id, goal.id);
+        trainingGoalJoinViewModel.insert(trainingGoalJoin);
+    }
+
+    @Override
+    public void insertExercise(Exercise exercise) {
+        exerciseViewModel.insert(exercise);
+        //TrainingExerciseJoin trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(),exercise.id,training.id,TODO);
+    }
+
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
@@ -324,6 +350,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         TimePickerFragment(TimePickerDialog.OnTimeSetListener listener){
             this.listener = listener;
         }
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Calendar c = Calendar.getInstance();
@@ -346,6 +373,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         DatePickerFragment(DatePickerDialog.OnDateSetListener listener){
             this.listener = listener;
         }
+        @NonNull
         @Override
         public Dialog onCreateDialog( Bundle savedInstanceState) {
             final Calendar c = Calendar.getInstance();
@@ -396,6 +424,59 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             trainingListRv.setAdapter(generalAdapter);
             }
         }
+    private class ActionBarCallback implements ActionMode.Callback {
+        private String text;
+        ActionBarCallback(String text) {
+        this.text = text;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.contextual_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            mode.setTitle(text);
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.item_delete:
+                    generalAdapter.discardStatus();
+                    disableActionMode();
+                    return true;
+                case R.id.item_add:
+                    generalAdapter.saveStatus();
+                    disableActionMode();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+
+
+        }
     }
+    private void enableActionMode( String text) {
+        if (actionMode == null) {
+            actionMode = startSupportActionMode(new ActionBarCallback(text));
+        }
+        if(actionMode != null) {
+            actionMode.invalidate();
+        }
+    }
+    private void disableActionMode()
+    {
+        actionMode.finish();
+        actionMode = null;
+    }
+}
 
 

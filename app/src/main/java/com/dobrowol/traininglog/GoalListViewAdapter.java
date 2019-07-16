@@ -1,53 +1,73 @@
 package com.dobrowol.traininglog;
 
-import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
 
-    public static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
+    private static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
+
+    void discardStatus() {
+        viewHolder.discardStatus();
+    }
 
     public interface OnItemClickListener {
         void onItemClick(Goal item);
 
         void onItemRemove(Goal goal);
+
+        void onNewGoalEnter();
+
+        void onExistingGoalEdit();
+
+        void onNewExerciseEnter();
+
+        void insertGoal(Goal goal);
+
+        void insertExercise(Exercise exercise);
     }
 
     private OnItemClickListener listener;
     private ArrayList<Goal> goals;
     private ArrayList<GoalExercisePair> goalExercisePairs;
     private Map<String, List<String>> map = new HashMap<>();
+    private CustomViewHolder viewHolder;
 
     GoalListViewAdapter(OnItemClickListener listener) {
         this.listener = listener;
         goals = new ArrayList<>();
     }
-
+    void saveStatus(){
+        viewHolder.saveStatus();
+    }
     void setGoals(ArrayList<Goal> goals){
         if(goals != null && this.goals != null && goals.size() != this.goals.size()) {
             this.goals.clear();
             this.goals = goals;
         }
-
-        this.goals.add(EMPTY_GOAL);
+        if(goals !=null) {
+            this.goals.add(EMPTY_GOAL);
+        }
     }
 
     void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
@@ -60,11 +80,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     ArrayList<Goal> getGoals(){
         return goals;
     }
+    @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.goal_layout, null);
-
-        return new CustomViewHolder(view, listener);
+        viewHolder = new CustomViewHolder(view, listener);
+        return viewHolder;
     }
 
     @Override
@@ -86,19 +107,24 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         TextView addExercise;
         OnItemClickListener listener;
         Goal goal;
+        EditText descriptionEditText;
+        ViewSwitcher viewSwitcher;
 
-
-        public CustomViewHolder(View view, OnItemClickListener listener) {
+        CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
             this.listener = listener;
-            this.descriptionText = view.findViewById(R.id.generalTextView);
+            this.descriptionText = view.findViewById(R.id.goalTextView);
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
             this.addExercise = view.findViewById(R.id.addingExercise);
             view.setOnClickListener(this);
             //descriptionText.setEnabled(false);
             //addExercise.setEnabled(false);
-            descriptionText.setOnClickListener(this);
             addExercise.setOnClickListener(this);
+
+            viewSwitcher = view.findViewById(R.id.viewSwitcher);
+            descriptionEditText = view.findViewById(R.id.generalEditText);
+            descriptionText.setOnClickListener(this);
+
         }
 
         void fillView(Goal textAtPosition) {
@@ -114,13 +140,19 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.generalTextView:
-                    descriptionText.setEnabled(true);
-                    descriptionText.setText("");
-                    descriptionText.setCursorVisible(true);
-                    descriptionText.setFocusableInTouchMode(true);
-                    descriptionText.setInputType(InputType.TYPE_CLASS_TEXT);
-                    descriptionText.requestFocus();
+                case R.id.goalTextView:
+                    viewSwitcher.showNext();
+                    if(descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
+                        descriptionEditText.setText("");
+                        listener.onNewGoalEnter();
+                    }else{
+                        descriptionEditText.setText(descriptionText.getText());
+                        listener.onExistingGoalEdit();
+                    }
+                    break;
+
+                case R.id.addingExercise:
+                    listener.onNewExerciseEnter();
                     break;
                 case R.id.exercises_rv:
                     listener.onItemClick(goal);
@@ -130,6 +162,28 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     break;
             }
 
+        }
+
+        void saveStatus() {
+            switch(descriptionEditText.getId()){
+                case R.id.generalEditText:
+                    if (descriptionEditText.getText().toString().compareTo("")!=0) {
+                        Goal goal = new Goal(UUID.randomUUID().toString(), descriptionEditText.getText().toString());
+                        goal.startDate = new Date();
+                        listener.insertGoal(goal);
+
+                        descriptionText.setText(descriptionEditText.getText());
+                    }
+                    viewSwitcher.showPrevious();
+                    break;
+            }
+        }
+
+        void discardStatus() {
+            switch(descriptionEditText.getId()){
+                case R.id.generalEditText:
+                    viewSwitcher.showPrevious();
+            }
         }
     }
 

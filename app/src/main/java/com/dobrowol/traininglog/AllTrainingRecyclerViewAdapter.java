@@ -1,5 +1,6 @@
 package com.dobrowol.traininglog;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
@@ -44,30 +45,25 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     private final List<Training> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public AllTrainingRecyclerViewAdapter(List<Training> items, OnListFragmentInteractionListener listener) {
+    AllTrainingRecyclerViewAdapter(List<Training> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_training, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.setDate(holder.mItem.date);
 
-        holder.mView.setOnClickListener(v -> {
-            if (null != mListener) {
-                // Notify the active callbacks interface (the activity, if the
-                // fragment is attached to one) that an item has been selected.
-                mListener.onListFragmentInteraction(holder.mItem);
-            }
-        });
+
         holder.setDataChart(holder.mItem);
     }
 
@@ -77,18 +73,18 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements OnChartValueSelectedListener {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        final View mView;
+        final TextView mIdView;
         private HorizontalBarChart mChart;
-        public Training mItem;
+        Training mItem;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mIdView = view.findViewById(R.id.item_number);
-            mContentView = view.findViewById(R.id.content);
+
             mChart = view.findViewById(R.id.trainingLoadPreviewChart);
+
 
             mChart.setOnChartValueSelectedListener(this);
 
@@ -126,7 +122,9 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mIdView.setText(formatted);
         }
 
-        public void setDataChart(Training training){
+        void setDataChart(Training training){
+            setListeners(training);
+
             ArrayList<BarEntry> values = new ArrayList<>();
 
             float [] trainingLoads = new float[3];
@@ -168,10 +166,18 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mChart.invalidate();
         }
 
+        private void setListeners(Training training) {
+            View.OnClickListener onClickListener = v -> mListener.onListFragmentInteraction(training);
+            mView.setOnClickListener(onClickListener);
+            mChart.setOnClickListener(onClickListener);
+            mIdView.setOnClickListener(onClickListener);
+        }
 
+
+        @NonNull
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + "'";
         }
 
         @Override

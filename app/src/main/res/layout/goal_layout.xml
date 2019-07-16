@@ -2,18 +2,28 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="320dp"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:layout_weight="1">
+    >
 
-    <TextView
-        android:id="@+id/generalTextView"
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
         android:layout_width="300dp"
         android:layout_height="63dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
+
+        app:layout_constraintBottom_toTopOf="@+id/guideline_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp">
+    <TextView
+        android:id="@+id/goalTextView"
+        android:layout_width="300dp"
+        android:layout_height="63dp"
         android:background="@drawable/edit_text_general_background"
         android:foregroundGravity="fill_vertical"
         android:gravity="center|center_vertical"
@@ -23,6 +33,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
+        <EditText
+            android:inputType="text"
+            android:id="@+id/generalEditText"
+            android:layout_width="300dp"
+            android:layout_height="63dp"
+            android:background="@drawable/edit_text_general_background"
+            android:foregroundGravity="fill_vertical"
+            android:gravity="center|center_vertical"
+            android:text="@string/add_goal"
+            app:layout_constraintBottom_toTopOf="@+id/guideline_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            />
+    </ViewSwitcher>
     <android.support.constraint.Guideline
         android:id="@+id/guideline_top"
         android:layout_width="wrap_content"
@@ -39,12 +65,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline_top"
-        android:background="@drawable/recycler_view_background"/>
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/recycler_view_grey_background"/>
 
     <TextView
         android:id="@+id/addingExercise"
         android:layout_width="300dp"
         android:layout_height="63dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
         android:text="@string/add_exercise"
         android:gravity="center|center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
