@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private TextView generalTextView;
     private static int oneColumn = 1;
     private ActionMode actionMode;
+    private Goal editedGoal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         initializeObservers();
         setAppBarTitle();
         exerciseList = new ArrayList<>();
+        editedGoal = null;
     }
 
     private void initializeObservers(){
@@ -317,17 +319,18 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onNewGoalEnter() {
-        enableActionMode("Dodaj nowy cel");
+
     }
 
     @Override
-    public void onExistingGoalEdit() {
-        enableActionMode("Edytuj cel");
+    public void onExistingGoalEdit(String description) {
+
+        goalViewModel.getGoal(description).observe(this, goal -> editedGoal = goal);
     }
 
     @Override
     public void onNewExerciseEnter() {
-        enableActionMode("Dodaj nowe cwiczenie");
+
     }
 
     @Override
@@ -341,6 +344,30 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void insertExercise(Exercise exercise) {
         exerciseViewModel.insert(exercise);
         //TrainingExerciseJoin trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(),exercise.id,training.id,TODO);
+    }
+
+    @Override
+    public void updateExercise(Exercise newExercise) {
+
+    }
+
+    @Override
+    public void updateGoal(Goal newGoal) {
+        if(newGoal!= null) {
+            if (newGoal.description != null) {
+                editedGoal.description = newGoal.description;
+            }
+            if (newGoal.startDate != null) {
+                editedGoal.startDate = newGoal.startDate;
+            }
+            if (newGoal.endDate != null) {
+                editedGoal.endDate = newGoal.endDate;
+            }
+            if (newGoal.priority != -1) {
+                editedGoal.priority = newGoal.priority;
+            }
+            goalViewModel.update(editedGoal);
+        }
     }
 
     public static class TimePickerFragment extends DialogFragment
@@ -477,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         actionMode.finish();
         actionMode = null;
     }
+
 }
 
 

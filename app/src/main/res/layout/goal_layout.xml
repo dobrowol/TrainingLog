@@ -81,7 +81,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/exercises_rv"
-        android:background="@drawable/edit_text_general_background"/>
+        android:background="@drawable/edit_text_general_background"
+        android:textColor="@color/adding_text_colour"
+        android:textStyle="bold"/>
 
 
 </android.support.constraint.ConstraintLayout>

@@ -7,9 +7,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
-
 import java.util.List;
 
 @Dao
@@ -21,7 +18,7 @@ public interface GoalDAO {
     List<Goal> loadAllByIds(int[] eIds);
 
     @Query("SELECT * FROM goal_table WHERE description=:eDescription LIMIT 1")
-    Goal getByDescription(String eDescription);
+    LiveData<Goal> getByDescription(String eDescription);
 
     @Insert
     void insert(Goal exercise);

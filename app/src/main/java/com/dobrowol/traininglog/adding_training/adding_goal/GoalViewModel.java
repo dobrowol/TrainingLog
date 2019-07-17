@@ -27,5 +27,8 @@ public class GoalViewModel extends AndroidViewModel {
 
     public void update(Goal goal) { mRepository.update(goal); }
 
+    public LiveData<Goal> getGoal(String description) {
+        return mRepository.getGoal(description);
+    }
 }
 

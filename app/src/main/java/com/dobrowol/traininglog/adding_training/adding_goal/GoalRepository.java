@@ -36,6 +36,10 @@ public class GoalRepository {
         new updateAsyncTask(goalDAO).execute(goal);
     }
 
+    public LiveData<Goal> getGoal(String description) {
+        return goalDAO.getByDescription(description);
+    }
+
     private static class insertAsyncTask extends AsyncTask<Goal, Void, Void> {
 
         private GoalDAO mAsyncTaskDao;

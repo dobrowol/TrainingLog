@@ -48,6 +48,9 @@ public class Goal implements Parcelable {
     public Goal(String id, String description) {
         this.id = id;
         this.description = description;
+        startDate = null;
+        endDate = null;
+        priority = -1;
     }
 
     @Override
