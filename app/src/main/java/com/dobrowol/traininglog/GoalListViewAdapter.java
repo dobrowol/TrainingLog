@@ -167,17 +167,18 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
            ViewSwitcher viewSwitcher;
            Goal oldGoal;
            TextView descriptionText;
+           EditText descriptionEditText;
+
            ExistingGoalUpdateState(View view, OnItemClickListener listener){
                this.listener = listener;
                this.view = view;
                viewSwitcher = view.findViewById(R.id.viewSwitcher);
                descriptionText = view.findViewById(R.id.goalTextView);
                oldGoal = new Goal(null, descriptionText.getText().toString());
+               descriptionEditText = view.findViewById(R.id.generalEditText);
            }
            @Override
            public void saveStatus() {
-
-               EditText descriptionEditText = view.findViewById(R.id.generalEditText);
 
                if (descriptionEditText.getText().toString().compareTo("")!=0) {
                   Goal newGoal = new Goal(null, descriptionEditText.getText().toString());
@@ -203,6 +204,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         EditText descriptionEditText;
         ViewSwitcher viewSwitcher;
         TrainingDetailEnterState trainingDetailEnterState;
+        NewGoalEnterState newGoalEnterState;
+        ExistingGoalUpdateState existingGoalUpdateState;
         private ActionMode actionMode;
 
         CustomViewHolder(View view, OnItemClickListener listener) {
@@ -220,6 +223,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             descriptionEditText = view.findViewById(R.id.generalEditText);
             descriptionText.setOnClickListener(this);
             trainingDetailEnterState = null;
+            newGoalEnterState = new NewGoalEnterState(view, listener);
+            existingGoalUpdateState = new ExistingGoalUpdateState(view, listener);
+
         }
 
         void fillView(Goal textAtPosition) {
@@ -242,12 +248,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     if(descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
                         descriptionEditText.setText("");
                         enableActionMode(v,"Dodaj cel");
-                        setState(new NewGoalEnterState(v, listener));
+                        setState(newGoalEnterState);
                     }else{
                         descriptionEditText.setText(descriptionText.getText());
                         enableActionMode(v,"Edytuj cel");
                         listener.onExistingGoalEdit(descriptionText.getText().toString());
-                        setState(new ExistingGoalUpdateState(v, listener));
+                        setState(existingGoalUpdateState);
                     }
                     if(actionMode != null) {
                         actionMode.invalidate();
