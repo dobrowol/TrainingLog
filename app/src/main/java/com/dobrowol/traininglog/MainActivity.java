@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -106,9 +107,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
         goalRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        goalRecyclerView.setFocusable(false);
         generalAdapter = new GoalListViewAdapter(this);
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
+        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST);
 
 
         Intent intent = getIntent();
@@ -171,8 +174,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             default:
                 break;
         }
+    }
 
-
+    @Override
+    public void scrollToPosition(int adapterPosition) {
+        goalRecyclerView.scrollToPosition(adapterPosition);
     }
 
     @Override

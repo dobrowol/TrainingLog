@@ -1,12 +1,17 @@
 package com.dobrowol.traininglog;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -32,6 +37,7 @@ import java.util.UUID;
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
 
+    boolean[] editTextFocused;
     private static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
 
     void discardStatus() {
@@ -59,6 +65,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         void onClick(View v);
+
+        void scrollToPosition(int adapterPosition);
     }
 
     private OnItemClickListener listener;
@@ -78,6 +86,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         if(goals != null && this.goals != null && goals.size() != this.goals.size()) {
             this.goals.clear();
             this.goals = goals;
+            editTextFocused = new boolean[goals.size()+1];
+            disableAllEditText();
         }
         if(this.goals !=null) {
             this.goals.add(EMPTY_GOAL);
@@ -106,6 +116,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int i) {
         Goal textAtPosition = goals.get(i);
         customViewHolder.fillView(textAtPosition);
+        if(i>=0 && i < editTextFocused.length && editTextFocused[i]) {
+            customViewHolder.viewSwitcher.showNext();
+        }
+        else {
+            customViewHolder.viewSwitcher.showPrevious();
+        }
 
     }
 
@@ -194,7 +210,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                viewSwitcher.showPrevious();
            }
     }
-    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnKeyListener {
 
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
@@ -221,6 +237,21 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
             viewSwitcher = view.findViewById(R.id.viewSwitcher);
             descriptionEditText = view.findViewById(R.id.generalEditText);
+            descriptionEditText.setOnKeyListener(this);
+            descriptionEditText.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    setState(null);
+                    disableActionMode();
+                }
+            });
+            view.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    setState(null);
+                    disableActionMode();
+                }
+            });
+
+            view.setOnKeyListener(this);
             descriptionText.setOnClickListener(this);
             trainingDetailEnterState = null;
             newGoalEnterState = new NewGoalEnterState(view, listener);
@@ -244,7 +275,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.goalTextView:
+                    setOnlyOneEditTextFocused(getAdapterPosition());
                     viewSwitcher.showNext();
+                    showSoftKeyboard(v);
                     if(descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
                         descriptionEditText.setText("");
                         enableActionMode(v,"Dodaj cel");
@@ -255,11 +288,10 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                         listener.onExistingGoalEdit(descriptionText.getText().toString());
                         setState(existingGoalUpdateState);
                     }
-                    if(actionMode != null) {
-                        actionMode.invalidate();
-                    }
                     break;
-
+                case R.id.generalEditText:
+                    showSoftKeyboard(v);
+                    break;
                 case R.id.addingExercise:
                     enableActionMode(v,"Dodaj ćwiczenie");
 
@@ -273,7 +305,13 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             }
 
         }
-
+        public void showSoftKeyboard(View view) {
+            if (descriptionEditText.requestFocus()) {
+                InputMethodManager imm = (InputMethodManager)
+                        ((AppCompatActivity)view.getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }
         private void setState(TrainingDetailEnterState newGoalEnterState) {
             if(trainingDetailEnterState != null){
                 trainingDetailEnterState.discardStatus();
@@ -291,8 +329,10 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         }
         private void disableActionMode()
         {
-            actionMode.finish();
-            actionMode = null;
+            if(actionMode != null) {
+                actionMode.finish();
+                actionMode = null;
+            }
         }
         void saveStatus() {
             if (descriptionEditText.getText().toString().compareTo("") != 0) {
@@ -308,6 +348,13 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void discardStatus() {
             viewSwitcher.showPrevious();
         }
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            listener.scrollToPosition(getAdapterPosition());
+            return false;
+        }
+
         private class ActionBarCallback implements ActionMode.Callback {
             private String text;
             ActionBarCallback(String text) {
@@ -330,18 +377,19 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.item_delete:
-                        if(trainingDetailEnterState != null) {
-                            trainingDetailEnterState.discardStatus();
-                            trainingDetailEnterState = null;
-                        }
+                        setState(null);
                         disableActionMode();
+                        disableAllEditText();
+                        viewSwitcher.showPrevious();
                         return true;
                     case R.id.item_add:
                         if(trainingDetailEnterState != null) {
                             trainingDetailEnterState.saveStatus();
                             trainingDetailEnterState = null;
                         }
+                        disableAllEditText();
                         disableActionMode();
+                        viewSwitcher.showPrevious();
                         return true;
                     default:
                         return false;
@@ -354,6 +402,15 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
             }
         }
+    }
+    private void disableAllEditText(){
+        for(int i =0; i< editTextFocused.length; i++){
+            editTextFocused[i] = false;
+        }
+    }
+    private void setOnlyOneEditTextFocused(int adapterPosition) {
+        disableAllEditText();
+        editTextFocused[adapterPosition] = true;
     }
 
     private OnItemClickListener onItemClickListener;
