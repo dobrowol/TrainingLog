@@ -236,6 +236,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             addExercise.setOnClickListener(this);
 
             viewSwitcher = view.findViewById(R.id.viewSwitcher);
+            viewSwitcher.showPrevious();
             descriptionEditText = view.findViewById(R.id.generalEditText);
             descriptionEditText.setOnKeyListener(this);
             descriptionEditText.setOnFocusChangeListener((v, hasFocus) -> {

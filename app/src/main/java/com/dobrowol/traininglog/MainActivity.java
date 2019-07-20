@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 
 import androidx.appcompat.view.ActionMode;
@@ -23,8 +24,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.ViewSwitcher;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -106,7 +109,18 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
-        goalRecyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) {
+            @Override
+            public boolean requestChildRectangleOnScreen(RecyclerView parent, View child, Rect rect, boolean immediate, boolean focusedChildVisible) {
+
+                if (((ViewGroup) child).getFocusedChild() instanceof ViewSwitcher) {
+                    return false;
+                }
+
+                return super.requestChildRectangleOnScreen(parent, child, rect, immediate, focusedChildVisible);
+            }
+        };
+        goalRecyclerView.setLayoutManager(linearLayoutManager);
         goalRecyclerView.setFocusable(false);
         generalAdapter = new GoalListViewAdapter(this);
         generalAdapter.setOnItemClickListener(this);
