@@ -3,10 +3,12 @@ package com.dobrowol.traininglog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ViewSwitcher;
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private static int oneColumn = 1;
     private ActionMode actionMode;
     private Goal editedGoal;
-
+    private FloatingActionButton fab_add_goal;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         exerciseDescriptionViewModel = ViewModelProviders.of(this).get(ExerciseDescriptionViewModel.class);
         exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel.class);
 
+        fab_add_goal = findViewById(R.id.fab_add_goal);
+        fab_add_goal.setOnClickListener(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) {
             @Override
             public boolean requestChildRectangleOnScreen(RecyclerView parent, View child, Rect rect, boolean immediate, boolean focusedChildVisible) {
@@ -185,9 +190,49 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.fab_add_goal:
+                showAlert("Dodaj cel");
+                break;
             default:
                 break;
         }
+    }
+
+    public void showAlert(String text){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        alertDialog.setTitle("GOAL");
+        alertDialog.setMessage(text);
+
+        final EditText input = new EditText(MainActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+
+        alertDialog.setView(input);
+        //alertDialog.setIcon(R.drawable.key);
+
+        alertDialog.setPositiveButton("YES",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        insertGoal(input.getText().toString());
+
+                    }
+                });
+
+        alertDialog.setNegativeButton("NO",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void insertGoal(String goalDescription) {
+        Goal goal = new Goal(UUID.randomUUID().toString(),goalDescription);
+        insertGoal(goal);
     }
 
     @Override

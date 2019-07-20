@@ -19,7 +19,15 @@
             app:layout_constraintStart_toStartOf="parent"
             android:id="@+id/goal_rv"
             android:background="@drawable/recycler_view_background"/>
-
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_input_add"/>
 
     </android.support.constraint.ConstraintLayout>
 

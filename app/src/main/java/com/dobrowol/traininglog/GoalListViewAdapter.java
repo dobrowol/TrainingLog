@@ -1,6 +1,8 @@
 package com.dobrowol.traininglog;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,14 +15,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
@@ -36,8 +42,6 @@ import java.util.UUID;
 
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
-
-    boolean[] editTextFocused;
     private static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
 
     void discardStatus() {
@@ -83,15 +87,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         viewHolder.saveStatus();
     }
     void setGoals(ArrayList<Goal> goals){
-        if(goals != null && this.goals != null && goals.size() != this.goals.size()) {
-            this.goals.clear();
-            this.goals = goals;
-            editTextFocused = new boolean[goals.size()+1];
-            disableAllEditText();
-        }
-        if(this.goals !=null) {
-            this.goals.add(EMPTY_GOAL);
-        }
+        this.goals = goals;
     }
 
     void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
@@ -116,22 +112,16 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int i) {
         Goal textAtPosition = goals.get(i);
         customViewHolder.fillView(textAtPosition);
-        if(i>=0 && i < editTextFocused.length && editTextFocused[i]) {
-            customViewHolder.viewSwitcher.showNext();
-        }
-        else {
-            customViewHolder.viewSwitcher.showPrevious();
-        }
-
     }
 
     @Override
     public int getItemCount() {
         return (null != goals ? goals.size() : 0);
     }
-    private interface TrainingDetailEnterState{
 
-        void saveStatus();
+    private interface TrainingDetailEnterState{
+        void start();
+        void saveStatus(String name);
         void discardStatus();
     }
    /* private class TrainingDetailsSM{
@@ -149,66 +139,92 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     private class NewGoalEnterState implements TrainingDetailEnterState {
        OnItemClickListener listener;
        View view;
-       ViewSwitcher viewSwitcher;
+
+       // EditText descriptionEditText;
 
        NewGoalEnterState(View view, OnItemClickListener listener) {
            this.listener = listener;
            this.view = view;
-           viewSwitcher = view.findViewById(R.id.viewSwitcher);
        }
-
+        @Override
+        public void start(){
+        //    descriptionEditText.setText("");
+        }
        @Override
-       public void saveStatus() {
-           TextView descriptionText = view.findViewById(R.id.goalTextView);
-           EditText descriptionEditText = view.findViewById(R.id.generalEditText);
+       public void saveStatus(String name) {
 
-           if (descriptionEditText.getText().toString().compareTo("") != 0) {
-               Goal goal = new Goal(UUID.randomUUID().toString(), descriptionEditText.getText().toString());
+           if (name != null && name.compareTo("") != 0) {
+               Goal goal = new Goal(UUID.randomUUID().toString(), name);
                goal.startDate = new Date();
                listener.insertGoal(goal);
-
-               descriptionText.setText(descriptionEditText.getText());
            }
-           viewSwitcher.showPrevious();
        }
 
        @Override
        public void discardStatus() {
-           viewSwitcher.showPrevious();
        }
    }
        private class ExistingGoalUpdateState implements TrainingDetailEnterState{
            OnItemClickListener listener;
            View view;
-           ViewSwitcher viewSwitcher;
            Goal oldGoal;
            TextView descriptionText;
-           EditText descriptionEditText;
+          // EditText descriptionEditText;
 
            ExistingGoalUpdateState(View view, OnItemClickListener listener){
                this.listener = listener;
                this.view = view;
-               viewSwitcher = view.findViewById(R.id.viewSwitcher);
                descriptionText = view.findViewById(R.id.goalTextView);
                oldGoal = new Goal(null, descriptionText.getText().toString());
-               descriptionEditText = view.findViewById(R.id.generalEditText);
            }
            @Override
-           public void saveStatus() {
+           public void start(){
+              // descriptionEditText.setText(descriptionText.getText());
+               listener.onExistingGoalEdit(descriptionText.getText().toString());
 
-               if (descriptionEditText.getText().toString().compareTo("")!=0) {
-                  Goal newGoal = new Goal(null, descriptionEditText.getText().toString());
-                   listener.updateGoal(newGoal);
+           }
+           @Override
+           public void saveStatus(String name) {
 
-                   descriptionText.setText(descriptionEditText.getText());
+              if (name != null && name.compareTo("")!=0) {
+                  Goal newGoal = new Goal(null, name);
+                  listener.updateGoal(newGoal);
+
+                  descriptionText.setText(name);
                }
-               viewSwitcher.showPrevious();
            }
 
            @Override
            public void discardStatus() {
-               viewSwitcher.showPrevious();
            }
+    }
+    private class NewExerciseAdd implements TrainingDetailEnterState{
+        OnItemClickListener listener;
+        View view;
+        Goal oldGoal;
+        TextView descriptionText;
+        //EditText descriptionEditText;
+
+        NewExerciseAdd(View view, OnItemClickListener listener){
+            this.listener = listener;
+            this.view = view;
+            descriptionText = view.findViewById(R.id.goalTextView);
+            oldGoal = new Goal(null, descriptionText.getText().toString());
+        }
+        @Override
+        public void start(){
+            Intent intent = new Intent(view.getContext() ,AddExercise.class);
+            ((AppCompatActivity)view.getContext()).startActivity(intent);
+        }
+        @Override
+        public void saveStatus(String name) {
+
+        }
+
+        @Override
+        public void discardStatus() {
+
+        }
     }
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnKeyListener {
 
@@ -217,15 +233,18 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         TextView addExercise;
         OnItemClickListener listener;
         Goal goal;
-        EditText descriptionEditText;
         ViewSwitcher viewSwitcher;
+        View view;
+
         TrainingDetailEnterState trainingDetailEnterState;
         NewGoalEnterState newGoalEnterState;
         ExistingGoalUpdateState existingGoalUpdateState;
         private ActionMode actionMode;
+        private String password;
 
         CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
+            this.view = view;
             this.listener = listener;
             this.descriptionText = view.findViewById(R.id.goalTextView);
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
@@ -235,16 +254,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             //addExercise.setEnabled(false);
             addExercise.setOnClickListener(this);
 
-            viewSwitcher = view.findViewById(R.id.viewSwitcher);
-            viewSwitcher.showPrevious();
-            descriptionEditText = view.findViewById(R.id.generalEditText);
-            descriptionEditText.setOnKeyListener(this);
-            descriptionEditText.setOnFocusChangeListener((v, hasFocus) -> {
-                if (!hasFocus) {
-                    setState(null);
-                    disableActionMode();
-                }
-            });
             view.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
                     setState(null);
@@ -260,13 +269,30 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         }
 
+        public void showTextView() {
+            if (viewSwitcher.getNextView() instanceof TextView) {
+                viewSwitcher.showNext();
+            } else {
+                viewSwitcher.showPrevious();
+            }
+        }
+
+        public void showEditText() {
+            if (viewSwitcher.getNextView() instanceof EditText) {
+                viewSwitcher.showNext();
+            } else {
+                viewSwitcher.showPrevious();
+            }
+        }
+
         void fillView(Goal textAtPosition) {
 
             this.goal = textAtPosition;
             descriptionText.setText(textAtPosition.description);
-            if(this.goal.id.equals(GoalListViewAdapter.EMPTY_GOAL.id)){
+
+            if (this.goal.id.equals(GoalListViewAdapter.EMPTY_GOAL.id)) {
                 descriptionText.setTextColor(descriptionText.getResources().getColor(R.color.adding_text_colour));
-                descriptionText.setTypeface(descriptionText.getTypeface(),Typeface.BOLD);
+                descriptionText.setTypeface(descriptionText.getTypeface(), Typeface.BOLD);
                 addExercise.setVisibility(TextView.INVISIBLE);
                 exercisesRecyclerView.setVisibility(RecyclerView.INVISIBLE);
             }
@@ -274,27 +300,23 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.goalTextView:
-                    setOnlyOneEditTextFocused(getAdapterPosition());
-                    viewSwitcher.showNext();
-                    showSoftKeyboard(v);
-                    if(descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
-                        descriptionEditText.setText("");
-                        enableActionMode(v,"Dodaj cel");
+                    if (descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
                         setState(newGoalEnterState);
-                    }else{
-                        descriptionEditText.setText(descriptionText.getText());
-                        enableActionMode(v,"Edytuj cel");
-                        listener.onExistingGoalEdit(descriptionText.getText().toString());
+                        //trainingDetailEnterState.start();
+                        //enableActionMode(v, "Dodaj cel");
+                        showAlert("Dodaj cel");
+
+                    } else {
+                        //enableActionMode(v, "Edytuj cel");
                         setState(existingGoalUpdateState);
+                        //trainingDetailEnterState.start();
+                        showAlert("Edytuj cel");
                     }
                     break;
-                case R.id.generalEditText:
-                    showSoftKeyboard(v);
-                    break;
                 case R.id.addingExercise:
-                    enableActionMode(v,"Dodaj ćwiczenie");
+                    enableActionMode(v, "Dodaj ćwiczenie");
 
                     break;
                 case R.id.exercises_rv:
@@ -306,15 +328,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             }
 
         }
-        public void showSoftKeyboard(View view) {
-            if (descriptionEditText.requestFocus()) {
-                InputMethodManager imm = (InputMethodManager)
-                        ((AppCompatActivity)view.getContext()).getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-            }
-        }
         private void setState(TrainingDetailEnterState newGoalEnterState) {
-            if(trainingDetailEnterState != null){
+            if (trainingDetailEnterState != null) {
                 trainingDetailEnterState.discardStatus();
             }
             trainingDetailEnterState = newGoalEnterState;
@@ -322,32 +337,31 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         private void enableActionMode(View v, String text) {
             if (actionMode == null) {
-                actionMode = ((AppCompatActivity)v.getContext()).startSupportActionMode(new ActionBarCallback(text));
+                actionMode = ((AppCompatActivity) v.getContext()).startSupportActionMode(new ActionBarCallback(text));
             }
-            if(actionMode != null) {
+            if (actionMode != null) {
                 actionMode.invalidate();
             }
         }
-        private void disableActionMode()
-        {
-            if(actionMode != null) {
+
+        private void disableActionMode() {
+            if (actionMode != null) {
                 actionMode.finish();
                 actionMode = null;
             }
         }
+
         void saveStatus() {
-            if (descriptionEditText.getText().toString().compareTo("") != 0) {
-                Goal goal = new Goal(UUID.randomUUID().toString(), descriptionEditText.getText().toString());
+            if (true) {
+                // Goal goal = new Goal(UUID.randomUUID().toString(), descriptionEditText.getText().toString());
                 goal.startDate = new Date();
                 listener.insertGoal(goal);
 
-                descriptionText.setText(descriptionEditText.getText());
+                //   descriptionText.setText(descriptionEditText.getText());
             }
-            viewSwitcher.showPrevious();
         }
 
         void discardStatus() {
-            viewSwitcher.showPrevious();
         }
 
         @Override
@@ -358,6 +372,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         private class ActionBarCallback implements ActionMode.Callback {
             private String text;
+
             ActionBarCallback(String text) {
                 this.text = text;
             }
@@ -380,17 +395,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     case R.id.item_delete:
                         setState(null);
                         disableActionMode();
-                        disableAllEditText();
-                        viewSwitcher.showPrevious();
                         return true;
                     case R.id.item_add:
-                        if(trainingDetailEnterState != null) {
-                            trainingDetailEnterState.saveStatus();
+                        if (trainingDetailEnterState != null) {
                             trainingDetailEnterState = null;
                         }
-                        disableAllEditText();
                         disableActionMode();
-                        viewSwitcher.showPrevious();
                         return true;
                     default:
                         return false;
@@ -403,15 +413,43 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
             }
         }
-    }
-    private void disableAllEditText(){
-        for(int i =0; i< editTextFocused.length; i++){
-            editTextFocused[i] = false;
+        public void showAlert(String text){
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(view.getContext());
+            alertDialog.setTitle("GOAL");
+            alertDialog.setMessage(text);
+
+            final EditText input = new EditText(view.getContext());
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(lp);
+            if(goal.id.compareTo(GoalListViewAdapter.EMPTY_GOAL.id) != 0){
+                input.setText(goal.description);
+            }
+            alertDialog.setView(input);
+            //alertDialog.setIcon(R.drawable.key);
+
+            alertDialog.setPositiveButton("YES",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                           descriptionText.setText( input.getText().toString());
+                            if (trainingDetailEnterState != null) {
+                                trainingDetailEnterState.saveStatus(input.getText().toString());
+                                trainingDetailEnterState = null;
+                            }
+                        }
+                    });
+
+            alertDialog.setNegativeButton("NO",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            setState(null);
+                        }
+                    });
+
+            alertDialog.show();
         }
-    }
-    private void setOnlyOneEditTextFocused(int adapterPosition) {
-        disableAllEditText();
-        editTextFocused[adapterPosition] = true;
     }
 
     private OnItemClickListener onItemClickListener;
