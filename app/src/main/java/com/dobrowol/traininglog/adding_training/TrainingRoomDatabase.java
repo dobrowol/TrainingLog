@@ -16,6 +16,7 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionDAO;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalDAO;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseJoinDAO;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinDAO;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
@@ -30,7 +31,8 @@ public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract TrainingDAO trainingDAO();
     public abstract GoalDAO goalDAO();
     public abstract TrainingExerciseJoinDAO trainingExerciseJoinDAO();
-    public abstract TrainingGoalExerciseJoinDAO goalExerciseJoinDAO();
+    public abstract GoalExerciseJoinDAO goalExerciseJoinDAO();
+    public abstract TrainingGoalExerciseJoinDAO trainingGoalExerciseJoinDAO();
     public abstract TrainingGoalJoinDAO trainingGoalJoinDAO();
 
     private static volatile TrainingRoomDatabase INSTANCE;

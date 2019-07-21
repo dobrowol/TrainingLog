@@ -8,6 +8,7 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,7 +19,7 @@ import static androidx.room.ForeignKey.CASCADE;
         parentColumns = "id",
         childColumns = "primaryGoalId",
         onDelete = CASCADE))
-public class Goal implements Parcelable {
+public class Goal implements Parcelable, Serializable {
     @PrimaryKey
     @NonNull
     public String id;

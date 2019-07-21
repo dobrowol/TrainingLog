@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         if (training == null){
             initializeTraining();
         }
+        generalAdapter.setTraining(training);
         initializeObservers();
         setAppBarTitle();
         exerciseList = new ArrayList<>();

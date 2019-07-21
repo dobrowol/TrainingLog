@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
@@ -42,7 +43,7 @@ import java.util.UUID;
 
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
-    private static Goal EMPTY_GOAL = new Goal("000000", "Dodaj cel ");
+    private Training training;
 
     void discardStatus() {
         viewHolder.discardStatus();
@@ -90,6 +91,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         this.goals = goals;
     }
 
+    void setTraining(Training training){
+        this.training = training;
+    }
     void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
         if(goalsExercises != null && this.goals != null && goalsExercises.size() != this.goals.size()) {
             this.goalExercisePairs.clear();
@@ -286,38 +290,19 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         }
 
         void fillView(Goal textAtPosition) {
-
             this.goal = textAtPosition;
             descriptionText.setText(textAtPosition.description);
-
-            if (this.goal.id.equals(GoalListViewAdapter.EMPTY_GOAL.id)) {
-                descriptionText.setTextColor(descriptionText.getResources().getColor(R.color.adding_text_colour));
-                descriptionText.setTypeface(descriptionText.getTypeface(), Typeface.BOLD);
-                addExercise.setVisibility(TextView.INVISIBLE);
-                exercisesRecyclerView.setVisibility(RecyclerView.INVISIBLE);
-            }
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.goalTextView:
-                    if (descriptionText.getText().equals(GoalListViewAdapter.EMPTY_GOAL.description)) {
-                        setState(newGoalEnterState);
-                        //trainingDetailEnterState.start();
-                        //enableActionMode(v, "Dodaj cel");
-                        showAlert("Dodaj cel");
-
-                    } else {
-                        //enableActionMode(v, "Edytuj cel");
-                        setState(existingGoalUpdateState);
-                        //trainingDetailEnterState.start();
-                        showAlert("Edytuj cel");
-                    }
+                    setState(existingGoalUpdateState);
+                    showAlert("Edytuj cel");
                     break;
                 case R.id.addingExercise:
-                    enableActionMode(v, "Dodaj ćwiczenie");
-
+                    AddExercise.startNewInstance(view.getContext(), training, goal);
                     break;
                 case R.id.exercises_rv:
                     listener.onItemClick(goal);
@@ -423,9 +408,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT);
             input.setLayoutParams(lp);
-            if(goal.id.compareTo(GoalListViewAdapter.EMPTY_GOAL.id) != 0){
-                input.setText(goal.description);
-            }
+
+            input.setText(goal.description);
+
             alertDialog.setView(input);
             //alertDialog.setIcon(R.drawable.key);
 

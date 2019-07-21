@@ -1,5 +1,6 @@
 package com.dobrowol.traininglog.adding_training.adding_exercise;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoin;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +31,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class AddExercise extends AppCompatActivity implements View.OnClickListener, Observer<List<ExerciseDescription>>, AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
-    public static final String REQUESTED_CODE = "exercise";
+    public static final String TRAINING = "training";
+    public static final String GOAL = "goal";
     public static int CREATE_EXERCISE=1;
     Button btnSubmit, btnAddDescription;
     EditText distance, numberOfRepetitions, numberOfSets, intensity;
@@ -47,7 +50,16 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private TrainingExerciseJoin trainingExerciseJoin;
     private Exercise exercise;
     private Drawable originalEditTextBackground;
+    private Goal goal;
 
+    public static void startNewInstance(Context context, Training training, Goal goal){
+        Intent intent = new Intent(context, AddExercise.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(AddExercise.TRAINING, training);
+        bundle.putSerializable(AddExercise.GOAL, goal);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,14 +95,11 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         exerciseType = ExerciseType.General;
         Intent intent = getIntent();
         if (intent != null ) {
-            if(intent.hasExtra(MainActivity.TRAINING)) {
-                training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
+            if(intent.hasExtra(AddExercise.TRAINING)) {
+                training = (Training) intent.getExtras().getSerializable(AddExercise.TRAINING);
             }
-            if(intent.hasExtra(MainActivity.NUMBER_OF_EXERCISES)){
-                numberOfExercises = intent.getExtras().getInt(MainActivity.NUMBER_OF_EXERCISES);
-            }
-            if(intent.hasExtra(MainActivity.EXERCISE_TYPE)){
-                exerciseType = ExerciseType.values()[intent.getExtras().getInt(MainActivity.EXERCISE_TYPE)];
+            if(intent.hasExtra(AddExercise.GOAL)){
+                goal = (Goal) intent.getExtras().getSerializable(AddExercise.GOAL);
             }
         }
     }
