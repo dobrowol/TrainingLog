@@ -27,5 +27,8 @@ public class ExerciseViewModel extends AndroidViewModel {
 
     public void update(Exercise exercise) { mRepository.update(exercise); }
 
+    public LiveData<Exercise> getExerciseById(String id) {
+        return mRepository.getExerciseById(id);
+    }
 }
 

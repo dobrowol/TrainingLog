@@ -23,7 +23,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
     private List<Exercise> exerciseList;
-    private ArrayList<ExerciseDescription> exerciseDescriptionList;
+    private List<ExerciseDescription> exerciseDescriptionList;
 
     MyRecyclerViewAdapter() {
         exerciseList = new ArrayList<>();
@@ -37,7 +37,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         this.exerciseList = exerciseList;
     }
 
-    void setExerciseDescriptionList(ArrayList<ExerciseDescription> exerciseList){
+    void setExerciseDescriptionList(List<ExerciseDescription> exerciseList){
         this.exerciseDescriptionList = exerciseList;
     }
 

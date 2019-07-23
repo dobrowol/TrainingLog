@@ -32,5 +32,8 @@ public interface ExerciseDAO {
 
     @Update
     void update(Exercise exercise);
+
+    @Query("SELECT * FROM exercise_table WHERE id IN (:id)")
+    LiveData<Exercise> getExerciseById(String id);
 }
 

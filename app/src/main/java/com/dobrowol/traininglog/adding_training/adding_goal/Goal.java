@@ -34,6 +34,21 @@ public class Goal implements Parcelable, Serializable {
 
     public Date endDate;
 
+    public int hashCode(){
+        return goalId.hashCode();
+    }
+    public boolean equals(Object object){
+        if (this == object)
+            return true;
+        if (object == null)
+            return false;
+        if (getClass() != object.getClass())
+            return false;
+        Goal other = (Goal) object;
+        if (goalId.compareTo( other.goalId)!= 0 )
+            return false;
+        return true;
+    }
     public static final Creator<Goal> CREATOR = new Creator<Goal>() {
         @Override
         public Goal createFromParcel(Parcel in) {

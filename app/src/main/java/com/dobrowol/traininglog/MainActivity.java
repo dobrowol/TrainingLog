@@ -167,8 +167,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 generalAdapter.notifyDataSetChanged();
             }
         });
-        trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
+
+        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exerciseDescriptions -> {
+            generalAdapter.setExerciseDescriptions(exerciseDescriptions);
+        });
+        //trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
+        trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
 
     }
     private void initializeTraining(){
@@ -178,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         numberOfExercises = 0;
 
-         trainingViewModel.insert(training);
+        trainingViewModel.insert(training);
     }
 
     private void setAppBarTitle() {

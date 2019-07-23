@@ -30,6 +30,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +50,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     private TrainingViewModel trainingViewModel;
+    private GoalViewModel goalViewModel;
     private ExerciseViewModel exerciseViewModel;
     private ArrayList<ExerciseDescription> exerciseDescription;
     private String exerciseDescriptionId;
@@ -64,11 +66,12 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
     public static void startNewInstance(Context context, Training training, Goal goal){
         Intent intent = new Intent(context, AddExercise.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(AddExercise.TRAINING, training);
 
-        bundle.putSerializable(AddExercise.GOAL, goal);
-        intent.putExtras(bundle);
+        intent.putExtra(AddExercise.TRAINING, training.id);
+
+       // bundle.putParcelable(AddExercise.GOAL, goal);
+
+        intent.putExtra(AddExercise.GOAL, goal.goalId);
         context.startActivity(intent);
     }
     @Override
@@ -101,6 +104,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
+        goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
         goalExerciseJoinViewModel = ViewModelProviders.of(this).get(GoalExerciseJoinViewModel.class);
 
         exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, this);
@@ -109,27 +113,37 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         exerciseType = ExerciseType.General;
         Intent intent = getIntent();
         if (intent != null ) {
-            if(intent.hasExtra(AddExercise.TRAINING)) {
-                training = (Training) intent.getExtras().getSerializable(AddExercise.TRAINING);
-            }
-            if(intent.hasExtra(AddExercise.GOAL)){
-                goal = (Goal) intent.getExtras().getSerializable(AddExercise.GOAL);
-            }
+
+                String trainingId = intent.getStringExtra(AddExercise.TRAINING);
+
+                String goalId =  intent.getStringExtra(AddExercise.GOAL);
+
+                trainingViewModel.getTraining(trainingId).observe(this, training1 -> {
+                    training = training1;
+                    setAppBarTitle();
+                });
+
+                goalViewModel.getGoalById(goalId).observe(this, goal1 -> {
+                    goal = goal1;
+                    setAppBarTitle();
+                });
+
         }
-        setAppBarTitle();
     }
 
     private void setAppBarTitle() {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
-        String formatted = sdf.format(training.date);
-        formatted += " " + goal.description;
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.setTitle(formatted);
-        }else{
-            android.app.ActionBar actionBar1 = getActionBar();
-            if(actionBar1 != null){
-                actionBar1.setTitle(formatted);
+        if(training != null && goal != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
+            String formatted = sdf.format(training.date);
+            formatted += " " + goal.description;
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(formatted);
+            } else {
+                android.app.ActionBar actionBar1 = getActionBar();
+                if (actionBar1 != null) {
+                    actionBar1.setTitle(formatted);
+                }
             }
         }
     }
@@ -155,16 +169,22 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                         getNumber(numberOfRepetitions), numOfSets, new Date());
 
                 exerciseViewModel.insert(exercise);
-                int nextExercise = numberOfExercises+1;
-                trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(), exercise.id, training.id, nextExercise);
-                GoalExercise goalExercise = new GoalExercise(UUID.randomUUID().toString(), goal.goalId, exercise.id, getNumber(specificity));
-                goalExerciseJoinViewModel.insert(goalExercise);
-                trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
-                TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise);
-                trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin);
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
+                exerciseViewModel.getExerciseById(exercise.id).observe(this, exercise1 -> {
+                    if(exercise1 != null) {
+                        int nextExercise = numberOfExercises + 1;
+                        trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(), exercise.id, training.id, nextExercise);
+                        GoalExercise goalExercise = new GoalExercise(UUID.randomUUID().toString(), goal.goalId, exercise.id, getNumber(specificity));
+                        goalExerciseJoinViewModel.insert(goalExercise);
+                        trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
+                        TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise);
+                        trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin);
+                        Intent intent = new Intent();
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
+                });
+
+
             }
             break;
             case R.id.btnAddDescription:

@@ -17,7 +17,7 @@ public class AddExerciseDescription extends AppCompatActivity implements View.On
     public static final String REQUESTED_CODE = "exercise_description";
     public static int CREATE_EXERCISE_DESCRIPTION=1;
     Button btnSubmit;
-    EditText description, specificity;
+    EditText description;
 
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
 
@@ -27,8 +27,6 @@ public class AddExerciseDescription extends AppCompatActivity implements View.On
         setContentView(R.layout.add_exercise_description_layout);
 
         description = findViewById(R.id.txtExerciseDescription);
-        specificity = findViewById(R.id.txtSpecificity);
-        specificity.setHint("Specificity from 1 to 5");
 
         btnSubmit = findViewById(R.id.btnSend);
         btnSubmit.setOnClickListener(this);
@@ -38,7 +36,7 @@ public class AddExerciseDescription extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View view) {
-        if ( description.getText().toString().isEmpty() || specificity.getText().toString().isEmpty()) {
+        if ( description.getText().toString().isEmpty() ) {
             Toast.makeText(this, "Not all fields are filled.", Toast.LENGTH_SHORT).show();
         } else {
 

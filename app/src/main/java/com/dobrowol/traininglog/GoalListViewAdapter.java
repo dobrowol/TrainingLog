@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseList;
@@ -48,6 +49,7 @@ import java.util.UUID;
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
     private Training training;
+    private List<ExerciseDescription> exerciseDescriptions;
 
     void discardStatus() {
         viewHolder.discardStatus();
@@ -104,9 +106,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     void setTraining(Training training){
         this.training = training;
     }
+    void setExerciseDescriptions(List<ExerciseDescription> exerciseDescriptions){
+        this.exerciseDescriptions = exerciseDescriptions;
+    }
     void setGoalsExercises(List<GoalExercisePair> goalsExercises){
         map.clear();
-        if(this.goals != null) {
+        if(this.goalExercisePairs != null) {
             this.goalExercisePairs.clear();
         }
         this.goalExercisePairs = goalsExercises;
@@ -117,6 +122,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                 if(list == null)
                 {
                     list = new ArrayList<>();
+                    list.add(goalExercise.exercise);
                     map.put(goalExercise.goal, list);
                 }
                 else {
@@ -139,8 +145,16 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int i) {
-        Map.Entry<Goal, List<Exercise>> textAtPosition = (Map.Entry<Goal, List<Exercise>>) map.entrySet().toArray()[i];
-        customViewHolder.fillView(textAtPosition.getKey(), textAtPosition.getValue());
+        int j = 0;
+        for (Map.Entry<Goal, List<Exercise>> entry : map.entrySet()) {
+            if(j == i) {
+                customViewHolder.fillView(entry.getKey(), entry.getValue());
+                return;
+            }
+            j++;
+            // now work with key and value...
+        }
+
     }
 
     @Override
@@ -325,6 +339,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             exercisesRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false));
 
             exerciseAdapter = new MyRecyclerViewAdapter();
+            exerciseAdapter.setExerciseDescriptionList(exerciseDescriptions);
             exercisesRecyclerView.setAdapter(exerciseAdapter);
 
         }
@@ -335,6 +350,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             descriptionText.setText(goal.description);
             deleteGoalState = new DeleteGoalState(view, listener, this.goal);
             exerciseAdapter.setExerciseList(exercises);
+            exerciseAdapter.notifyDataSetChanged();
         }
 
         @Override

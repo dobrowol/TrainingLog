@@ -37,6 +37,10 @@ public class ExerciseRepository {
         new updateAsyncTask(mExerciseDao).execute(exercise);
     }
 
+    public LiveData<Exercise> getExerciseById(String id) {
+        return mExerciseDao.getExerciseById(id);
+    }
+
     private static class insertAsyncTask extends AsyncTask<Exercise, Void, Void> {
 
         private ExerciseDAO mAsyncTaskDao;

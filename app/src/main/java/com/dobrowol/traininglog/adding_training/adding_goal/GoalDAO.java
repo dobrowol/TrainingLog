@@ -28,5 +28,8 @@ public interface GoalDAO {
 
     @Update
     void update(Goal goal);
+
+    @Query("SELECT * FROM goal_table WHERE goalId=:goalId")
+    LiveData<Goal> getById(String goalId);
 }
 
