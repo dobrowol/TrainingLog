@@ -16,10 +16,6 @@ public interface ExerciseDescriptionDAO {
     @Query("SELECT * FROM exercise_description_table WHERE eid IN (:eIds)")
     List<ExerciseDescription> loadAllByIds(int[] eIds);
 
-    @Query("SELECT * FROM exercise_description_table WHERE description LIKE :description AND " +
-            "specificity LIKE :specificity LIMIT 1")
-    ExerciseDescription findByName(String description, Integer specificity);
-
     @Query("SELECT * FROM exercise_description_table WHERE description LIKE :exerciseDescription LIMIT 1")
     LiveData<ExerciseDescription> findByDescription( String exerciseDescription);
 

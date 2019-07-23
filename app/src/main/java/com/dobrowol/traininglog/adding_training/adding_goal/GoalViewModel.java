@@ -30,5 +30,9 @@ public class GoalViewModel extends AndroidViewModel {
     public LiveData<Goal> getGoal(String description) {
         return mRepository.getGoal(description);
     }
+
+    public void delete(Goal oldGoal) {
+        mRepository.delete(oldGoal);
+    }
 }
 

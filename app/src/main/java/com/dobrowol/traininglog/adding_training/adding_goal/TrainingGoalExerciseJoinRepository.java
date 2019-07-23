@@ -17,14 +17,18 @@ public class TrainingGoalExerciseJoinRepository {
 
     TrainingGoalExerciseJoinRepository(Application application) {
         TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
-        trainingGoalExerciseJoinDAO = db.goalExerciseJoinDAO();
+        trainingGoalExerciseJoinDAO = db.trainingGoalExerciseJoinDAO();
     }
-    LiveData<List<Exercise>> getExercisesForTrainingAndGoal(final String trainingGoalId){
-        return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingGoalId);
+    LiveData<List<Exercise>> getExercisesForTrainingAndGoal(final String trainingId, final String goalId){
+        return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingId, goalId);
     }
 
     public void insert (TrainingGoalExerciseJoin exercise) {
         new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);
+    }
+
+    public LiveData<List<GoalExercisePair>> getGoalsAndExercisesForTraining(String trainingId) {
+        return trainingGoalExerciseJoinDAO.getGoalsAndExercisesForTraining(trainingId);
     }
 
     private static class insertAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {

@@ -160,6 +160,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 generalAdapter.notifyDataSetChanged();
             }
         });
+
+        trainingGoalExerciseJoinViewModel.goalExercisesForTraining.observe(this, goalExercises -> {
+            if(goalExercises != null){
+                generalAdapter.setGoalsExercises(goalExercises);
+                generalAdapter.notifyDataSetChanged();
+            }
+        });
         trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
 
@@ -199,6 +206,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         }
     }
 
+    @Override
+    public void deleteGoal(Goal oldGoal) {
+
+        goalViewModel.delete(oldGoal);
+    }
+
     public void showAlert(String text){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle("GOAL");
@@ -236,10 +249,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         insertGoal(goal);
     }
 
-    @Override
-    public void scrollToPosition(int adapterPosition) {
-        goalRecyclerView.scrollToPosition(adapterPosition);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -384,11 +393,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     @Override
-    public void onNewGoalEnter() {
-
-    }
-
-    @Override
     public void onExistingGoalEdit(String description) {
 
         goalViewModel.getGoal(description).observe(this, goal -> editedGoal = goal);
@@ -402,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void insertGoal(Goal goal) {
         goalViewModel.insert(goal);
-        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(),training.id, goal.id);
+        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(),training.id, goal.goalId);
         trainingGoalJoinViewModel.insert(trainingGoalJoin);
     }
 
@@ -423,8 +427,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             if (newGoal.description != null) {
                 editedGoal.description = newGoal.description;
             }
-            if (newGoal.startDate != null) {
-                editedGoal.startDate = newGoal.startDate;
+            if (newGoal.goalStartDate != null) {
+                editedGoal.goalStartDate = newGoal.goalStartDate;
             }
             if (newGoal.endDate != null) {
                 editedGoal.endDate = newGoal.endDate;

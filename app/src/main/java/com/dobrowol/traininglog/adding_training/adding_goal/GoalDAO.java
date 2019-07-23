@@ -14,19 +14,19 @@ public interface GoalDAO {
     @Query("SELECT * FROM goal_table")
     LiveData<List<Goal>> getAll();
 
-    @Query("SELECT * FROM goal_table WHERE id IN (:eIds)")
+    @Query("SELECT * FROM goal_table WHERE goalId IN (:eIds)")
     List<Goal> loadAllByIds(int[] eIds);
 
     @Query("SELECT * FROM goal_table WHERE description=:eDescription LIMIT 1")
     LiveData<Goal> getByDescription(String eDescription);
 
     @Insert
-    void insert(Goal exercise);
+    void insert(Goal goal);
 
     @Delete
-    void delete(Goal exercise);
+    void delete(Goal goal);
 
     @Update
-    void update(Goal exercise);
+    void update(Goal goal);
 }
 

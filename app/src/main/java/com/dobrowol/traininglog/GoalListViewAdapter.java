@@ -24,12 +24,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercise;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseList;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 
 import org.w3c.dom.Text;
@@ -37,6 +40,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,8 +58,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         void onItemRemove(Goal goal);
 
-        void onNewGoalEnter();
-
         void onExistingGoalEdit(String description);
 
         void onNewExerciseEnter();
@@ -71,13 +73,13 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         @Override
         void onClick(View v);
 
-        void scrollToPosition(int adapterPosition);
+        void deleteGoal(Goal oldGoal);
     }
 
     private OnItemClickListener listener;
     private ArrayList<Goal> goals;
-    private ArrayList<GoalExercisePair> goalExercisePairs;
-    private Map<String, List<String>> map = new HashMap<>();
+    private List<GoalExercisePair> goalExercisePairs;
+    private LinkedHashMap<Goal, List<Exercise>> map = new LinkedHashMap<>();
     private CustomViewHolder viewHolder;
 
     GoalListViewAdapter(OnItemClickListener listener) {
@@ -89,15 +91,38 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     }
     void setGoals(ArrayList<Goal> goals){
         this.goals = goals;
+        for(Goal goal : goals){
+            List<Exercise> list = map.get(goal);
+            if(list == null){
+                list = new ArrayList<>();
+                map.put(goal, list);
+            }
+        }
+
     }
 
     void setTraining(Training training){
         this.training = training;
     }
-    void setGoalsExercises(ArrayList<GoalExercisePair> goalsExercises){
-        if(goalsExercises != null && this.goals != null && goalsExercises.size() != this.goals.size()) {
+    void setGoalsExercises(List<GoalExercisePair> goalsExercises){
+        map.clear();
+        if(this.goals != null) {
             this.goalExercisePairs.clear();
-            this.goalExercisePairs = goalsExercises;
+        }
+        this.goalExercisePairs = goalsExercises;
+        if(goalsExercises != null){
+            for(GoalExercisePair goalExercise : goalsExercises){
+                List<Exercise> list = map.get(goalExercise.goal);
+
+                if(list == null)
+                {
+                    list = new ArrayList<>();
+                    map.put(goalExercise.goal, list);
+                }
+                else {
+                    list.add(goalExercise.exercise);
+                }
+            }
         }
     }
 
@@ -114,8 +139,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder customViewHolder, int i) {
-        Goal textAtPosition = goals.get(i);
-        customViewHolder.fillView(textAtPosition);
+        Map.Entry<Goal, List<Exercise>> textAtPosition = (Map.Entry<Goal, List<Exercise>>) map.entrySet().toArray()[i];
+        customViewHolder.fillView(textAtPosition.getKey(), textAtPosition.getValue());
     }
 
     @Override
@@ -159,7 +184,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
            if (name != null && name.compareTo("") != 0) {
                Goal goal = new Goal(UUID.randomUUID().toString(), name);
-               goal.startDate = new Date();
+               goal.goalStartDate = new Date();
                listener.insertGoal(goal);
            }
        }
@@ -202,6 +227,35 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
            public void discardStatus() {
            }
     }
+    private class DeleteGoalState implements TrainingDetailEnterState{
+        OnItemClickListener listener;
+        View view;
+        Goal oldGoal;
+        TextView descriptionText;
+
+        public DeleteGoalState(View view, OnItemClickListener listener, Goal goal) {
+            this.listener = listener;
+            this.view = view;
+            descriptionText = view.findViewById(R.id.goalTextView);
+            oldGoal = goal;
+        }
+
+        @Override
+        public void start(){
+        }
+        @Override
+        public void saveStatus(String name) {
+
+            if (name != null && name.compareTo("")!=0) {
+                Goal newGoal = new Goal(null, name);
+                listener.deleteGoal(oldGoal);
+            }
+        }
+
+        @Override
+        public void discardStatus() {
+        }
+    }
     private class NewExerciseAdd implements TrainingDetailEnterState{
         OnItemClickListener listener;
         View view;
@@ -230,21 +284,22 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         }
     }
-    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnKeyListener {
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
         TextView addExercise;
         OnItemClickListener listener;
         Goal goal;
-        ViewSwitcher viewSwitcher;
         View view;
 
         TrainingDetailEnterState trainingDetailEnterState;
         NewGoalEnterState newGoalEnterState;
         ExistingGoalUpdateState existingGoalUpdateState;
+        DeleteGoalState deleteGoalState;
         private ActionMode actionMode;
-        private String password;
+        private MyRecyclerViewAdapter exerciseAdapter;
+        private List<Exercise> exercises;
 
         CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
@@ -254,9 +309,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
             this.addExercise = view.findViewById(R.id.addingExercise);
             view.setOnClickListener(this);
-            //descriptionText.setEnabled(false);
-            //addExercise.setEnabled(false);
             addExercise.setOnClickListener(this);
+            descriptionText.setOnLongClickListener(this);
 
             view.setOnFocusChangeListener((v, hasFocus) -> {
                 if (!hasFocus) {
@@ -264,34 +318,23 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     disableActionMode();
                 }
             });
-
-            view.setOnKeyListener(this);
             descriptionText.setOnClickListener(this);
             trainingDetailEnterState = null;
             newGoalEnterState = new NewGoalEnterState(view, listener);
             existingGoalUpdateState = new ExistingGoalUpdateState(view, listener);
+            exercisesRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false));
+
+            exerciseAdapter = new MyRecyclerViewAdapter();
+            exercisesRecyclerView.setAdapter(exerciseAdapter);
 
         }
 
-        public void showTextView() {
-            if (viewSwitcher.getNextView() instanceof TextView) {
-                viewSwitcher.showNext();
-            } else {
-                viewSwitcher.showPrevious();
-            }
-        }
-
-        public void showEditText() {
-            if (viewSwitcher.getNextView() instanceof EditText) {
-                viewSwitcher.showNext();
-            } else {
-                viewSwitcher.showPrevious();
-            }
-        }
-
-        void fillView(Goal textAtPosition) {
-            this.goal = textAtPosition;
-            descriptionText.setText(textAtPosition.description);
+        void fillView(Goal goal, List<Exercise> exercises) {
+            this.goal = goal;
+            this.exercises = exercises;
+            descriptionText.setText(goal.description);
+            deleteGoalState = new DeleteGoalState(view, listener, this.goal);
+            exerciseAdapter.setExerciseList(exercises);
         }
 
         @Override
@@ -339,10 +382,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void saveStatus() {
             if (true) {
                 // Goal goal = new Goal(UUID.randomUUID().toString(), descriptionEditText.getText().toString());
-                goal.startDate = new Date();
+                goal.goalStartDate = new Date();
                 listener.insertGoal(goal);
-
-                //   descriptionText.setText(descriptionEditText.getText());
             }
         }
 
@@ -350,8 +391,13 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         }
 
         @Override
-        public boolean onKey(View v, int keyCode, KeyEvent event) {
-            listener.scrollToPosition(getAdapterPosition());
+        public boolean onLongClick(View v) {
+            switch (v.getId()){
+                case R.id.goalTextView:
+                    enableActionMode(v,"Usuń cel");
+                    trainingDetailEnterState = deleteGoalState;
+                    break;
+            }
             return false;
         }
 
@@ -378,7 +424,10 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.item_delete:
-                        setState(null);
+                        if(trainingDetailEnterState != null) {
+                            trainingDetailEnterState.saveStatus("");
+                            trainingDetailEnterState = null;
+                        }
                         disableActionMode();
                         return true;
                     case R.id.item_add:
@@ -412,25 +461,20 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             input.setText(goal.description);
 
             alertDialog.setView(input);
-            //alertDialog.setIcon(R.drawable.key);
 
             alertDialog.setPositiveButton("YES",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                           descriptionText.setText( input.getText().toString());
-                            if (trainingDetailEnterState != null) {
-                                trainingDetailEnterState.saveStatus(input.getText().toString());
-                                trainingDetailEnterState = null;
-                            }
+                    (dialog, which) -> {
+                       descriptionText.setText( input.getText().toString());
+                        if (trainingDetailEnterState != null) {
+                            trainingDetailEnterState.saveStatus(input.getText().toString());
+                            trainingDetailEnterState = null;
                         }
                     });
 
             alertDialog.setNegativeButton("NO",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            setState(null);
-                        }
+                    (dialog, which) -> {
+                        dialog.cancel();
+                        setState(null);
                     });
 
             alertDialog.show();

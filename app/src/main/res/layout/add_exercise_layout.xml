@@ -5,10 +5,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <EditText
+        android:id="@+id/txtSpecificity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/specificity"
+        android:inputType="number"
+        android:selectAllOnFocus="true"
+        android:importantForAutofill="no" />
+    <EditText
         android:id="@+id/txtDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:ems="10"
         android:hint="@string/distance"
         android:inputType="number"

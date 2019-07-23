@@ -40,6 +40,10 @@ public class GoalRepository {
         return goalDAO.getByDescription(description);
     }
 
+    public void delete(Goal oldGoal) {
+       new deleteAsyncTask(goalDAO).execute(oldGoal);
+    }
+
     private static class insertAsyncTask extends AsyncTask<Goal, Void, Void> {
 
         private GoalDAO mAsyncTaskDao;
@@ -65,6 +69,20 @@ public class GoalRepository {
         @Override
         protected Void doInBackground(final Goal... params) {
             mAsyncTaskDao.update(params[0]);
+            return null;
+        }
+    }
+    private static class deleteAsyncTask extends AsyncTask<Goal, Void, Void> {
+
+        private GoalDAO mAsyncTaskDao;
+
+        deleteAsyncTask(GoalDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Goal... params) {
+            mAsyncTaskDao.delete(params[0]);
             return null;
         }
     }

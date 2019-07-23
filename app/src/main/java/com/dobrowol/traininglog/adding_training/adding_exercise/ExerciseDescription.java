@@ -16,8 +16,4 @@ public class ExerciseDescription implements Serializable {
     @NonNull
     @ColumnInfo(name = "description")
     public String description;
-
-    @NonNull
-    @ColumnInfo(name = "specificity")
-    public Specificity specificity;
 }

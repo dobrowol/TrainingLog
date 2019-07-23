@@ -45,16 +45,6 @@ public class AddExerciseDescription extends AppCompatActivity implements View.On
             ExerciseDescription exerciseDescription = new ExerciseDescription();
             exerciseDescription.eid = UUID.randomUUID().toString();
             exerciseDescription.description = description.getText().toString();
-            Integer specificityNumber = Integer.parseInt(specificity.getText().toString()) - 1;
-            if(specificityNumber >4 ){
-                specificityNumber = 4;
-            }
-            else if(specificityNumber <0)
-            {
-                specificityNumber = 0;
-            }
-
-            exerciseDescription.specificity = Specificity.values()[specificityNumber];
 
             exerciseDescriptionViewModel.insert(exerciseDescription);
 

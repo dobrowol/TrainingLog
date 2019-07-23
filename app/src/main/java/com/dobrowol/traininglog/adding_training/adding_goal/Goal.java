@@ -16,13 +16,13 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "goal_table",
         foreignKeys = @ForeignKey(entity = Goal.class,
-        parentColumns = "id",
+        parentColumns = "goalId",
         childColumns = "primaryGoalId",
         onDelete = CASCADE))
 public class Goal implements Parcelable, Serializable {
     @PrimaryKey
     @NonNull
-    public String id;
+    public String goalId;
 
     public String primaryGoalId;
 
@@ -30,7 +30,7 @@ public class Goal implements Parcelable, Serializable {
 
     public int priority;
 
-    public Date startDate;
+    public Date goalStartDate;
 
     public Date endDate;
 
@@ -46,10 +46,10 @@ public class Goal implements Parcelable, Serializable {
         }
     };
 
-    public Goal(String id, String description) {
-        this.id = id;
+    public Goal(String goalId, String description) {
+        this.goalId = goalId;
         this.description = description;
-        startDate = null;
+        goalStartDate = null;
         endDate = null;
         priority = -1;
     }
@@ -60,19 +60,19 @@ public class Goal implements Parcelable, Serializable {
     }
 
     public Goal(Parcel in){
-        id = in.readString();
+        goalId = in.readString();
         description = in.readString();
         priority = in.readInt();
-        startDate = (Date) in.readSerializable();
+        goalStartDate = (Date) in.readSerializable();
         endDate = (Date) in.readSerializable();
     }
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(goalId);
         dest.writeString(primaryGoalId);
         dest.writeString(description);
         dest.writeInt(priority);
-        dest.writeSerializable(startDate);
+        dest.writeSerializable(goalStartDate);
         dest.writeSerializable(endDate);
     }
 }

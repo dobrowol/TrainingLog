@@ -17,7 +17,7 @@ public interface TrainingGoalJoinDAO {
         @Insert(onConflict = OnConflictStrategy.REPLACE)
         void insert(TrainingGoalJoin trainingGoalJoin);
 
-        @Query("SELECT goal_table.* FROM goal_table  INNER JOIN training_goal_join ON goal_table.id=training_goal_join.goalId WHERE training_goal_join.trainingId=:trainingId ")
+        @Query("SELECT goal_table.* FROM goal_table  INNER JOIN training_goal_join ON goal_table.goalId=training_goal_join.goalId WHERE training_goal_join.trainingId=:trainingId ")
         LiveData<List<Goal>> getGoalsForTraining(final String trainingId);
 
         @Query("SELECT training_table.* FROM training_table  INNER JOIN training_goal_join ON training_table.id=training_goal_join.trainingId WHERE training_goal_join.goalId=:goalId ")
