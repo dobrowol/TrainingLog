@@ -49,18 +49,6 @@ public class TrainingRepository {
 
     }
 
-    public LiveData<List<Integer>> getAllGeneralLoads() {
-        return trainingDAO.getAllGeneralLoads();
-    }
-
-    public LiveData<List<Integer>> getAllSpecificLoads() {
-        return trainingDAO.getAllSpecificLoads();
-    }
-
-    public LiveData<List<Integer>> getAllCompetitiveLoads() {
-        return trainingDAO.getAllCompetitiveLoads();
-    }
-
     public LiveData<Training> getTrainingById(String trainingId) {
 
         return trainingDAO.findTrainingById(trainingId);

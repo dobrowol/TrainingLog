@@ -14,7 +14,13 @@ import java.util.List;
 
 public class TrainingGoalJoinViewModel extends AndroidViewModel {
 
+
     private TrainingGoalJoinRepository mRepository;
+
+    public void update(TrainingGoalJoin trainingGoalJoin) {
+        mRepository.update(trainingGoalJoin);
+    }
+
     private class TrainingGoal{
         public String trainingId;
         public String goalId;
@@ -25,14 +31,13 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         }
     }
     private MutableLiveData<String> query  = new MutableLiveData<>();
-    public LiveData<List<Goal>> trainingGoals = Transformations.switchMap(query,
+    public LiveData<List<Goal>> goalsForTraining = Transformations.switchMap(query,
             trainingId ->
             mRepository.getAllGoalsForTraining(trainingId)
     );
 
     public void getAllGoalsForTraining( String trainingId){
         query.setValue(trainingId); }
-
     private MutableLiveData<String> query1  = new MutableLiveData<>();
     public LiveData<List<Training>> goalTrainings = Transformations.switchMap(query1,
             goalId ->
@@ -48,5 +53,11 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         mRepository = new TrainingGoalJoinRepository(application);
     }
     public void insert(TrainingGoalJoin trainingGoalJoin) { mRepository.insert(trainingGoalJoin); }
+
+    private MutableLiveData<String> query2 = new MutableLiveData<>();
+    public LiveData<List<TrainingGoalJoin>> trainingGoals = Transformations.switchMap(query2,
+            trainingId ->
+                    mRepository.getAllTrainingGoalsForTrainingId(trainingId));
 }
+
 

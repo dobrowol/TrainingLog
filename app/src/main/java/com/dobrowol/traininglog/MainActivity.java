@@ -21,10 +21,8 @@ import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,25 +33,21 @@ import android.widget.ViewSwitcher;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.dobrowol.traininglog.adding_training.TrainingExerciseJoin;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionViewModel;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseType;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
-import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
-import com.dobrowol.traininglog.training_load.calculating.TrainingLoad;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -152,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        trainingGoalJoinViewModel.trainingGoals.observe(this, goals -> {
+        trainingGoalJoinViewModel.goalsForTraining.observe(this, goals -> {
             if (goals != null) {
                 // Update the cached copy of the exercises in the adapter.
                 ArrayList<Goal> array = new ArrayList<>(goals);
@@ -377,9 +371,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             ArrayList<Exercise> array = new ArrayList<>(exercises);
             numberOfExercises = array.size();
             setExercises(array);
-            TrainingLoad trainingLoad = new TrainingLoad(training, trainingViewModel,
-                    exerciseViewModel, trainingExerciseJoinViewModel, MainActivity.this);
-            trainingLoad.calculate(exercises);
         }
     }
 

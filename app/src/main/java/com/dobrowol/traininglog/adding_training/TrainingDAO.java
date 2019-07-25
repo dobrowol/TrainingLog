@@ -17,14 +17,6 @@ public interface TrainingDAO {
     @Query("SELECT * FROM training_table WHERE id IN (:ids)")
     List<Training> loadAllByIds(int[] ids);
 
-    @Query("SELECT general_load FROM training_table")
-    LiveData<List<Integer>> getAllGeneralLoads();
-
-    @Query("SELECT specific_load FROM training_table")
-    LiveData<List<Integer>> getAllSpecificLoads();
-
-    @Query("SELECT competitive_load FROM training_table")
-    LiveData<List<Integer>> getAllCompetitiveLoads();
     @Insert
     void insert(Training exercise);
 

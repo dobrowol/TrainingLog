@@ -11,6 +11,7 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoin;
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinRepository;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
     private class TrainingGoal{
         public String trainingId;
         public String goalId;
+        TrainingGoal(String trainingId, String goalId){
+            this.trainingId=trainingId;
+            this.goalId=goalId;
+        }
     }
     private MutableLiveData<TrainingGoal> query  = new MutableLiveData<>();
     public LiveData<List<Exercise>> goalTrainingExercises = Transformations.switchMap(query,
@@ -29,9 +34,7 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
     );
 
     public void getExercisesByTrainingIdGoalId( String trainingId, String goalId){
-        TrainingGoal trainingGoal = new TrainingGoal();
-        trainingGoal.goalId = goalId;
-        trainingGoal.trainingId = trainingId;
+        TrainingGoal trainingGoal = new TrainingGoal(trainingId, goalId);
         query.setValue(trainingGoal);
     }
 
@@ -44,6 +47,20 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
     public void getGoalExercisesForTraining( String trainingId){
         query1.setValue(trainingId);
     }
+
+
+    private MutableLiveData<TrainingGoal> query2  = new MutableLiveData<>();
+    public LiveData<List<TrainingGoalLoadData>> trainingGoalLoadData = Transformations.switchMap(query2,
+            trainingGoal ->
+                    mRepository.getTrainingGoalLoadData(trainingGoal.trainingId, trainingGoal.goalId)
+    );
+
+    public void getTrainingGoalData( String trainingId, String goalId){
+        TrainingGoal trainingGoal = new TrainingGoal(trainingId, goalId);
+
+        query2.setValue(trainingGoal);
+    }
+
 
     public TrainingGoalExerciseJoinViewModel(Application application) {
         super(application);

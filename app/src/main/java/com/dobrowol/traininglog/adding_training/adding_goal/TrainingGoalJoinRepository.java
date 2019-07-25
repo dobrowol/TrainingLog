@@ -33,6 +33,14 @@ public class TrainingGoalJoinRepository {
         new insertAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
     }
 
+    public void update(TrainingGoalJoin trainingGoalJoin) {
+        new updateAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
+    }
+
+    public LiveData<List<TrainingGoalJoin>> getAllTrainingGoalsForTrainingId(String trainingId) {
+        return trainingGoalJoinDAO.getTrainingGoalsForTrainingId(trainingId);
+    }
+
     private static class insertAsyncTask extends AsyncTask<TrainingGoalJoin, Void, Void> {
 
         private TrainingGoalJoinDAO mAsyncTaskDao;
@@ -44,6 +52,20 @@ public class TrainingGoalJoinRepository {
         @Override
         protected Void doInBackground(final TrainingGoalJoin... params) {
             mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+    private static class updateAsyncTask extends AsyncTask<TrainingGoalJoin, Void, Void> {
+
+        private TrainingGoalJoinDAO mAsyncTaskDao;
+
+        updateAsyncTask(TrainingGoalJoinDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final TrainingGoalJoin... params) {
+            mAsyncTaskDao.update(params[0]);
             return null;
         }
     }

@@ -23,28 +23,14 @@ public class Training implements Serializable, Parcelable {
 
     public Date date;
 
-    @ColumnInfo(name = "general_load")
-    public Integer general_load;
-
-    @ColumnInfo(name = "specific_load")
-    public Integer specific_load;
-
-    @ColumnInfo(name = "competitive_load")
-    public Integer competitive_load;
-
     public Training(String id, Date date, Integer general_load, Integer specific_load, Integer competitive_load){
         this.id = id;
         this.date = date;
-        this.general_load = general_load;
-        this.specific_load = specific_load;
-        this.competitive_load = competitive_load;
+
     }
     protected Training(Parcel in) {
         id = in.readString();
         date = (Date) in.readSerializable();
-        general_load = in.readInt();
-        specific_load = in.readInt();
-        competitive_load = in.readInt();
     }
 
     public static final Creator<Training> CREATOR = new Creator<Training>() {
@@ -68,21 +54,15 @@ public class Training implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeSerializable(date);
-        parcel.writeInt(general_load);
-        parcel.writeInt(specific_load);
-        parcel.writeInt(competitive_load);
 
     }
     public Training(){
         date = new Date();
-        general_load = 0;
-        specific_load = 0;
-        competitive_load = 0;
     }
 
     public void calculateLoads(List<Exercise> exerciseList){
 
-        general_load = 0;
+      /*  general_load = 0;
         specific_load = 0;
         competitive_load = 0;
         for(Exercise exercise : exerciseList){
@@ -99,5 +79,5 @@ public class Training implements Serializable, Parcelable {
 
         }
 
-    }
+    */}
 }

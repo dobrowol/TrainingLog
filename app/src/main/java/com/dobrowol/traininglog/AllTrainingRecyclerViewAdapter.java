@@ -1,6 +1,7 @@
 package com.dobrowol.traininglog;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
@@ -43,11 +44,13 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         void onListFragmentInteraction(Training item);
     }
     private final List<Training> mValues;
+    private final List<List<Integer>> trainingGoalsLoads;
     private final OnListFragmentInteractionListener mListener;
 
     AllTrainingRecyclerViewAdapter(List<Training> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+        trainingGoalsLoads = new ArrayList<>();
     }
 
     @NonNull
@@ -150,7 +153,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             } else {
                 set1 = new BarDataSet(values,"");
                 //set1.setDrawIcons(false);
-                set1.setColors(getColors());
+                set1.setColors(getColors(3));
 
                 ArrayList<IBarDataSet> dataSets = new ArrayList<>();
                 dataSets.add(set1);
@@ -190,12 +193,12 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
         }
 
-        private int[] getColors() {
+        private int[] getColors(int number) {
 
             // have as many colors as stack-values per entry
-            int[] colors = new int[3];
+            int[] colors = new int[number];
 
-            System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+            System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, number);
 
             return colors;
         }

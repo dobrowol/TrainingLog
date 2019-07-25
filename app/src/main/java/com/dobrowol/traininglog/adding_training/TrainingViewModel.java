@@ -37,9 +37,5 @@ public class TrainingViewModel extends AndroidViewModel {
     public LiveData<Training> getTraining(String trainingId) {
         return mRepository.getTrainingById(trainingId);
     }
-
-    public LiveData<List<Integer>> getAllGeneralLoads() {
-        return mRepository.getAllGeneralLoads();
-    }
 }
 

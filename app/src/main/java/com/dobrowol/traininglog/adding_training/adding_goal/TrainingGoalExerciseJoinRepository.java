@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
 
@@ -44,5 +45,9 @@ public class TrainingGoalExerciseJoinRepository {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
+    }
+
+    public LiveData<List<TrainingGoalLoadData>> getTrainingGoalLoadData(String trainingId, String goalId){
+        return trainingGoalExerciseJoinDAO.getTrainingGoalLoadData(trainingId, goalId);
     }
 }
