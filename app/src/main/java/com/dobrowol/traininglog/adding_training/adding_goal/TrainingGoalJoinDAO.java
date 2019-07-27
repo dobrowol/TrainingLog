@@ -8,7 +8,6 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.dobrowol.traininglog.adding_training.Training;
-import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
 import java.util.List;
 
@@ -29,4 +28,10 @@ public interface TrainingGoalJoinDAO {
 
         @Query("SELECT training_goal_join.* FROM training_goal_join WHERE training_goal_join.trainingId=:trainingId")
         LiveData<List<TrainingGoalJoin>> getTrainingGoalsForTrainingId(String trainingId);
+
+        @Query("SELECT training_goal_join.* FROM training_goal_join")
+        LiveData<List<TrainingGoalJoin>> getAllTrainingGoals();
+
+        @Query("SELECT training_goal_join.* FROM training_goal_join WHERE training_goal_join.trainingId=:trainingId AND training_goal_join.goalId=:goalId")
+        LiveData<TrainingGoalJoin> getTrainingGoal(String trainingId, String goalId);
 }

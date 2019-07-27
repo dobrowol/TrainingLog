@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
-import com.hadilq.liveevent.LiveEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

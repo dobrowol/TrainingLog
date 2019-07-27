@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.dobrowol.traininglog.adding_training.Training;
-import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
 import java.util.List;
 
@@ -17,8 +16,16 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
 
     private TrainingGoalJoinRepository mRepository;
 
+    public LiveData<List<TrainingGoalJoin>> getAllTrainingGoalJoins(){
+        return mRepository.getAllTrainingGoals();
+    }
+
     public void update(TrainingGoalJoin trainingGoalJoin) {
         mRepository.update(trainingGoalJoin);
+    }
+
+    public void getAllTrainingGoalJoinsForTraining(String id) {
+        query2.setValue(id);
     }
 
     private class TrainingGoal{
@@ -55,9 +62,20 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
     public void insert(TrainingGoalJoin trainingGoalJoin) { mRepository.insert(trainingGoalJoin); }
 
     private MutableLiveData<String> query2 = new MutableLiveData<>();
-    public LiveData<List<TrainingGoalJoin>> trainingGoals = Transformations.switchMap(query2,
+    public LiveData<List<TrainingGoalJoin>> trainingGoalsForTrainingId = Transformations.switchMap(query2,
             trainingId ->
                     mRepository.getAllTrainingGoalsForTrainingId(trainingId));
+
+    private MutableLiveData<TrainingGoal> query3  = new MutableLiveData<>();
+
+    public LiveData<TrainingGoalJoin> trainingGoal = Transformations.switchMap(query3,
+            trainingGoal -> mRepository.getTrainingGoal(trainingGoal.trainingId, trainingGoal.goalId)
+            );
+    public void getTrainingGoal(String trainingId, String goalId){
+        TrainingGoal trainingGoal = new TrainingGoal(trainingId, goalId);
+        query3.setValue(trainingGoal);
+    }
+
 }
 
 

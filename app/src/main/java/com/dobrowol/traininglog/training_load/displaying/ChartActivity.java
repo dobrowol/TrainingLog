@@ -59,7 +59,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
 
-        trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
+        //trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
 
         tvX = findViewById(R.id.tvXMax);
         tvY = findViewById(R.id.tvYMax);
@@ -168,7 +168,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         // draw points over time
         chart.animateX(1500);
 
-        // get the legend (only possible after setting data)
+        // getTrainingGoalExercise the legend (only possible after setting data)
         Legend l = chart.getLegend();
 
         // draw legend entries as lines

@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
+    private List<TrainingGoalJoin> trainingGoalJoins;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +148,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
+        trainingGoalJoinViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> {
+            this.trainingGoalJoins = trainingGoalJoins;
+        });
+
         trainingGoalJoinViewModel.goalsForTraining.observe(this, goals -> {
             if (goals != null) {
                 // Update the cached copy of the exercises in the adapter.
@@ -157,6 +163,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         trainingGoalExerciseJoinViewModel.goalExercisesForTraining.observe(this, goalExercises -> {
             if(goalExercises != null){
+                for(TrainingGoalJoin trainingGoalJoin : trainingGoalJoins){
+                    TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad(trainingGoalJoin, trainingGoalExerciseJoinViewModel, this, trainingGoalJoinViewModel);
+                    trainingGoalLoad.calculate();
+                }
                 generalAdapter.setGoalsExercises(goalExercises);
                 generalAdapter.notifyDataSetChanged();
             }
@@ -168,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         //trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
+        trainingGoalJoinViewModel.getAllTrainingGoalJoinsForTraining(training.id);
 
     }
     private void initializeTraining(){
@@ -402,15 +413,15 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void insertGoal(Goal goal) {
         goalViewModel.insert(goal);
-        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(),training.id, goal.goalId);
-        trainingGoalJoinViewModel.insert(trainingGoalJoin);
+        goalViewModel.getGoalById(goal.goalId).observe(this, goal1 -> {
+            if(goal1!=null) {
+                TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
+                trainingGoalJoinViewModel.insert(trainingGoalJoin);
+            }
+        });
+
     }
 
-    @Override
-    public void insertExercise(Exercise exercise) {
-        exerciseViewModel.insert(exercise);
-        //TrainingExerciseJoin trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(),exercise.id,training.id,TODO);
-    }
 
     @Override
     public void updateExercise(Exercise newExercise) {

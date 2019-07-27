@@ -71,9 +71,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         void fillView(Exercise textAtPosition) {
             ExerciseDescription ed = null;
-            for(int i = 0; i < exerciseDescriptionList.size(); i++){
-                if(exerciseDescriptionList.get(i).eid.equalsIgnoreCase(textAtPosition.exerciseDescriptionId)){
-                    ed = exerciseDescriptionList.get(i);
+            if(exerciseDescriptionList != null) {
+                for (int i = 0; i < exerciseDescriptionList.size(); i++) {
+                    if (exerciseDescriptionList.get(i).eid.equalsIgnoreCase(textAtPosition.exerciseDescriptionId)) {
+                        ed = exerciseDescriptionList.get(i);
+                    }
                 }
             }
             if(ed != null) {

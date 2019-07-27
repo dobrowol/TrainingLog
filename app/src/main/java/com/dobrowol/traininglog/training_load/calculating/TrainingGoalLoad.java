@@ -2,54 +2,54 @@ package com.dobrowol.traininglog.training_load.calculating;
 
 import androidx.lifecycle.LifecycleOwner;
 
-import com.dobrowol.traininglog.adding_training.Training;
-import com.dobrowol.traininglog.adding_training.TrainingViewModel;
-import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
-import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class TrainingGoalLoad {
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     private LifecycleOwner owner;
-    private TrainingLoadCalculatedListener listener;
+    private TrainingGoalJoin trainingGoalJoin;
+    private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
 
-    public interface TrainingLoadCalculatedListener{
-        public void loadCalculated(int load);
-    }
-    public TrainingGoalLoad(TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel, LifecycleOwner owner,
-                            TrainingLoadCalculatedListener listener) {
+    public TrainingGoalLoad(TrainingGoalJoin trainingGoalJoin, TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel, LifecycleOwner owner,
+                            TrainingGoalJoinViewModel trainingGoalJoinViewModel) {
+
         this.trainingGoalExerciseJoinViewModel = trainingGoalExerciseJoinViewModel;
         this.owner = owner;
-        this.listener = listener;
+        this.trainingGoalJoin = trainingGoalJoin;
+        this.trainingGoalJoinViewModel = trainingGoalJoinViewModel;
         trainingGoalExerciseJoinViewModel.trainingGoalLoadData.observe(owner, trainingGoalLoadData -> {
             if(trainingGoalLoadData != null) {
-                int load = 0;
+                int load = -1;
                 for (TrainingGoalLoadData loadData : trainingGoalLoadData) {
-                    long diffInMillies = Math.abs(loadData.trainingDate.getTime() - loadData.exerciseStartDate.getTime());
-                    long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                    if(trainingGoalJoin.trainingId.equals(loadData.trainingId) && trainingGoalJoin.goalId.equals(loadData.goalId)) {
+                        long diffInMillies = Math.abs(loadData.trainingDate.getTime() - loadData.exerciseStartDate.getTime());
+                        long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-                    int neurologicalBoostPeriod = 21;
-                    int neurologicalBoost = 1;
-                    if(daysFromFirstOccurence <= neurologicalBoostPeriod){
-                        neurologicalBoost=8;
+                        int neurologicalBoostPeriod = 21;
+                        int neurologicalBoost = 1;
+                        if (daysFromFirstOccurence <= neurologicalBoostPeriod) {
+                            neurologicalBoost = 8;
+                        }
+                        load += loadData.loadValue * loadData.specificity * neurologicalBoost;
                     }
-                    load += loadData.load*loadData.specificity*neurologicalBoost;
                 }
-                listener.loadCalculated(load);
+                if(load != -1) {
+                    trainingGoalJoin.load = load;
+                    this.trainingGoalJoinViewModel.update(trainingGoalJoin);
+                }
             }
 
         });
     }
 
 
-    public void calculate(String trainingId, String goalId) {
+    public void calculate() {
 
-        trainingGoalExerciseJoinViewModel.getTrainingGoalData(trainingId, goalId);
+        trainingGoalExerciseJoinViewModel.getTrainingGoalData(trainingGoalJoin.trainingId, trainingGoalJoin.goalId);
 
     }
 }

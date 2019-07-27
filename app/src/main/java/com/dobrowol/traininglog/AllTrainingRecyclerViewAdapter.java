@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.dobrowol.traininglog.adding_training.Training;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.training_load.displaying.MyValueFormatter;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Training} and makes a call to the
@@ -39,19 +41,27 @@ import java.util.Locale;
  */
 public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrainingRecyclerViewAdapter.ViewHolder> {
 
+    List<Training> trainings;
+    List<TrainingGoalJoin> trainingLoadsMap;
+
+    public AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
+        this.mListener = trainingsApp;
+    }
+    public void setTrainings(List<Training> trainings){
+        this.trainings = trainings;
+    }
+    public void setTrainingGoalsLoads(List<TrainingGoalJoin> trainingGoalsLoads){
+        this.trainingLoadsMap = trainingGoalsLoads;
+    }
+
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Training item);
     }
-    private final List<Training> mValues;
-    private final List<List<Integer>> trainingGoalsLoads;
+
+
     private final OnListFragmentInteractionListener mListener;
 
-    AllTrainingRecyclerViewAdapter(List<Training> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
-        mListener = listener;
-        trainingGoalsLoads = new ArrayList<>();
-    }
 
     @NonNull
     @Override
@@ -63,21 +73,34 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        holder.mItem = trainings.get(position);
+        List<Integer> loads = new ArrayList<>();
+        if(trainingLoadsMap != null) {
+            for (TrainingGoalJoin trainingGoalJoin : trainingLoadsMap) {
+                if (trainingGoalJoin.trainingId == holder.mItem.id) {
+                    loads.add(trainingGoalJoin.load);
+                }
+            }
+        }
+
+        holder.mLoads = loads;
         holder.setDate(holder.mItem.date);
 
-
-        holder.setDataChart(holder.mItem);
+        holder.setDataChart(holder.mItem, holder.mLoads);
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        if(trainings == null){
+            return 0;
+        }
+        return trainings.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements OnChartValueSelectedListener {
         final View mView;
         final TextView mIdView;
+        public List<Integer> mLoads;
         private HorizontalBarChart mChart;
         Training mItem;
 
@@ -125,18 +148,16 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mIdView.setText(formatted);
         }
 
-        void setDataChart(Training training){
+        void setDataChart(Training training, List<Integer> goalLoads){
             setListeners(training);
 
             ArrayList<BarEntry> values = new ArrayList<>();
 
-            float [] trainingLoads = new float[3];
-            trainingLoads[0] = training.general_load!=null?
-                 training.general_load:0;
-            trainingLoads[1] = training.specific_load!=null?
-                    training.specific_load:0;
-            trainingLoads[2] = training.competitive_load!=null?
-                    training.competitive_load:0;
+            float [] trainingLoads = new float[goalLoads.size()];
+            int j = 0;
+            for(Integer load : goalLoads) {
+                trainingLoads[j] = load;
+            }
 
             values.add(new BarEntry(
                         0,

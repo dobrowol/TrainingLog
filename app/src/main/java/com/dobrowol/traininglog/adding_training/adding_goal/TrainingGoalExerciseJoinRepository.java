@@ -12,6 +12,8 @@ import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class TrainingGoalExerciseJoinRepository {
 
     private TrainingGoalExerciseJoinDAO trainingGoalExerciseJoinDAO;
@@ -24,12 +26,18 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingId, goalId);
     }
 
-    public void insert (TrainingGoalExerciseJoin exercise) {
-        new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);
+    public Single<Long> insert (TrainingGoalExerciseJoin exercise) {
+        return Single.fromCallable(() -> trainingGoalExerciseJoinDAO.insert(exercise));
+
+       // new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);
     }
 
     public LiveData<List<GoalExercisePair>> getGoalsAndExercisesForTraining(String trainingId) {
         return trainingGoalExerciseJoinDAO.getGoalsAndExercisesForTraining(trainingId);
+    }
+
+    public LiveData<TrainingGoalExerciseJoin> getTrainingGoalExercise(String id) {
+        return trainingGoalExerciseJoinDAO.getTrainingGoalExercise(id);
     }
 
     private static class insertAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {
@@ -49,5 +57,19 @@ public class TrainingGoalExerciseJoinRepository {
 
     public LiveData<List<TrainingGoalLoadData>> getTrainingGoalLoadData(String trainingId, String goalId){
         return trainingGoalExerciseJoinDAO.getTrainingGoalLoadData(trainingId, goalId);
+    }
+    private static class getAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {
+
+        private TrainingGoalExerciseJoinDAO mAsyncTaskDao;
+
+        getAsyncTask(TrainingGoalExerciseJoinDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final TrainingGoalExerciseJoin... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
     }
 }

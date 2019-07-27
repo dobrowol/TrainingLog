@@ -29,14 +29,20 @@ import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseJoinView
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class AddExercise extends AppCompatActivity implements View.OnClickListener, Observer<List<ExerciseDescription>>, AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
     public static final String TRAINING = "training";
@@ -49,6 +55,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
+    private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
     private TrainingViewModel trainingViewModel;
     private GoalViewModel goalViewModel;
     private ExerciseViewModel exerciseViewModel;
@@ -63,13 +70,12 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private Goal goal;
     private EditText specificity;
     private GoalExerciseJoinViewModel goalExerciseJoinViewModel;
+    private TrainingGoalJoin trainingGoalJoin;
 
     public static void startNewInstance(Context context, Training training, Goal goal){
         Intent intent = new Intent(context, AddExercise.class);
 
         intent.putExtra(AddExercise.TRAINING, training.id);
-
-       // bundle.putParcelable(AddExercise.GOAL, goal);
 
         intent.putExtra(AddExercise.GOAL, goal.goalId);
         context.startActivity(intent);
@@ -106,6 +112,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
         goalExerciseJoinViewModel = ViewModelProviders.of(this).get(GoalExerciseJoinViewModel.class);
+        trainingGoalJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
 
         exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, this);
 
@@ -121,13 +128,26 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                 trainingViewModel.getTraining(trainingId).observe(this, training1 -> {
                     training = training1;
                     setAppBarTitle();
+                    setTrainingGoal();
                 });
 
                 goalViewModel.getGoalById(goalId).observe(this, goal1 -> {
                     goal = goal1;
                     setAppBarTitle();
+                    setTrainingGoal();
                 });
 
+        }
+        trainingGoalJoin = null;
+
+        trainingGoalJoinViewModel.trainingGoal.observe(this, trainingGoalJoin1 -> {
+            trainingGoalJoin=trainingGoalJoin1;
+        });
+    }
+
+    private void setTrainingGoal() {
+        if(goal != null && training != null){
+            trainingGoalJoinViewModel.getTrainingGoal(training.id, goal.goalId);
         }
     }
 
@@ -167,6 +187,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
                 exercise = new Exercise(UUID.randomUUID().toString(), exerciseType, getNumber(distance), Intensity.values()[getNumber(intensity)-1], exerciseDescriptionId,
                         getNumber(numberOfRepetitions), numOfSets, new Date());
+                exercise.calculateLoad();
 
                 exerciseViewModel.insert(exercise);
                 exerciseViewModel.getExerciseById(exercise.id).observe(this, exercise1 -> {
@@ -177,14 +198,12 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                         goalExerciseJoinViewModel.insert(goalExercise);
                         trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
                         TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise);
-                        trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin);
-                        Intent intent = new Intent();
-                        setResult(RESULT_OK, intent);
-                        finish();
+                        trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                                s -> {
+                                   finish();
+                                });
                     }
                 });
-
-
             }
             break;
             case R.id.btnAddDescription:
@@ -229,8 +248,6 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onChanged(List<ExerciseDescription> exerciseDescriptions) {
-
-                // Update the cached copy of the words in the adapter.
                 String[] array = new String[exerciseDescriptions.size()];
                 for (int i =0; i < exerciseDescriptions.size();i++){
                     array[i] = exerciseDescriptions.get(i).description;

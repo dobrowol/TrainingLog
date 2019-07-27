@@ -15,6 +15,10 @@ import androidx.lifecycle.Observer;
 
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -25,14 +29,17 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener}
  * interface.
  */
-public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener, View.OnClickListener {
+public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener, View.OnClickListener{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private TrainingViewModel trainingViewModel;
+    private TrainingGoalJoinViewModel trainingGoalViewModel;
+    private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     RecyclerView recyclerView;
+    AllTrainingRecyclerViewAdapter adapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -72,10 +79,15 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), mColumnCount));
             }
-
+        adapter = new AllTrainingRecyclerViewAdapter( this);
+        recyclerView.setAdapter(adapter);
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
-        trainingViewModel.getAllTrainings().observe(this, this);
+            trainingViewModel.getAllTrainings().observe(this, this);
 
+        trainingGoalViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
+
+        trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
+        trainingGoalViewModel.getAllTrainingGoalJoins().observe(this, trainingGoalJoins -> adapter.setTrainingGoalsLoads(trainingGoalJoins));
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
     }
@@ -83,7 +95,8 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
     @Override
     public void onChanged(List<Training> trainings) {
 
-        recyclerView.setAdapter(new AllTrainingRecyclerViewAdapter(trainings, this));
+        adapter.setTrainings(trainings);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

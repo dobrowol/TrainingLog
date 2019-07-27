@@ -35,6 +35,8 @@ import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercise;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseList;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 
 import org.w3c.dom.Text;
 
@@ -50,7 +52,11 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     private Training training;
     private List<ExerciseDescription> exerciseDescriptions;
-
+    private OnItemClickListener listener;
+    private ArrayList<Goal> goals;
+    private List<GoalExercisePair> goalExercisePairs;
+    private LinkedHashMap<Goal, List<Exercise>> map = new LinkedHashMap<>();
+    private CustomViewHolder viewHolder;
     void discardStatus() {
         viewHolder.discardStatus();
     }
@@ -66,8 +72,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         void insertGoal(Goal goal);
 
-        void insertExercise(Exercise exercise);
-
         void updateExercise(Exercise newExercise);
 
         void updateGoal( Goal newGoal);
@@ -78,12 +82,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void deleteGoal(Goal oldGoal);
     }
 
-    private OnItemClickListener listener;
-    private ArrayList<Goal> goals;
-    private List<GoalExercisePair> goalExercisePairs;
-    private LinkedHashMap<Goal, List<Exercise>> map = new LinkedHashMap<>();
-    private CustomViewHolder viewHolder;
-
     GoalListViewAdapter(OnItemClickListener listener) {
         this.listener = listener;
         goals = new ArrayList<>();
@@ -93,14 +91,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     }
     void setGoals(ArrayList<Goal> goals){
         this.goals = goals;
-        for(Goal goal : goals){
-            List<Exercise> list = map.get(goal);
-            if(list == null){
-                list = new ArrayList<>();
-                map.put(goal, list);
-            }
-        }
-
+        setMap();
     }
 
     void setTraining(Training training){
@@ -109,27 +100,37 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     void setExerciseDescriptions(List<ExerciseDescription> exerciseDescriptions){
         this.exerciseDescriptions = exerciseDescriptions;
     }
-    void setGoalsExercises(List<GoalExercisePair> goalsExercises){
+    void setMap(){
         map.clear();
+        if(goals != null){
+            for(Goal goal : goals){
+                List<Exercise> list = map.get(goal);
+                if(list == null){
+                    list = new ArrayList<>();
+                    map.put(goal, list);
+                }
+            }
+        }
+        if(goalExercisePairs != null){
+            for(GoalExercisePair goalExercise : goalExercisePairs){
+                List<Exercise> list = map.get(goalExercise.goal);
+
+                if(list == null) {
+                    list = new ArrayList<>();
+                }
+                list.add(goalExercise.exercise);
+                map.put(goalExercise.goal, list);
+
+            }
+        }
+    }
+    void setGoalsExercises(List<GoalExercisePair> goalsExercises){
         if(this.goalExercisePairs != null) {
             this.goalExercisePairs.clear();
         }
         this.goalExercisePairs = goalsExercises;
-        if(goalsExercises != null){
-            for(GoalExercisePair goalExercise : goalsExercises){
-                List<Exercise> list = map.get(goalExercise.goal);
+        setMap();
 
-                if(list == null)
-                {
-                    list = new ArrayList<>();
-                    list.add(goalExercise.exercise);
-                    map.put(goalExercise.goal, list);
-                }
-                else {
-                    list.add(goalExercise.exercise);
-                }
-            }
-        }
     }
 
     ArrayList<Goal> getGoals(){
