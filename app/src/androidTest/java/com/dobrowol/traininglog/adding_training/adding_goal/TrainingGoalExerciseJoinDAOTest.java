@@ -7,6 +7,9 @@ import androidx.test.core.app.ApplicationProvider;
 
 import androidx.room.Room;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 import com.jraska.livedata.TestObserver;
 
 import com.dobrowol.traininglog.adding_training.Training;
@@ -24,7 +27,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -68,23 +73,51 @@ public class TrainingGoalExerciseJoinDAOTest {
         exerciseDescription.eid = "ed1";
 
         long res = exerciseDescriptionDAO.insert(exerciseDescription);
-        if(res >0) {
-            Exercise exercise = new Exercise("e1", 1, Intensity.ZoneOne, "ed1", 1, 1, new Date());
-            exerciseDAO.insert(exercise);
+
+            Exercise exercise1 = new Exercise("e1", 1, Intensity.ZoneOne, "ed1", 1, 1, new Date());
+            exercise1.calculateLoad();
+            Exercise exercise2 = new Exercise("e2", 2, Intensity.ZoneOne, "ed1", 2, 2, new Date());
+            exercise2.calculateLoad();
+            exerciseDAO.insert(exercise1);
+            exerciseDAO.insert(exercise2);
 
             Goal goal = new Goal("g1", "kraul");
             goalDAO.insert(goal);
             GoalExercise goalExercise = new GoalExercise("ge1", "g1", "e1", 5);
+            GoalExercise goalExercise2 = new GoalExercise("ge2", "g1", "e2", 4);
+
             goalExerciseJoinDAO.insert(goalExercise);
+            goalExerciseJoinDAO.insert(goalExercise2);
 
             Training training = new Training("t1", new Date());
             trainingDAO.insert(training);
             TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin("tge1", "t1", "g1", "e1", 1);
-            trainingGoalExerciseJoinDAO.insert(trainingGoalExerciseJoin);
+            TrainingGoalExerciseJoin trainingGoalExerciseJoin2 = new TrainingGoalExerciseJoin("tge2", "t1", "g1", "e2", 2);
 
-        }
-        TestObserver.test( trainingGoalExerciseJoinDAO.getTrainingGoalLoadData("t1", "g1")).awaitValue()
-                .assertHasValue();
+            trainingGoalExerciseJoinDAO.insert(trainingGoalExerciseJoin);
+            trainingGoalExerciseJoinDAO.insert(trainingGoalExerciseJoin2);
+
+
+        List<TrainingGoalLoadData> expectedList = new ArrayList<>();
+        TrainingGoalLoadData trainingGoalLoad = new TrainingGoalLoadData();
+        trainingGoalLoad.goalId="g1";
+        trainingGoalLoad.trainingJoinId = "t1";
+        trainingGoalLoad.loadValue=exercise1.loadValue;
+        trainingGoalLoad.startDate=exercise1.startDate;
+        trainingGoalLoad.date = training.date;
+        trainingGoalLoad.specificity=goalExercise.specificity;
+
+        TrainingGoalLoadData trainingGoalLoad2 = new TrainingGoalLoadData();
+        trainingGoalLoad2.goalId="g1";
+        trainingGoalLoad2.trainingJoinId = "t1";
+        trainingGoalLoad2.loadValue = exercise2.loadValue;
+        trainingGoalLoad2.startDate=exercise2.startDate;
+        trainingGoalLoad2.date=training.date;
+        trainingGoalLoad2.specificity=goalExercise2.specificity;
+        expectedList.add(trainingGoalLoad);
+        expectedList.add(trainingGoalLoad2);
+        TestObserver<List<TrainingGoalLoadData>> testObserver = TestObserver.test( trainingGoalExerciseJoinDAO.getTrainingGoalLoadData("t1", "g1")).awaitValue();
+        testObserver.assertValue(expectedList);
 
         //assertThat(byName.get(0), equalTo(user));
     }
