@@ -30,7 +30,6 @@ public class Exercise implements Serializable, Parcelable {
     public String id;
     @ColumnInfo (name = "exerciseDescriptionId")
     public String exerciseDescriptionId;
-    public ExerciseType type;
     public int totalDistance;
     public int distance;
     public Intensity intensity;
@@ -43,10 +42,9 @@ public class Exercise implements Serializable, Parcelable {
     public int loadValue;
     public Date startDate;
 
-    public Exercise(String id, ExerciseType type, int distance, Intensity intensity, String descritpionId, int numberOfRepetitionsInSet,
+    public Exercise(String id, int distance, Intensity intensity, String descritpionId, int numberOfRepetitionsInSet,
                     int numberOfSetsInSeries, Date startDate){
         this.id = id;
-        this.type = type;
         this.distance = distance;
         this.intensity = intensity;
         this.exerciseDescriptionId = descritpionId;
@@ -68,7 +66,6 @@ public class Exercise implements Serializable, Parcelable {
     protected Exercise(Parcel in) {
         id = in.readString();
         exerciseDescriptionId = in.readString();
-        type = (ExerciseType) in.readSerializable();
         distance = in.readInt();
         intensity = (Intensity) in.readSerializable();
         totalDistance = in.readInt();
@@ -103,7 +100,6 @@ public class Exercise implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeString(exerciseDescriptionId);
-        parcel.writeSerializable(type);
         parcel.writeInt(distance);
         parcel.writeSerializable(intensity);
         parcel.writeInt(totalDistance);

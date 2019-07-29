@@ -185,7 +185,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
             } else {
                 int numOfSets = getNumber(numberOfSets);
 
-                exercise = new Exercise(UUID.randomUUID().toString(), exerciseType, getNumber(distance), Intensity.values()[getNumber(intensity)-1], exerciseDescriptionId,
+                exercise = new Exercise(UUID.randomUUID().toString(), getNumber(distance), Intensity.values()[getNumber(intensity)-1], exerciseDescriptionId,
                         getNumber(numberOfRepetitions), numOfSets, new Date());
                 exercise.calculateLoad();
 

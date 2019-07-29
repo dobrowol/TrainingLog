@@ -43,6 +43,11 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
     List<Training> trainings;
     List<TrainingGoalJoin> trainingLoadsMap;
+    int maximumLoad;
+
+    public void setMaximumLoad(int maximumLoad) {
+        this.maximumLoad = 3*maximumLoad;
+    }
 
     public AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
         this.mListener = trainingsApp;
@@ -77,7 +82,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         List<Integer> loads = new ArrayList<>();
         if(trainingLoadsMap != null) {
             for (TrainingGoalJoin trainingGoalJoin : trainingLoadsMap) {
-                if (trainingGoalJoin.trainingId == holder.mItem.id) {
+                if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
                     loads.add(trainingGoalJoin.load);
                 }
             }
@@ -131,15 +136,12 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             YAxis leftAxis = mChart.getAxisLeft();
             leftAxis.setValueFormatter(new MyValueFormatter("K"));
             leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-            leftAxis.setAxisMaximum(20000);
+            leftAxis.setAxisMaximum(maximumLoad);
             mChart.getAxisRight().setEnabled(false);
             mChart.getAxisLeft().setEnabled(false);
 
             mChart.getXAxis().setEnabled(false);
             mChart.getLegend().setEnabled(false);
-            //XAxis xLabels = mChart.getXAxis();
-            //xLabels.setPosition(XAxis.XAxisPosition.TOP);
-
         }
 
         public void setDate(Date date){
@@ -156,7 +158,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             float [] trainingLoads = new float[goalLoads.size()];
             int j = 0;
             for(Integer load : goalLoads) {
-                trainingLoads[j] = load;
+                trainingLoads[j++] = load;
             }
 
             values.add(new BarEntry(

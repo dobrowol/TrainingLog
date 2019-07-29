@@ -23,7 +23,7 @@ public class Training implements Serializable, Parcelable {
 
     public Date date;
 
-    public Training(String id, Date date, Integer general_load, Integer specific_load, Integer competitive_load){
+    public Training(String id, Date date){
         this.id = id;
         this.date = date;
 

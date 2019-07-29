@@ -1,24 +1,13 @@
 package com.dobrowol.traininglog;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -32,17 +21,10 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
-import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercise;
-import com.dobrowol.traininglog.adding_training.adding_goal.GoalExerciseList;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
-import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
-import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +50,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         void onExistingGoalEdit(String description);
 
-        void onNewExerciseEnter();
-
         void insertGoal(Goal goal);
-
-        void updateExercise(Exercise newExercise);
 
         void updateGoal( Goal newGoal);
 
@@ -153,7 +131,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                 return;
             }
             j++;
-            // now work with key and value...
         }
 
     }
@@ -164,22 +141,10 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     }
 
     private interface TrainingDetailEnterState{
-        void start();
         void saveStatus(String name);
         void discardStatus();
     }
-   /* private class TrainingDetailsSM{
-         TrainingDetailEnterState trainingDetailEnterState;
-         void saveStatus(){
-             trainingDetailEnterState.saveStatus();
-         }
-         void discardStatus(){
-             trainingDetailEnterState.discardStatus();
-         }
-         void setTrainingDetailEnterState(TrainingDetailEnterState trainingDetailEnterState){
-             this.trainingDetailEnterState = trainingDetailEnterState;
-         }
-    }*/
+
     private class NewGoalEnterState implements TrainingDetailEnterState {
        OnItemClickListener listener;
        View view;
@@ -190,10 +155,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
            this.listener = listener;
            this.view = view;
        }
-        @Override
-        public void start(){
-        //    descriptionEditText.setText("");
-        }
        @Override
        public void saveStatus(String name) {
 
@@ -221,12 +182,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                descriptionText = view.findViewById(R.id.goalTextView);
                oldGoal = new Goal(null, descriptionText.getText().toString());
            }
-           @Override
-           public void start(){
-              // descriptionEditText.setText(descriptionText.getText());
-               listener.onExistingGoalEdit(descriptionText.getText().toString());
 
-           }
            @Override
            public void saveStatus(String name) {
 
@@ -256,49 +212,18 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         }
 
         @Override
-        public void start(){
-        }
-        @Override
         public void saveStatus(String name) {
 
-            if (name != null && name.compareTo("")!=0) {
-                Goal newGoal = new Goal(null, name);
+
+        }
+
+        @Override
+        public void discardStatus() {
                 listener.deleteGoal(oldGoal);
-            }
-        }
-
-        @Override
-        public void discardStatus() {
-        }
-    }
-    private class NewExerciseAdd implements TrainingDetailEnterState{
-        OnItemClickListener listener;
-        View view;
-        Goal oldGoal;
-        TextView descriptionText;
-        //EditText descriptionEditText;
-
-        NewExerciseAdd(View view, OnItemClickListener listener){
-            this.listener = listener;
-            this.view = view;
-            descriptionText = view.findViewById(R.id.goalTextView);
-            oldGoal = new Goal(null, descriptionText.getText().toString());
-        }
-        @Override
-        public void start(){
-            Intent intent = new Intent(view.getContext() ,AddExercise.class);
-            ((AppCompatActivity)view.getContext()).startActivity(intent);
-        }
-        @Override
-        public void saveStatus(String name) {
-
-        }
-
-        @Override
-        public void discardStatus() {
 
         }
     }
+
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         TextView descriptionText;
@@ -314,7 +239,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         DeleteGoalState deleteGoalState;
         private ActionMode actionMode;
         private MyRecyclerViewAdapter exerciseAdapter;
-        private List<Exercise> exercises;
 
         CustomViewHolder(View view, OnItemClickListener listener) {
             super(view);
@@ -347,7 +271,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         void fillView(Goal goal, List<Exercise> exercises) {
             this.goal = goal;
-            this.exercises = exercises;
             descriptionText.setText(goal.description);
             deleteGoalState = new DeleteGoalState(view, listener, this.goal);
             exerciseAdapter.setExerciseList(exercises);
@@ -415,7 +338,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     trainingDetailEnterState = deleteGoalState;
                     break;
             }
-            return false;
+            return true;
         }
 
         private class ActionBarCallback implements ActionMode.Callback {
@@ -441,17 +364,12 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.item_delete:
-                        if(trainingDetailEnterState != null) {
-                            trainingDetailEnterState.saveStatus("");
-                            trainingDetailEnterState = null;
+                        if(deleteGoalState != null) {
+                            deleteGoalState.saveStatus(null);
                         }
                         disableActionMode();
                         return true;
                     case R.id.item_add:
-                        if (trainingDetailEnterState != null) {
-                            trainingDetailEnterState = null;
-                        }
-                        disableActionMode();
                         return true;
                     default:
                         return false;

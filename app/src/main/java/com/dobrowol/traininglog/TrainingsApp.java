@@ -90,6 +90,12 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         trainingGoalViewModel.getAllTrainingGoalJoins().observe(this, trainingGoalJoins -> adapter.setTrainingGoalsLoads(trainingGoalJoins));
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
+        trainingGoalViewModel.getMaximumLoad().observe(this, maximumLoad -> {
+            if (maximumLoad != null) {
+                adapter.setMaximumLoad(maximumLoad);
+            }
+        }
+        );
     }
 
     @Override

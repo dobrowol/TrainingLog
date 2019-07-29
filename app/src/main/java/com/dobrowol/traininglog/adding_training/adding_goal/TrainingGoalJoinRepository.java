@@ -28,6 +28,10 @@ public class TrainingGoalJoinRepository {
         return trainingGoalJoinDAO.getGoalsForTraining(trainingId);
     }
 
+    LiveData<Integer> getMaximumLoad(){
+        return trainingGoalJoinDAO.getMaximumLoad();
+    }
+
     public void insert (TrainingGoalJoin trainingGoalJoin) {
         new insertAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
     }

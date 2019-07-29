@@ -126,8 +126,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         generalAdapter = new GoalListViewAdapter(this);
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST);
-
 
         Intent intent = getIntent();
         if(intent != null) {
@@ -234,13 +232,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         input.setLayoutParams(lp);
 
         alertDialog.setView(input);
-        //alertDialog.setIcon(R.drawable.key);
 
         alertDialog.setPositiveButton("YES",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         insertGoal(input.getText().toString());
-
                     }
                 });
 
@@ -284,8 +280,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     protected void onRestoreInstanceState(Bundle inState){
         super.onRestoreInstanceState(inState);
         generalAdapter.setGoals(inState.getParcelableArrayList("generalExerciseList"));
-
-
     }
 
     @Override
@@ -406,11 +400,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     @Override
-    public void onNewExerciseEnter() {
-
-    }
-
-    @Override
     public void insertGoal(Goal goal) {
         goalViewModel.insert(goal);
         goalViewModel.getGoalById(goal.goalId).observe(this, goal1 -> {
@@ -419,12 +408,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 trainingGoalJoinViewModel.insert(trainingGoalJoin);
             }
         });
-
-    }
-
-
-    @Override
-    public void updateExercise(Exercise newExercise) {
 
     }
 

@@ -34,4 +34,7 @@ public interface TrainingGoalJoinDAO {
 
         @Query("SELECT training_goal_join.* FROM training_goal_join WHERE training_goal_join.trainingId=:trainingId AND training_goal_join.goalId=:goalId")
         LiveData<TrainingGoalJoin> getTrainingGoal(String trainingId, String goalId);
+
+        @Query("SELECT MAX(training_goal_join.load) FROM training_goal_join")
+        LiveData<Integer> getMaximumLoad();
 }

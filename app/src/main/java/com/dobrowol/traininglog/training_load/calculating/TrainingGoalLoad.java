@@ -25,8 +25,8 @@ public class TrainingGoalLoad {
             if(trainingGoalLoadData != null) {
                 int load = -1;
                 for (TrainingGoalLoadData loadData : trainingGoalLoadData) {
-                    if(trainingGoalJoin.trainingId.equals(loadData.trainingId) && trainingGoalJoin.goalId.equals(loadData.goalId)) {
-                        long diffInMillies = Math.abs(loadData.trainingDate.getTime() - loadData.exerciseStartDate.getTime());
+                /*    if(trainingGoalJoin.trainingId.equals(loadData.trainingJoinId) && trainingGoalJoin.goalId.equals(loadData.goalId)) {
+                        long diffInMillies = Math.abs(loadData.date.getTime() - loadData.startDate.getTime());
                         long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
                         int neurologicalBoostPeriod = 21;
@@ -35,7 +35,7 @@ public class TrainingGoalLoad {
                             neurologicalBoost = 8;
                         }
                         load += loadData.loadValue * loadData.specificity * neurologicalBoost;
-                    }
+                    }*/
                 }
                 if(load != -1) {
                     trainingGoalJoin.load = load;

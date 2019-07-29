@@ -75,6 +75,9 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         TrainingGoal trainingGoal = new TrainingGoal(trainingId, goalId);
         query3.setValue(trainingGoal);
     }
+    public LiveData<Integer> getMaximumLoad(){
+        return mRepository.getMaximumLoad();
+    }
 
 }
 

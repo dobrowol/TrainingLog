@@ -20,7 +20,7 @@ public interface ExerciseDescriptionDAO {
     LiveData<ExerciseDescription> findByDescription( String exerciseDescription);
 
     @Insert
-    void insert(ExerciseDescription exerciseDescription);
+    long insert(ExerciseDescription exerciseDescription);
 
     @Delete
     void delete(ExerciseDescription exerciseDescription);
