@@ -8,7 +8,6 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.room.Room;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 import com.jraska.livedata.TestObserver;
 
@@ -30,27 +29,21 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-
-import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class TrainingGoalExerciseJoinDAOTest {
     @Rule
     public InstantTaskExecutorRule testRule = new InstantTaskExecutorRule();
     private TrainingRoomDatabase db;
-    TrainingGoalExerciseJoinDAO trainingGoalExerciseJoinDAO;
-    ExerciseDAO exerciseDAO;
-    GoalDAO goalDAO;
-    ExerciseDescriptionDAO exerciseDescriptionDAO;
-    GoalExerciseJoinDAO goalExerciseJoinDAO;
-    TrainingDAO trainingDAO;
+    private TrainingGoalExerciseJoinDAO trainingGoalExerciseJoinDAO;
+    private ExerciseDAO exerciseDAO;
+    private GoalDAO goalDAO;
+    private ExerciseDescriptionDAO exerciseDescriptionDAO;
+    private GoalExerciseJoinDAO goalExerciseJoinDAO;
+    private TrainingDAO trainingDAO;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, TrainingRoomDatabase.class).build();
         trainingGoalExerciseJoinDAO = db.trainingGoalExerciseJoinDAO();
@@ -62,7 +55,7 @@ public class TrainingGoalExerciseJoinDAOTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         db.close();
 
     }
@@ -118,8 +111,6 @@ public class TrainingGoalExerciseJoinDAOTest {
         expectedList.add(trainingGoalLoad2);
         TestObserver<List<TrainingGoalLoadData>> testObserver = TestObserver.test( trainingGoalExerciseJoinDAO.getTrainingGoalLoadData("t1", "g1")).awaitValue();
         testObserver.assertValue(expectedList);
-
-        //assertThat(byName.get(0), equalTo(user));
     }
 
 

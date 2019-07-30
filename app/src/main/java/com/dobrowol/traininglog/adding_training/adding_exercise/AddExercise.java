@@ -140,9 +140,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
         }
         trainingGoalJoin = null;
 
-        trainingGoalJoinViewModel.trainingGoal.observe(this, trainingGoalJoin1 -> {
-            trainingGoalJoin=trainingGoalJoin1;
-        });
+        trainingGoalJoinViewModel.trainingGoal.observe(this, trainingGoalJoin1 -> trainingGoalJoin=trainingGoalJoin1);
     }
 
     private void setTrainingGoal() {
@@ -183,26 +181,29 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
                 Toast.makeText(this, errorMessage,Toast.LENGTH_SHORT).show();
             } else {
+                btnSubmit.setEnabled(false);
+                btnSubmit.setOnClickListener(null);
                 int numOfSets = getNumber(numberOfSets);
 
                 exercise = new Exercise(UUID.randomUUID().toString(), getNumber(distance), Intensity.values()[getNumber(intensity)-1], exerciseDescriptionId,
                         getNumber(numberOfRepetitions), numOfSets, new Date());
                 exercise.calculateLoad();
 
-                exerciseViewModel.insert(exercise);
-                exerciseViewModel.getExerciseById(exercise.id).observe(this, exercise1 -> {
-                    if(exercise1 != null) {
+                exerciseViewModel.insert(exercise).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                        s -> {
+
+
                         int nextExercise = numberOfExercises + 1;
                         trainingExerciseJoin = new TrainingExerciseJoin(UUID.randomUUID().toString(), exercise.id, training.id, nextExercise);
                         GoalExercise goalExercise = new GoalExercise(UUID.randomUUID().toString(), goal.goalId, exercise.id, getNumber(specificity));
                         goalExerciseJoinViewModel.insert(goalExercise);
                         trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
+                        TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad(trainingGoalJoin, trainingGoalJoinViewModel);
+                        trainingGoalLoad.update(exercise, goalExercise, training);
                         TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise);
                         trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                                s -> {
-                                   finish();
-                                });
-                    }
+                                s1 -> finish());
+
                 });
             }
             break;
@@ -228,10 +229,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private boolean isNumberInvalid(EditText field, int lowerBound, int upperBound) {
 
         int res = getNumber(field);
-        if(res>=1&&res<=5){
-            return false;
-        }
-        return true;
+        return res < lowerBound || res > upperBound;
     }
 
     private int getNumber(EditText editText) {

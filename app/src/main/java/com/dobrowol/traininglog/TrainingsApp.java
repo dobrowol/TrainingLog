@@ -16,12 +16,11 @@ import androidx.lifecycle.Observer;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
-import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
-import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Items.
@@ -64,7 +63,7 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         Intent intent = getIntent();
         if (intent != null) {
             if (intent.hasExtra(ARG_COLUMN_COUNT)) {
-                mColumnCount = intent.getExtras().getInt(ARG_COLUMN_COUNT);
+                mColumnCount = Objects.requireNonNull(intent.getExtras()).getInt(ARG_COLUMN_COUNT);
             }
             mColumnCount = 1;
         }
@@ -87,20 +86,18 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         trainingGoalViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalViewModel.getAllTrainingGoalJoins().observe(this, trainingGoalJoins -> adapter.setTrainingGoalsLoads(trainingGoalJoins));
+        trainingGoalViewModel.getAllTrainingGoalJoins().observe(this, trainingGoalJoins -> adapter.setTrainingGoalJoins(trainingGoalJoins));
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
         trainingGoalViewModel.getMaximumLoad().observe(this, maximumLoad -> {
             if (maximumLoad != null) {
                 adapter.setMaximumLoad(maximumLoad);
-            }
-        }
+            } }
         );
     }
 
     @Override
     public void onChanged(List<Training> trainings) {
-
         adapter.setTrainings(trainings);
         adapter.notifyDataSetChanged();
     }
@@ -113,30 +110,13 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         intent.putExtras(bundle);
 
         startActivity(intent);
-
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.fab_add_training:
+        if(v.getId() == R.id.fab_add_training){
                 Intent intent = new Intent(this,MainActivity.class);
-
                 startActivity(intent);
-                break;
-
         }
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
 }

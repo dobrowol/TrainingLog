@@ -11,6 +11,8 @@ import com.dobrowol.traininglog.adding_training.Training;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class TrainingGoalJoinViewModel extends AndroidViewModel {
 
 
@@ -32,7 +34,7 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         public String trainingId;
         public String goalId;
 
-        public TrainingGoal(String trainingId, String goalId) {
+        TrainingGoal(String trainingId, String goalId) {
             this.trainingId = trainingId;
             this.goalId = goalId;
         }
@@ -59,7 +61,7 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         super(application);
         mRepository = new TrainingGoalJoinRepository(application);
     }
-    public void insert(TrainingGoalJoin trainingGoalJoin) { mRepository.insert(trainingGoalJoin); }
+    public Single<Long> insert(TrainingGoalJoin trainingGoalJoin) { return mRepository.insert(trainingGoalJoin); }
 
     private MutableLiveData<String> query2 = new MutableLiveData<>();
     public LiveData<List<TrainingGoalJoin>> trainingGoalsForTrainingId = Transformations.switchMap(query2,

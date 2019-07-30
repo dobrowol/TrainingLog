@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,6 +59,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         fab_add_goal.setOnClickListener(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) {
             @Override
-            public boolean requestChildRectangleOnScreen(RecyclerView parent, View child, Rect rect, boolean immediate, boolean focusedChildVisible) {
+            public boolean requestChildRectangleOnScreen(@NonNull RecyclerView parent, @NonNull View child, @NonNull Rect rect, boolean immediate, boolean focusedChildVisible) {
 
                 if (((ViewGroup) child).getFocusedChild() instanceof ViewSwitcher) {
                     return false;
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         Intent intent = getIntent();
         if(intent != null) {
                 if (intent.hasExtra(MainActivity.TRAINING)) {
-                    training = (Training) intent.getExtras().getSerializable(MainActivity.TRAINING);
+                    training = (Training) Objects.requireNonNull(intent.getExtras()).getSerializable(MainActivity.TRAINING);
                 }
         }
         if (training == null){
@@ -146,9 +148,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        trainingGoalJoinViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> {
-            this.trainingGoalJoins = trainingGoalJoins;
-        });
+        trainingGoalJoinViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> this.trainingGoalJoins = trainingGoalJoins);
 
         trainingGoalJoinViewModel.goalsForTraining.observe(this, goals -> {
             if (goals != null) {
@@ -161,19 +161,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         trainingGoalExerciseJoinViewModel.goalExercisesForTraining.observe(this, goalExercises -> {
             if(goalExercises != null){
-                for(TrainingGoalJoin trainingGoalJoin : trainingGoalJoins){
-                    TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad(trainingGoalJoin, trainingGoalExerciseJoinViewModel, this, trainingGoalJoinViewModel);
-                    trainingGoalLoad.calculate();
-                }
                 generalAdapter.setGoalsExercises(goalExercises);
                 generalAdapter.notifyDataSetChanged();
             }
         });
 
-        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exerciseDescriptions -> {
-            generalAdapter.setExerciseDescriptions(exerciseDescriptions);
-        });
-        //trainingExerciseJoinViewModel.getExercisesByTrainingId(training.id);
+        exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exerciseDescriptions -> generalAdapter.setExerciseDescriptions(exerciseDescriptions));
+
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
         trainingGoalJoinViewModel.getAllTrainingGoalJoinsForTraining(training.id);
@@ -195,22 +189,20 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setTitle(formatted);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }else{
             android.app.ActionBar actionBar1 = getActionBar();
             if(actionBar1 != null){
                 actionBar1.setTitle(formatted);
+                actionBar1.setDisplayHomeAsUpEnabled(true);
             }
         }
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.fab_add_goal:
+        if(view.getId() == R.id.fab_add_goal){
                 showAlert("Dodaj cel");
-                break;
-            default:
-                break;
         }
     }
 
@@ -234,18 +226,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         alertDialog.setView(input);
 
         alertDialog.setPositiveButton("YES",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        insertGoal(input.getText().toString());
-                    }
-                });
+                (dialog, which) -> insertGoal(input.getText().toString()));
 
         alertDialog.setNegativeButton("NO",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                (dialog, which) -> dialog.cancel());
 
         alertDialog.show();
     }
@@ -255,17 +239,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         insertGoal(goal);
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK)
-        if (requestCode == AddExercise.CREATE_EXERCISE ){
-
-        }
-
-    }
     @Override
     public void onItemClick(Exercise item) {
 
@@ -286,7 +259,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
-
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -468,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+            return new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {

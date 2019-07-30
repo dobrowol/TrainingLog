@@ -2,6 +2,7 @@ package com.dobrowol.traininglog.adding_training;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -24,7 +25,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinDAO;
 
 @Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class, Goal.class, TrainingGoalExerciseJoin.class,
-        TrainingGoalJoin.class, GoalExercise.class}, version = 16)
+        TrainingGoalJoin.class, GoalExercise.class}, version = 19)
 @TypeConverters({Converters.class})
 public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract ExerciseDescriptionDAO exerciseDescriptionDAO();
@@ -53,7 +54,7 @@ public abstract class TrainingRoomDatabase extends RoomDatabase {
     }
     static final Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
-        public void migrate(SupportSQLiteDatabase database) {
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
             // Since we didn't alter the table, there's nothing else to do here.
         }
     };

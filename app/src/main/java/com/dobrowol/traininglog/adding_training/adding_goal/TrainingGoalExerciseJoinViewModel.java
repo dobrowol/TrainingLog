@@ -67,8 +67,8 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
             trainingGoalExerciseId ->
                     mRepository.getTrainingGoalExercise(trainingGoalExerciseId)
     );
-    public LiveData<TrainingGoalExerciseJoin> getTrainingGoalExercise(String trainingGoalExerciseJoin) {
-        return mRepository.getTrainingGoalExercise(trainingGoalExerciseJoin);
+    public void getTrainingGoalExercise(String trainingGoalExerciseJoin) {
+         query3.setValue(trainingGoalExerciseJoin);
     }
 
     public TrainingGoalExerciseJoinViewModel(Application application) {

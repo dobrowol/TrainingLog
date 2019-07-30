@@ -15,7 +15,7 @@ import java.util.List;
 public interface TrainingGoalJoinDAO {
 
         @Insert(onConflict = OnConflictStrategy.REPLACE)
-        void insert(TrainingGoalJoin trainingGoalJoin);
+        long insert(TrainingGoalJoin trainingGoalJoin);
 
         @Query("SELECT goal_table.* FROM goal_table  INNER JOIN training_goal_join ON goal_table.goalId=training_goal_join.goalId WHERE training_goal_join.trainingId=:trainingId ")
         LiveData<List<Goal>> getGoalsForTraining(final String trainingId);

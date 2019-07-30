@@ -11,6 +11,8 @@ import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class TrainingGoalJoinRepository {
 
     private TrainingGoalJoinDAO trainingGoalJoinDAO;
@@ -32,23 +34,23 @@ public class TrainingGoalJoinRepository {
         return trainingGoalJoinDAO.getMaximumLoad();
     }
 
-    public void insert (TrainingGoalJoin trainingGoalJoin) {
-        new insertAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
+    public Single<Long> insert (TrainingGoalJoin trainingGoalJoin) {
+        return Single.fromCallable(() -> trainingGoalJoinDAO.insert(trainingGoalJoin));
     }
 
     public void update(TrainingGoalJoin trainingGoalJoin) {
         new updateAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
     }
 
-    public LiveData<List<TrainingGoalJoin>> getAllTrainingGoalsForTrainingId(String trainingId) {
+    LiveData<List<TrainingGoalJoin>> getAllTrainingGoalsForTrainingId(String trainingId) {
         return trainingGoalJoinDAO.getTrainingGoalsForTrainingId(trainingId);
     }
 
-    public LiveData<List<TrainingGoalJoin>> getAllTrainingGoals() {
+    LiveData<List<TrainingGoalJoin>> getAllTrainingGoals() {
         return trainingGoalJoinDAO.getAllTrainingGoals();
     }
 
-    public LiveData<TrainingGoalJoin> getTrainingGoal(String trainingId, String goalId) {
+    LiveData<TrainingGoalJoin> getTrainingGoal(String trainingId, String goalId) {
         return trainingGoalJoinDAO.getTrainingGoal(trainingId, goalId);
     }
 

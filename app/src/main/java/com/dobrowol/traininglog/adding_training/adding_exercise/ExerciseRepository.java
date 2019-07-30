@@ -10,6 +10,8 @@ import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class ExerciseRepository {
 
     private ExerciseDAO mExerciseDao;
@@ -29,15 +31,15 @@ public class ExerciseRepository {
         return mExerciseDao.findExerciseDescriptonByDescription(description);
     }
 
-    public void insert (Exercise exercise) {
-        new insertAsyncTask(mExerciseDao).execute(exercise);
+    public Single<Long> insert (Exercise exercise) {
+        return Single.fromCallable(() -> mExerciseDao.insert(exercise));
     }
 
     public void update(Exercise exercise) {
         new updateAsyncTask(mExerciseDao).execute(exercise);
     }
 
-    public LiveData<Exercise> getExerciseById(String id) {
+    LiveData<Exercise> getExerciseById(String id) {
         return mExerciseDao.getExerciseById(id);
     }
 

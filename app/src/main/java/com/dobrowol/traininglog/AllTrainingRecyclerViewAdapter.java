@@ -1,10 +1,8 @@
 package com.dobrowol.traininglog;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +12,11 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.training_load.displaying.MyValueFormatter;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -32,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Training} and makes a call to the
@@ -41,22 +36,23 @@ import java.util.Map;
  */
 public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrainingRecyclerViewAdapter.ViewHolder> {
 
-    List<Training> trainings;
-    List<TrainingGoalJoin> trainingLoadsMap;
-    int maximumLoad;
+    private List<Training> trainings;
+    private List<TrainingGoalJoin> trainingGoalJoins;
+    private int maximumLoad;
 
-    public void setMaximumLoad(int maximumLoad) {
+    void setMaximumLoad(int maximumLoad) {
         this.maximumLoad = 3*maximumLoad;
     }
 
-    public AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
+    AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
         this.mListener = trainingsApp;
     }
-    public void setTrainings(List<Training> trainings){
+    void setTrainings(List<Training> trainings){
         this.trainings = trainings;
     }
-    public void setTrainingGoalsLoads(List<TrainingGoalJoin> trainingGoalsLoads){
-        this.trainingLoadsMap = trainingGoalsLoads;
+    void setTrainingGoalJoins(List<TrainingGoalJoin> trainingGoalJoins){
+        this.trainingGoalJoins = trainingGoalJoins;
+        notifyDataSetChanged();
     }
 
     public interface OnListFragmentInteractionListener {
@@ -80,8 +76,8 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = trainings.get(position);
         List<Integer> loads = new ArrayList<>();
-        if(trainingLoadsMap != null) {
-            for (TrainingGoalJoin trainingGoalJoin : trainingLoadsMap) {
+        if(trainingGoalJoins != null) {
+            for (TrainingGoalJoin trainingGoalJoin : trainingGoalJoins) {
                 if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
                     loads.add(trainingGoalJoin.load);
                 }
@@ -105,7 +101,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     public class ViewHolder extends RecyclerView.ViewHolder implements OnChartValueSelectedListener {
         final View mView;
         final TextView mIdView;
-        public List<Integer> mLoads;
+        List<Integer> mLoads;
         private HorizontalBarChart mChart;
         Training mItem;
 
@@ -115,7 +111,6 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mIdView = view.findViewById(R.id.item_number);
 
             mChart = view.findViewById(R.id.trainingLoadPreviewChart);
-
 
             mChart.setOnChartValueSelectedListener(this);
 

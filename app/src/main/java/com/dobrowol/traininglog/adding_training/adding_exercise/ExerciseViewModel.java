@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class ExerciseViewModel extends AndroidViewModel {
 
     private ExerciseRepository mRepository;
@@ -23,7 +25,7 @@ public class ExerciseViewModel extends AndroidViewModel {
 
     public LiveData<ExerciseDescription> getExerciseDescription(String description) {return mRepository.getExerciseDescription(description);}
 
-    public void insert(Exercise exercise) { mRepository.insert(exercise); }
+    public Single<Long> insert(Exercise exercise) { return mRepository.insert(exercise); }
 
     public void update(Exercise exercise) { mRepository.update(exercise); }
 

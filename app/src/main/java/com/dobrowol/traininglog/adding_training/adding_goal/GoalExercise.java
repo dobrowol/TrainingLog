@@ -29,7 +29,7 @@ public class GoalExercise {
     String id;
     public String goalId;
     public String exerciseId;
-    int specificity;
+    public int specificity;
 
     public GoalExercise(@NonNull String id, String goalId, String exerciseId, int specificity){
         this.id = id;
