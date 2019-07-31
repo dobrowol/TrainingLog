@@ -15,6 +15,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 
@@ -47,10 +48,12 @@ import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
+import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -62,9 +65,12 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
+        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
     public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
@@ -91,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
-    private List<TrainingGoalJoin> trainingGoalJoins;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         };
         goalRecyclerView.setLayoutManager(linearLayoutManager);
         goalRecyclerView.setFocusable(false);
-        generalAdapter = new GoalListViewAdapter(this);
+        generalAdapter = new GoalListViewAdapter(this, this);
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
 
@@ -148,8 +153,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private void initializeObservers(){
         trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
 
-        trainingGoalJoinViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> this.trainingGoalJoins = trainingGoalJoins);
-
         trainingGoalJoinViewModel.goalsForTraining.observe(this, goals -> {
             if (goals != null) {
                 // Update the cached copy of the exercises in the adapter.
@@ -170,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
-        trainingGoalJoinViewModel.getAllTrainingGoalJoinsForTraining(training.id);
 
     }
     private void initializeTraining(){
@@ -378,13 +380,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void insertGoal(Goal goal) {
-        goalViewModel.insert(goal);
-        goalViewModel.getGoalById(goal.goalId).observe(this, goal1 -> {
-            if(goal1!=null) {
+        goalViewModel.insert(goal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                s -> {
                 TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
                 trainingGoalJoinViewModel.insert(trainingGoalJoin);
             }
-        });
+        );
 
     }
 
@@ -404,6 +405,36 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 editedGoal.priority = newGoal.priority;
             }
             goalViewModel.update(editedGoal);
+        }
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+
+        if (viewHolder instanceof MyRecyclerViewAdapter.CustomViewHolder) {
+            // get the removed item name to display it in snack bar
+            Exercise name = exerciseList.get(viewHolder.getAdapterPosition());
+
+            // backup of removed item for undo purpose
+            final Exercise deletedItem = exerciseList.get(viewHolder.getAdapterPosition());
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            // remove the item from recycler view
+            exerciseViewModel.delete(deletedItem);
+
+            // showing snack bar with Undo option
+           /* Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, name + " removed from cart!", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // undo is selected, restore the deleted item
+                    mAdapter.restoreItem(deletedItem, deletedIndex);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();*/
         }
     }
 

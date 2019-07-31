@@ -21,7 +21,7 @@ public interface GoalDAO {
     LiveData<Goal> getByDescription(String eDescription);
 
     @Insert
-    void insert(Goal goal);
+    long insert(Goal goal);
 
     @Delete
     void delete(Goal goal);

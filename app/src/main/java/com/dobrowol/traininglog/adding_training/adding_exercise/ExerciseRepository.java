@@ -43,6 +43,10 @@ public class ExerciseRepository {
         return mExerciseDao.getExerciseById(id);
     }
 
+    public void delete(Exercise deletedItem) {
+        mExerciseDao.delete(deletedItem);
+    }
+
     private static class insertAsyncTask extends AsyncTask<Exercise, Void, Void> {
 
         private ExerciseDAO mAsyncTaskDao;

@@ -3,6 +3,8 @@ package com.dobrowol.traininglog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,12 +62,15 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         return (null != exerciseList ? exerciseList.size() : 0);
     }
-    class CustomViewHolder extends RecyclerView.ViewHolder {
-
+    public class CustomViewHolder extends RecyclerView.ViewHolder {
+        public LinearLayout viewForeground;
+        RelativeLayout viewBackground;
         TextView descriptionText;
 
         CustomViewHolder(View view) {
             super(view);
+            this.viewForeground = view.findViewById(R.id.view_foreground);
+            this.viewBackground = view.findViewById(R.id.view_background);
             this.descriptionText = view.findViewById(R.id.description);
         }
 

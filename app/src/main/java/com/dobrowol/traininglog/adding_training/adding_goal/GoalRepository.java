@@ -13,6 +13,8 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class GoalRepository {
 
     private GoalDAO goalDAO;
@@ -28,8 +30,8 @@ public class GoalRepository {
         return allGoals;
     }
 
-    public void insert (Goal goal) {
-        new insertAsyncTask(goalDAO).execute(goal);
+    public Single<Long> insert (Goal goal) {
+       return Single.fromCallable(() -> goalDAO.insert(goal));
     }
 
     public void update(Goal goal) {

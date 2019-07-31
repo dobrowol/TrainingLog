@@ -19,6 +19,7 @@
     <string name="animateX">Animate X</string>
     <string name="animateY">Animate Y</string>
     <string name="animateXY">Animate XY</string>
+    <string name="delete">DELETE</string>
 
     <string name="actionToggleValues">Toggle Values</string>
     <string name="actionToggleYValues">Toggle Y-Values</string>
