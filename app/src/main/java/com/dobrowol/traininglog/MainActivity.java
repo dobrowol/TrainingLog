@@ -383,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         goalViewModel.insert(goal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 s -> {
                 TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
-                trainingGoalJoinViewModel.insert(trainingGoalJoin);
+                trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
             }
         );
 
