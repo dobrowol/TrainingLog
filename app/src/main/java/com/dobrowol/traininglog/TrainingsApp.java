@@ -119,4 +119,10 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
                 startActivity(intent);
         }
     }
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //When BACK BUTTON is pressed, the activity on the stack is restarted
+        //Do what you want on the refresh procedure here
+    }
 }

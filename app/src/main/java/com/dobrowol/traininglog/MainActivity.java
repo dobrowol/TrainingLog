@@ -3,19 +3,16 @@ package com.dobrowol.traininglog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 
@@ -36,7 +33,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
-import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionViewModel;
@@ -48,12 +44,9 @@ import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
-import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
-import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -70,7 +63,7 @@ import io.reactivex.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
     public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
@@ -130,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         };
         goalRecyclerView.setLayoutManager(linearLayoutManager);
         goalRecyclerView.setFocusable(false);
-        generalAdapter = new GoalListViewAdapter(this, this);
+        generalAdapter = new GoalListViewAdapter(this);
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
 
@@ -202,6 +195,11 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+    @Override
     public void onClick(View view) {
         if(view.getId() == R.id.fab_add_goal){
                 showAlert("Dodaj cel");
@@ -210,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void deleteGoal(Goal oldGoal) {
-
         goalViewModel.delete(oldGoal);
     }
 
@@ -262,11 +259,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     }
     @Override
-    public boolean onSupportNavigateUp(){
-        finish();
-        return true;
-    }
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_list:
@@ -290,11 +282,12 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
+        /*if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
             this.finish();
         } else {
             getSupportFragmentManager().popBackStack();
-        }
+        }*/
     }
 
     @Override
@@ -386,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
             }
         );
-
     }
 
     @Override
@@ -405,36 +397,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 editedGoal.priority = newGoal.priority;
             }
             goalViewModel.update(editedGoal);
-        }
-    }
-
-    @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-
-        if (viewHolder instanceof MyRecyclerViewAdapter.CustomViewHolder) {
-            // get the removed item name to display it in snack bar
-            Exercise name = exerciseList.get(viewHolder.getAdapterPosition());
-
-            // backup of removed item for undo purpose
-            final Exercise deletedItem = exerciseList.get(viewHolder.getAdapterPosition());
-            final int deletedIndex = viewHolder.getAdapterPosition();
-
-            // remove the item from recycler view
-            exerciseViewModel.delete(deletedItem);
-
-            // showing snack bar with Undo option
-           /* Snackbar snackbar = Snackbar
-                    .make(coordinatorLayout, name + " removed from cart!", Snackbar.LENGTH_LONG);
-            snackbar.setAction("UNDO", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    // undo is selected, restore the deleted item
-                    mAdapter.restoreItem(deletedItem, deletedIndex);
-                }
-            });
-            snackbar.setActionTextColor(Color.YELLOW);
-            snackbar.show();*/
         }
     }
 

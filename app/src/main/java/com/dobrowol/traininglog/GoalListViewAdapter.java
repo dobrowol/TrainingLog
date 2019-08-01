@@ -1,6 +1,5 @@
 package com.dobrowol.traininglog;
 
-import android.graphics.Canvas;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,7 +22,6 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
-import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +39,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     private List<GoalExercisePair> goalExercisePairs;
     private LinkedHashMap<Goal, List<Exercise>> map = new LinkedHashMap<>();
     private CustomViewHolder viewHolder;
-    private RecyclerItemTouchHelper.RecyclerItemTouchHelperListener swipeListener;
 
     void discardStatus() {
         viewHolder.discardStatus();
@@ -65,9 +61,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void deleteGoal(Goal oldGoal);
     }
 
-    GoalListViewAdapter(OnItemClickListener listener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener swipeListener) {
+    GoalListViewAdapter(OnItemClickListener listener) {
         this.listener = listener;
-        this.swipeListener = swipeListener;
         goals = new ArrayList<>();
     }
     void saveStatus(){
@@ -219,14 +214,11 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void saveStatus(String name) {
-
-
+            listener.deleteGoal(oldGoal);
         }
 
         @Override
         public void discardStatus() {
-                listener.deleteGoal(oldGoal);
-
         }
     }
 
@@ -273,13 +265,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             exerciseAdapter.setExerciseDescriptionList(exerciseDescriptions);
             exercisesRecyclerView.setAdapter(exerciseAdapter);
 
-        }
-
-        void attachItemGlide(){
-            RecyclerItemTouchHelper recyclerItemTouchHelper = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, swipeListener);
-
-// attaching the touch helper to recycler view
-            new ItemTouchHelper(recyclerItemTouchHelper).attachToRecyclerView(exercisesRecyclerView);
         }
         void fillView(Goal goal, List<Exercise> exercises) {
             this.goal = goal;

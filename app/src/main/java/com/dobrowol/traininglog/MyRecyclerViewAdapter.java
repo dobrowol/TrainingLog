@@ -70,7 +70,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         CustomViewHolder(View view) {
             super(view);
             this.viewForeground = view.findViewById(R.id.view_foreground);
-            this.viewBackground = view.findViewById(R.id.view_background);
             this.descriptionText = view.findViewById(R.id.description);
         }
 
