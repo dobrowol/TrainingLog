@@ -1,5 +1,8 @@
 package com.dobrowol.traininglog;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +29,8 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescription;
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
+import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +48,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     private List<GoalExercisePair> goalExercisePairs;
     private LinkedHashMap<Goal, List<Exercise>> map = new LinkedHashMap<>();
     private CustomViewHolder viewHolder;
+    private Context context;
 
     void discardStatus() {
         viewHolder.discardStatus();
@@ -61,8 +71,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void deleteGoal(Goal oldGoal);
     }
 
-    GoalListViewAdapter(OnItemClickListener listener) {
+    GoalListViewAdapter(OnItemClickListener listener, Context context) {
         this.listener = listener;
+        this.context = context;
         goals = new ArrayList<>();
     }
     void saveStatus(){
@@ -119,7 +130,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.goal_layout, null);
-        viewHolder = new CustomViewHolder(view, listener);
+        viewHolder = new CustomViewHolder(view, listener, context);
         return viewHolder;
     }
 
@@ -222,7 +233,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         }
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
@@ -230,6 +241,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         OnItemClickListener listener;
         Goal goal;
         View view;
+        List<Exercise> exercises;
+        Context context;
 
         TrainingDetailEnterState trainingDetailEnterState;
         NewGoalEnterState newGoalEnterState;
@@ -237,14 +250,17 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         DeleteGoalState deleteGoalState;
         private ActionMode actionMode;
         private MyRecyclerViewAdapter exerciseAdapter;
+        private ConstraintLayout constraintLayout;
 
-        CustomViewHolder(View view, OnItemClickListener listener) {
+        CustomViewHolder(View view, OnItemClickListener listener, Context context) {
             super(view);
+            this.context = context;
             this.view = view;
             this.listener = listener;
             this.descriptionText = view.findViewById(R.id.goalTextView);
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
             this.addExercise = view.findViewById(R.id.addingExercise);
+            this.constraintLayout = view.findViewById(R.id.constraint_layout);
             view.setOnClickListener(this);
             addExercise.setOnClickListener(this);
             descriptionText.setOnLongClickListener(this);
@@ -263,17 +279,52 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
             exerciseAdapter = new MyRecyclerViewAdapter();
             exerciseAdapter.setExerciseDescriptionList(exerciseDescriptions);
+            exercisesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            exercisesRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+
             exercisesRecyclerView.setAdapter(exerciseAdapter);
+
+            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(exercisesRecyclerView);
+
 
         }
         void fillView(Goal goal, List<Exercise> exercises) {
             this.goal = goal;
+            this.exercises = exercises;
             descriptionText.setText(goal.description);
             deleteGoalState = new DeleteGoalState(view, listener, this.goal);
             exerciseAdapter.setExerciseList(exercises);
             exerciseAdapter.notifyDataSetChanged();
         }
 
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+            if (viewHolder instanceof MyRecyclerViewAdapter.CustomViewHolder) {
+                // get the removed item name to display it in snack bar
+                String name = exercises.get(viewHolder.getAdapterPosition()).id;
+
+// backup of removed item for undo purpose
+                final Exercise deletedItem = exercises.get(viewHolder.getAdapterPosition());
+                final int deletedIndex = viewHolder.getAdapterPosition();
+
+                // remove the item from recycler view
+                exerciseAdapter.removeItem(viewHolder.getAdapterPosition());
+
+                // showing snack bar with Undo option
+                Snackbar snackbar = Snackbar
+                        .make(constraintLayout, name + " removed from cart!", Snackbar.LENGTH_LONG);
+                snackbar.setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        // undo is selected, restore the deleted item
+                        exerciseAdapter.restoreItem(deletedItem, deletedIndex);
+                    }
+                });
+                snackbar.setActionTextColor(Color.YELLOW);
+                snackbar.show();
+            }
+        }
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -286,9 +337,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     break;
                 case R.id.exercises_rv:
                     listener.onItemClick(goal);
-                    break;
-                case R.id.btnAction:
-                    listener.onItemRemove(goal);
                     break;
             }
 

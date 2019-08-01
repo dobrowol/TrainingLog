@@ -76,7 +76,7 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
             super(view);
             this.listener = listener;
             this.descriptionText = view.findViewById(R.id.description);
-            this.btnRemove = view.findViewById(R.id.btnAction);
+
             btnRemove.setVisibility(View.VISIBLE);
             btnRemove.setText("Remove");
             view.setOnClickListener(this);
@@ -96,9 +96,6 @@ public class TrainingListViewAdapter extends RecyclerView.Adapter<TrainingListVi
                 case R.id.description:
                 case R.id.list_row:
                     listener.onItemClick(training);
-                    break;
-                case R.id.btnAction:
-                    listener.onItemRemove(training);
                     break;
             }
 

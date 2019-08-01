@@ -20,6 +20,14 @@ import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
+    public void removeItem(int adapterPosition) {
+        exerciseList.remove(adapterPosition);
+    }
+
+    public void restoreItem(Exercise deletedItem, int deletedIndex) {
+        exerciseList.add(deletedIndex, deletedItem);
+    }
+
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
     }
@@ -63,7 +71,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return (null != exerciseList ? exerciseList.size() : 0);
     }
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        public LinearLayout viewForeground;
+        public RelativeLayout viewForeground;
         RelativeLayout viewBackground;
         TextView descriptionText;
 

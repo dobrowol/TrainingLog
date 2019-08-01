@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 
@@ -47,6 +48,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinView
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         };
         goalRecyclerView.setLayoutManager(linearLayoutManager);
         goalRecyclerView.setFocusable(false);
-        generalAdapter = new GoalListViewAdapter(this);
+        generalAdapter = new GoalListViewAdapter(this, getApplicationContext());
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
 
@@ -258,6 +260,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
