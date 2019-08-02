@@ -199,8 +199,8 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                         goalExerciseJoinViewModel.insert(goalExercise);
                         trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
                         TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad(trainingGoalJoin, trainingGoalJoinViewModel);
-                        trainingGoalLoad.update(exercise, goalExercise, training);
-                        TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise);
+                        int exerciseLoad = trainingGoalLoad.update(exercise, goalExercise, training);
+                        TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise, exerciseLoad);
                         trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                                 s1 -> finish());
 

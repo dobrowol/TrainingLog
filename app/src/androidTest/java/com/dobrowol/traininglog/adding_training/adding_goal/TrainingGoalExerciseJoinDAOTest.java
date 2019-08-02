@@ -84,8 +84,8 @@ public class TrainingGoalExerciseJoinDAOTest {
 
             Training training = new Training("t1", new Date());
             trainingDAO.insert(training);
-            TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin("tge1", "t1", "g1", "e1", 1);
-            TrainingGoalExerciseJoin trainingGoalExerciseJoin2 = new TrainingGoalExerciseJoin("tge2", "t1", "g1", "e2", 2);
+            TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin("tge1", "t1", "g1", "e1", 1, 100);
+            TrainingGoalExerciseJoin trainingGoalExerciseJoin2 = new TrainingGoalExerciseJoin("tge2", "t1", "g1", "e2", 2, 200);
 
             trainingGoalExerciseJoinDAO.insert(trainingGoalExerciseJoin);
             trainingGoalExerciseJoinDAO.insert(trainingGoalExerciseJoin2);

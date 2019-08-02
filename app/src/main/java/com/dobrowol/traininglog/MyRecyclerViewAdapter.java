@@ -31,6 +31,14 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         notifyDataSetChanged();
     }
 
+    public void removeItemTemporarily(int adapterPosition) {
+        exerciseList.remove(adapterPosition);
+        notifyDataSetChanged();
+    }
+     public void removeItemPermanently(int adapterPosition){
+
+     }
+
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
     }

@@ -40,12 +40,14 @@ public class TrainingGoalExerciseJoin {
     @NonNull
     public String exerciseId;
     public int order;
+    public int exerciseLoad;
 
-    public TrainingGoalExerciseJoin(@NonNull String id, @NonNull String trainingJoinId, @NonNull String goalId, @NonNull String exerciseId, int order) {
+    public TrainingGoalExerciseJoin(@NonNull String id, @NonNull String trainingJoinId, @NonNull String goalId, @NonNull String exerciseId, int order, int exerciseLoad) {
         this.id = id;
         this.trainingJoinId = trainingJoinId;
         this.goalId = goalId;
         this.exerciseId = exerciseId;
         this.order = order;
+        this.exerciseLoad = exerciseLoad;
     }
 }

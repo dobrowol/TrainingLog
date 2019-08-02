@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.dobrowol.traininglog.adding_training.TrainingRoomDatabase;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalExerciseData;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
@@ -26,6 +27,10 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingId, goalId);
     }
 
+    LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated()
+    {
+        return trainingGoalExerciseJoinDAO.getTrainingGoalExerciseDataAggregated();
+    }
     public Single<Long> insert (TrainingGoalExerciseJoin exercise) {
         return Single.fromCallable(() -> trainingGoalExerciseJoinDAO.insert(exercise));
 

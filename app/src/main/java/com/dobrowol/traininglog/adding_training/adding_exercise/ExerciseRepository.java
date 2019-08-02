@@ -44,20 +44,20 @@ public class ExerciseRepository {
     }
 
     public void delete(Exercise deletedItem) {
-        mExerciseDao.delete(deletedItem);
+        new deleteAsyncTask(mExerciseDao).execute(deletedItem);
     }
 
-    private static class insertAsyncTask extends AsyncTask<Exercise, Void, Void> {
+    private static class deleteAsyncTask extends AsyncTask<Exercise, Void, Void> {
 
         private ExerciseDAO mAsyncTaskDao;
 
-        insertAsyncTask(ExerciseDAO dao) {
+        deleteAsyncTask(ExerciseDAO dao) {
             mAsyncTaskDao = dao;
         }
 
         @Override
         protected Void doInBackground(final Exercise... params) {
-            mAsyncTaskDao.insert(params[0]);
+            mAsyncTaskDao.delete(params[0]);
             return null;
         }
     }

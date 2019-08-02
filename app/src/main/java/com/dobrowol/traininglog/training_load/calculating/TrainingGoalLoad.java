@@ -26,39 +26,8 @@ public class TrainingGoalLoad {
 
     }
 
-
-    public void calculate(TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel, LifecycleOwner owner) {
-        trainingGoalExerciseJoinViewModel.trainingGoalLoadData.observe(owner, trainingGoalLoadData -> {
-            if(trainingGoalLoadData != null) {
-                int load = -1;
-                for (TrainingGoalLoadData loadData : trainingGoalLoadData) {
-                    if(trainingGoalJoin.trainingId.equals(loadData.trainingJoinId) && trainingGoalJoin.goalId.equals(loadData.goalId)) {
-                        long diffInMillies = Math.abs(loadData.date.getTime() - loadData.startDate.getTime());
-                        long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-                        int neurologicalBoostPeriod = 21;
-                        int neurologicalBoost = 1;
-                        if (daysFromFirstOccurence <= neurologicalBoostPeriod) {
-                            neurologicalBoost = 8;
-                        }
-                        load += loadData.loadValue * loadData.specificity * neurologicalBoost;
-                    }
-                }
-                if(load != -1) {
-                    trainingGoalJoin.load = load;
-                    this.trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                            s -> {
-
-                            });
-                }
-            }
-
-        });
-        trainingGoalExerciseJoinViewModel.getTrainingGoalData(trainingGoalJoin.trainingId, trainingGoalJoin.goalId);
-    }
-
-    public void update(Exercise exercise, GoalExercise goalExercise, Training training){
-        int load = trainingGoalJoin.load;
+    public int update(Exercise exercise, GoalExercise goalExercise, Training training){
+        int exerciseLoad = 0;
         if(trainingGoalJoin.trainingId.equals(training.id) && trainingGoalJoin.goalId.equals(goalExercise.goalId)) {
             long diffInMillies = Math.abs(training.date.getTime() - exercise.startDate.getTime());
             long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
@@ -68,12 +37,14 @@ public class TrainingGoalLoad {
             if (daysFromFirstOccurence <= neurologicalBoostPeriod) {
                 neurologicalBoost = 8;
             }
-            load += exercise.loadValue * goalExercise.specificity * neurologicalBoost;
+            exerciseLoad = exercise.loadValue * goalExercise.specificity * neurologicalBoost;
         }
-        trainingGoalJoin.load = load;
+        trainingGoalJoin.load += exerciseLoad;
+
         this.trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 s -> {
                 });
+        return exerciseLoad;
     }
 
 

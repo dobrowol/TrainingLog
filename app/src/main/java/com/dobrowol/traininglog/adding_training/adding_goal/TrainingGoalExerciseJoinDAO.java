@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalExerciseData;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
@@ -34,4 +35,7 @@ public interface TrainingGoalExerciseJoinDAO {
 
         @Query("SELECT training_goal_exercise_join.* FROM training_goal_exercise_join WHERE training_goal_exercise_join.id=:id")
         LiveData<TrainingGoalExerciseJoin> getTrainingGoalExercise(String id);
+
+        @Query("SELECT trainingJoinId as trainingId, goalId, SUM(exerciseLoad) AS goalLoad FROM training_goal_exercise_join GROUP BY trainingJoinId, goalId")
+        LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated();
 }

@@ -214,6 +214,16 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         goalViewModel.delete(oldGoal);
     }
 
+    @Override
+    public void removeExercise(Exercise adapterPosition) {
+        exerciseViewModel.delete(adapterPosition);
+    }
+
+    @Override
+    public void insertExercise(Exercise deletedItem) {
+        exerciseViewModel.insert(deletedItem);
+    }
+
     public void showAlert(String text){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle("GOAL");

@@ -84,9 +84,12 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
             trainingViewModel.getAllTrainings().observe(this, this);
 
         trainingGoalViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
+        //trainingGoalViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> adapter.setTrainingGoalJoins(trainingGoalJoins));
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalViewModel.getAllTrainingGoalJoins().observe(this, trainingGoalJoins -> adapter.setTrainingGoalJoins(trainingGoalJoins));
+        trainingGoalExerciseJoinViewModel.getTrainingGoalExerciseDataAggregated().observe(this, trainingGoalExerciseData -> {
+            adapter.setTrainingGoalLoads(trainingGoalExerciseData);
+        });
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
         trainingGoalViewModel.getMaximumLoad().observe(this, maximumLoad -> {
@@ -104,6 +107,8 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
 
     @Override
     public void onListFragmentInteraction(Training item) {
+        //trainingGoalViewModel.getAllTrainingGoalJoinsForTraining(item.id);
+
         Intent intent = new Intent(this,MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(MainActivity.TRAINING, item);

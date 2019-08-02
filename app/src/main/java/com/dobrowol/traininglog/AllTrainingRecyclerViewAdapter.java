@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalExerciseData;
 import com.dobrowol.traininglog.training_load.displaying.MyValueFormatter;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,6 +39,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
     private List<Training> trainings;
     private List<TrainingGoalJoin> trainingGoalJoins;
+    private List<TrainingGoalExerciseData> trainingGoalExerciseData;
     private int maximumLoad;
 
     void setMaximumLoad(int maximumLoad) {
@@ -52,6 +54,11 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     }
     void setTrainingGoalJoins(List<TrainingGoalJoin> trainingGoalJoins){
         this.trainingGoalJoins = trainingGoalJoins;
+        notifyDataSetChanged();
+    }
+
+    public void setTrainingGoalLoads(List<TrainingGoalExerciseData> trainingGoalExerciseData) {
+        this.trainingGoalExerciseData = trainingGoalExerciseData;
         notifyDataSetChanged();
     }
 
@@ -80,6 +87,13 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             for (TrainingGoalJoin trainingGoalJoin : trainingGoalJoins) {
                 if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
                     loads.add(trainingGoalJoin.load);
+                }
+            }
+        }
+        if(trainingGoalExerciseData != null) {
+            for (TrainingGoalExerciseData trainingGoalJoin : trainingGoalExerciseData) {
+                if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
+                    loads.add(trainingGoalJoin.goalLoad);
                 }
             }
         }

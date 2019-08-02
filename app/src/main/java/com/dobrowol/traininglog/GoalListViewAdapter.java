@@ -70,6 +70,10 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void onClick(View v);
 
         void deleteGoal(Goal oldGoal);
+
+        void removeExercise(Exercise adapterPosition);
+
+        void insertExercise(Exercise deletedItem);
     }
 
     GoalListViewAdapter(OnItemClickListener listener, Context context) {
@@ -308,7 +312,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                 final int deletedIndex = viewHolder.getAdapterPosition();
 
                 // remove the item from recycler view
-                exerciseAdapter.removeItem(viewHolder.getAdapterPosition());
+                exerciseAdapter.removeItemTemporarily(viewHolder.getAdapterPosition());
+                listener.removeExercise(deletedItem);
 
                 // showing snack bar with Undo option
                 Snackbar snackbar = Snackbar
@@ -317,6 +322,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
                     // undo is selected, restore the deleted item
                     exerciseAdapter.restoreItem(deletedItem, deletedIndex);
+                    listener.insertExercise(deletedItem);
                 });
                 snackbar.setActionTextColor(Color.YELLOW);
                 snackbar.show();

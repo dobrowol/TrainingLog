@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalExerciseData;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 
 import java.util.List;
@@ -71,6 +72,9 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
          query3.setValue(trainingGoalExerciseJoin);
     }
 
+    public LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated(){
+        return mRepository.getTrainingGoalExerciseDataAggregated();
+    }
     public TrainingGoalExerciseJoinViewModel(Application application) {
         super(application);
         mRepository = new TrainingGoalExerciseJoinRepository(application);
