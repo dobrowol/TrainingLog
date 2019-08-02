@@ -375,6 +375,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     enableActionMode(v,"Usuń cel");
                     trainingDetailEnterState = deleteGoalState;
             }
+            return true;
         }
 
         @Override
