@@ -3,15 +3,18 @@ package com.dobrowol.traininglog.adding_training.deleting_exercise;
 import android.graphics.Canvas;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dobrowol.traininglog.MyRecyclerViewAdapter;
 
-import static androidx.recyclerview.widget.ItemTouchHelper.Callback.getDefaultUIUtil;
+import java.util.Objects;
+
 
 public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     private RecyclerItemTouchHelperListener listener;
+
 
     public RecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListener listener) {
         super(dragDirs, swipeDirs);
@@ -19,10 +22,17 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
-    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
         return true;
     }
-
+    @Override
+    public boolean isItemViewSwipeEnabled() {
+        return true;
+    }
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return true;
+    }
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (viewHolder != null) {
@@ -33,7 +43,7 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
-    public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
+    public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
                                 RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                 int actionState, boolean isCurrentlyActive) {
         final View foregroundView = ((MyRecyclerViewAdapter.CustomViewHolder) viewHolder).viewForeground;
@@ -42,14 +52,14 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
-    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         final View foregroundView = ((MyRecyclerViewAdapter.CustomViewHolder) viewHolder).viewForeground;
         getDefaultUIUtil().clearView(foregroundView);
     }
 
     @Override
-    public void onChildDraw(Canvas c, RecyclerView recyclerView,
-                            RecyclerView.ViewHolder viewHolder, float dX, float dY,
+    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
         final View foregroundView = ((MyRecyclerViewAdapter.CustomViewHolder) viewHolder).viewForeground;
 
@@ -58,8 +68,8 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     }
 
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        listener.onSwiped(viewHolder, direction, viewHolder.getAdapterPosition());
+    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        listener.onSwiped(Objects.requireNonNull(viewHolder), direction, viewHolder.getAdapterPosition());
     }
 
     @Override

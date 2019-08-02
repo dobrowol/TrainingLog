@@ -1,6 +1,7 @@
 package com.dobrowol.traininglog;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -20,12 +21,14 @@ import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
-    public void removeItem(int adapterPosition) {
+    void removeItem(int adapterPosition) {
         exerciseList.remove(adapterPosition);
+        notifyDataSetChanged();
     }
 
-    public void restoreItem(Exercise deletedItem, int deletedIndex) {
+    void restoreItem(Exercise deletedItem, int deletedIndex) {
         exerciseList.add(deletedIndex, deletedItem);
+        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {
@@ -34,9 +37,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     private List<Exercise> exerciseList;
     private List<ExerciseDescription> exerciseDescriptionList;
+    private OnItemClickListener listener;
 
-    MyRecyclerViewAdapter() {
+    MyRecyclerViewAdapter(OnItemClickListener listener) {
         exerciseList = new ArrayList<>();
+        this.listener = listener;
         exerciseDescriptionList = new ArrayList<>();
     }
 
@@ -54,6 +59,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     List<Exercise> getExerciseList(){
         return exerciseList;
     }
+    @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);

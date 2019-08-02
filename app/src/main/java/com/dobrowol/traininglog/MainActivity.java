@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         };
         goalRecyclerView.setLayoutManager(linearLayoutManager);
         goalRecyclerView.setFocusable(false);
+        goalRecyclerView.setNestedScrollingEnabled(true);
         generalAdapter = new GoalListViewAdapter(this, getApplicationContext());
         generalAdapter.setOnItemClickListener(this);
         goalRecyclerView.setAdapter(generalAdapter);
