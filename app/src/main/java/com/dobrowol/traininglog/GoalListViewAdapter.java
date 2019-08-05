@@ -316,7 +316,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                 listener.removeExercise(deletedItem);
 
                 // showing snack bar with Undo option
-                Snackbar snackbar = Snackbar
+                /*Snackbar snackbar = Snackbar
                         .make(constraintLayout, name + " removed from cart!", Snackbar.LENGTH_LONG);
                 snackbar.setAction("UNDO", view -> {
 
@@ -325,7 +325,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     listener.insertExercise(deletedItem);
                 });
                 snackbar.setActionTextColor(Color.YELLOW);
-                snackbar.show();
+                snackbar.show();*/
             }
         }
         @Override
@@ -386,7 +386,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void onItemClick(Exercise item) {
-            exercisesRecyclerView.requestFocus();
+            AddExercise.startNewInstance(view.getContext(), training, goal, item);
         }
 
         private class ActionBarCallback implements ActionMode.Callback {

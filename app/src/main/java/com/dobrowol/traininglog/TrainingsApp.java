@@ -7,6 +7,9 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +20,8 @@ import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
+import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
+import com.dobrowol.traininglog.deleting_training.RecyclerTrainingTouchHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -28,7 +33,7 @@ import java.util.Objects;
  * Activities containing this fragment MUST implement the {@link AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener}
  * interface.
  */
-public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener, View.OnClickListener{
+public class TrainingsApp extends AppCompatActivity implements Observer<List<Training>>, AllTrainingRecyclerViewAdapter.OnListFragmentInteractionListener, View.OnClickListener, RecyclerTrainingTouchHelper.RecyclerItemTouchHelperListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -80,6 +85,12 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
             }
         adapter = new AllTrainingRecyclerViewAdapter( this);
         recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerTrainingTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
             trainingViewModel.getAllTrainings().observe(this, this);
 
@@ -92,11 +103,16 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         });
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
-        trainingGoalViewModel.getMaximumLoad().observe(this, maximumLoad -> {
+        trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
             if (maximumLoad != null) {
                 adapter.setMaximumLoad(maximumLoad);
             } }
         );
+        trainingGoalExerciseJoinViewModel.getMaximumNumberOfExercisesForTraining().observe(this, numberOfExercises ->{
+            if(numberOfExercises != null){
+                adapter.setNumberOfExercises(numberOfExercises);
+            }
+        });
     }
 
     @Override
@@ -129,5 +145,13 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         super.onRestart();
         //When BACK BUTTON is pressed, the activity on the stack is restarted
         //Do what you want on the refresh procedure here
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof AllTrainingRecyclerViewAdapter.ViewHolder) {
+            adapter.removeTraining(viewHolder.getAdapterPosition());
+            adapter.notifyDataSetChanged();
+        }
     }
 }

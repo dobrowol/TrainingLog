@@ -38,4 +38,10 @@ public interface TrainingGoalExerciseJoinDAO {
 
         @Query("SELECT trainingJoinId as trainingId, goalId, SUM(exerciseLoad) AS goalLoad FROM training_goal_exercise_join GROUP BY trainingJoinId, goalId")
         LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated();
+
+        @Query("SELECT MAX(exerciseLoad) FROM training_goal_exercise_join")
+        LiveData<Integer> getMaximumExerciseLoad();
+
+        @Query("SELECT MAX(mycount) FROM (SELECT COUNT(id) AS mycount FROM training_goal_exercise_join GROUP BY trainingJoinId)")
+        LiveData<Integer> getMaximumNumberOfExercisesForTraining();
 }

@@ -32,6 +32,10 @@ public class GoalExerciseJoinRepository {
         new insertAsyncTask(goalExerciseJoinDAO).execute(goalExercise);
     }
 
+    public LiveData<GoalExercise> getGoalExerciseJoin(String goalId, String exerciseId) {
+        return goalExerciseJoinDAO.getGoalExerciseJoin(goalId, exerciseId);
+    }
+
     private static class insertAsyncTask extends AsyncTask<GoalExercise, Void, Void> {
 
         private GoalExerciseJoinDAO mAsyncTaskDao;

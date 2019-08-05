@@ -62,4 +62,6 @@
     <string name="general">GENERAL</string>
     <string name="add_goal">Dodaj cel</string>
     <string name="add_exercise">Dodaj ćwiczenie</string>
+    <string name="updateBtn">Update</string>
+    <string name="add_exercise_text">Add</string>
 </resources>

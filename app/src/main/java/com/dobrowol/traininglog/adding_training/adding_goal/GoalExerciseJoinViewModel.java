@@ -14,13 +14,14 @@ import java.util.List;
 
 public class GoalExerciseJoinViewModel extends AndroidViewModel {
 
-    private GoalExerciseJoinRepository mRepository;
-    private class TrainingGoal{
-        public String trainingId;
-        public String goalId;
 
-        public TrainingGoal(String trainingId, String goalId) {
-            this.trainingId = trainingId;
+    private GoalExerciseJoinRepository mRepository;
+    private class GoalExerciseIds{
+        public String goalId;
+        public String exerciseId;
+
+        public GoalExerciseIds(String goalId, String exerciseId) {
+            this.exerciseId = exerciseId;
             this.goalId = goalId;
         }
     }
@@ -41,6 +42,18 @@ public class GoalExerciseJoinViewModel extends AndroidViewModel {
 
     public void getAlExercisesForGoal( String goalId){
         query1.setValue(goalId); }
+
+    private MutableLiveData<GoalExerciseIds> query2  = new MutableLiveData<>();
+    public LiveData<GoalExercise> goalExerciseJoin= Transformations.switchMap(query2,
+            goalexerciseIds ->
+                    mRepository.getGoalExerciseJoin(goalexerciseIds.goalId, goalexerciseIds.exerciseId)
+    );
+
+    public void getGoalExerciseJoin( String goalId, String exerciseId){
+        GoalExerciseIds goalExerciseIds = new GoalExerciseIds(goalId, exerciseId);
+        query2.setValue(goalExerciseIds);
+    }
+
 
     public GoalExerciseJoinViewModel(Application application) {
         super(application);

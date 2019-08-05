@@ -84,7 +84,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         return (null != exerciseList ? exerciseList.size() : 0);
     }
-    public class CustomViewHolder extends RecyclerView.ViewHolder {
+    public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RelativeLayout viewForeground;
         RelativeLayout viewBackground;
         TextView descriptionText;
@@ -93,6 +93,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             super(view);
             this.viewForeground = view.findViewById(R.id.view_foreground);
             this.descriptionText = view.findViewById(R.id.description);
+            descriptionText.setOnClickListener(this);
+            viewForeground.setOnClickListener(this);
         }
 
         void fillView(Exercise textAtPosition) {
@@ -110,6 +112,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                         ed.description
                 ));
             }
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onItemClick(exerciseList.get(getAdapterPosition()));
         }
     }
 

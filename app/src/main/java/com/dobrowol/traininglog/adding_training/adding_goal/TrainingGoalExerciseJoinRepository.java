@@ -45,6 +45,10 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getTrainingGoalExercise(id);
     }
 
+    public LiveData<Integer> getMaximumNumberOfExercisesForTraining() {
+        return trainingGoalExerciseJoinDAO.getMaximumNumberOfExercisesForTraining();
+    }
+
     private static class insertAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {
 
         private TrainingGoalExerciseJoinDAO mAsyncTaskDao;
@@ -76,5 +80,9 @@ public class TrainingGoalExerciseJoinRepository {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
+    }
+
+    public LiveData<Integer> getMaximumExerciseLoad(){
+        return trainingGoalExerciseJoinDAO.getMaximumExerciseLoad();
     }
 }

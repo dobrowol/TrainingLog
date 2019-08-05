@@ -80,8 +80,13 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
         mRepository = new TrainingGoalExerciseJoinRepository(application);
     }
 
+    public LiveData<Integer> getMaximumExerciseLoad(){
+        return mRepository.getMaximumExerciseLoad();
+    }
 
-
+    public LiveData<Integer> getMaximumNumberOfExercisesForTraining(){
+        return mRepository.getMaximumNumberOfExercisesForTraining();
+    }
     public Single<Long> insert(TrainingGoalExerciseJoin trainingGoalExerciseJoin) { return mRepository.insert(trainingGoalExerciseJoin); }
 }
 
