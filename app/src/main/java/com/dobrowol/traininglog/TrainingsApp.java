@@ -98,9 +98,7 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         //trainingGoalViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> adapter.setTrainingGoalJoins(trainingGoalJoins));
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalExerciseJoinViewModel.getTrainingGoalExerciseDataAggregated().observe(this, trainingGoalExerciseData -> {
-            adapter.setTrainingGoalLoads(trainingGoalExerciseData);
-        });
+        trainingGoalExerciseJoinViewModel.getTrainingGoalExerciseDataAggregated().observe(this, trainingGoalExerciseData -> adapter.setTrainingGoalLoads(trainingGoalExerciseData));
         FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
         floatingActionButton.setOnClickListener(this);
         trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
@@ -131,6 +129,11 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         intent.putExtras(bundle);
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteTraining(Training training) {
+        trainingViewModel.delete(training);
     }
 
     @Override

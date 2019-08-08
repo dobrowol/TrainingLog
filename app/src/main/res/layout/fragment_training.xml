@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cardview="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/list_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="5dp"
-    cardview:cardCornerRadius="2dp"
-    cardview:cardElevation="3dp"
-    cardview:cardUseCompatPadding="true">
+    android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/view_training_background"
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:background="@color/bg_row_background">
+
+        <ImageView
+            android:id="@+id/delete_training_icon"
+            android:layout_width="@dimen/ic_delete"
+            android:layout_height="@dimen/ic_delete"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padd_10"
+            android:src="@drawable/ic_delete_white_24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padd_10"
+            android:layout_toStartOf="@id/delete_training_icon"
+            android:text="@string/delete"
+            android:textColor="#fff"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/view_training_foreground"
         android:layout_width="wrap_content"
         android:layout_height="93dp"
         tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="5dp">
+        tools:layout_editor_absoluteY="5dp"
+        android:background="@android:color/white">
 
         <TextView
             android:id="@+id/item_number"
@@ -31,27 +56,13 @@
             cardview:layout_constraintHorizontal_bias="1.0"
             cardview:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="492dp" />
-
         <com.github.mikephil.charting.charts.HorizontalBarChart
             android:id="@+id/trainingLoadPreviewChart"
             android:layout_width="374dp"
             android:layout_height="38dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            cardview:layout_constraintBottom_toBottomOf="parent"
-            cardview:layout_constraintEnd_toEndOf="parent"
-            cardview:layout_constraintHorizontal_bias="0.571"
-            cardview:layout_constraintStart_toStartOf="parent"
-            cardview:layout_constraintTop_toBottomOf="@+id/item_number"
-            cardview:layout_constraintVertical_bias="0.2" />
+            android:layout_alignParentBottom="true"
+            />
 
 
-    </android.support.constraint.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+    </RelativeLayout>
+</FrameLayout>

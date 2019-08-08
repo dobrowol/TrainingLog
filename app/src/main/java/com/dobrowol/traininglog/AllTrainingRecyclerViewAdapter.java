@@ -3,6 +3,7 @@ package com.dobrowol.traininglog;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +42,8 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     private List<Training> trainings;
     private List<TrainingGoalJoin> trainingGoalJoins;
     private List<TrainingGoalExerciseData> trainingGoalExerciseData;
-    private int maximumLoad;
+    private Integer maximumLoad;
     private Integer numberOfExercises;
-    public RelativeLayout viewForeground;
 
     void setMaximumLoad(int maximumLoad) {
         this.maximumLoad = maximumLoad;
@@ -70,12 +70,14 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     }
 
     public void removeTraining(int adapterPosition) {
+        mListener.onDeleteTraining(trainings.get(adapterPosition));
         trainings.remove(adapterPosition);
     }
 
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Training item);
+        void onDeleteTraining(Training training);
     }
 
 
@@ -134,6 +136,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         ViewHolder(View view) {
             super(view);
             mView = view;
+            viewForeground = view.findViewById(R.id.view_training_foreground);
             mIdView = view.findViewById(R.id.item_number);
 
             mChart = view.findViewById(R.id.trainingLoadPreviewChart);
@@ -157,7 +160,13 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             YAxis leftAxis = mChart.getAxisLeft();
             leftAxis.setValueFormatter(new MyValueFormatter("K"));
             leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-            leftAxis.setAxisMaximum(maximumLoad*numberOfExercises);
+            if(maximumLoad == null || numberOfExercises == null)
+            {
+                leftAxis.setAxisMaximum(0.0f);
+            }
+            else {
+                leftAxis.setAxisMaximum(maximumLoad * numberOfExercises);
+            }
             mChart.getAxisRight().setEnabled(false);
             mChart.getAxisLeft().setEnabled(false);
 
