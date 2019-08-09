@@ -60,8 +60,8 @@
     <string name="specific">SPECIFIC</string>
     <string name="competitive">COMPETITIVE</string>
     <string name="general">GENERAL</string>
-    <string name="add_goal">Dodaj cel</string>
-    <string name="add_exercise">Dodaj ćwiczenie</string>
+    <string name="add_goal">Add goall</string>
+    <string name="add_exercise">Add exercise</string>
     <string name="updateBtn">Update</string>
     <string name="add_exercise_text">Add</string>
 </resources>

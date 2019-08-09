@@ -3,12 +3,14 @@ package com.dobrowol.traininglog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,6 +49,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -65,7 +68,7 @@ import io.reactivex.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity implements MyRecyclerViewAdapter.OnItemClickListener, View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener, TrainingListViewAdapter.OnItemClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
+        DatePickerDialog.OnDateSetListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
     public static final String TRAINING = "training";
     public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
@@ -84,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
     private Training training;
     private int numberOfExercises;
-    TrainingList detailsDialog;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private ExerciseViewModel exerciseViewModel;
     private TextView generalTextView;
@@ -92,6 +94,16 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
+
+    public static void startNewInstance(Context context, Training training)
+    {
+        Intent intent = new Intent(context, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MainActivity.TRAINING, training);
+        intent.putExtras(bundle);
+
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +149,13 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
                 }
         }
         if (training == null){
-            initializeTraining();
+            if(savedInstanceState != null)
+            {
+                training = (Training) savedInstanceState.getSerializable(TRAINING);
+            }
+            if(training == null) {
+                initializeTraining();
+            }
         }
         generalAdapter.setTraining(training);
         initializeObservers();
@@ -182,19 +200,24 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
 
     private void setAppBarTitle() {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
+        setSupportActionBar(findViewById(R.id.toolbar));
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd - HH:mm", Locale.ENGLISH);
+        TextView textView = findViewById(R.id.toolbarTitle);
         String formatted = sdf.format(training.date);
+        textView.setText(formatted);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
-            actionBar.setTitle(formatted);
+            actionBar.setTitle("");
             actionBar.setDisplayHomeAsUpEnabled(true);
         }else{
             android.app.ActionBar actionBar1 = getActionBar();
             if(actionBar1 != null){
-                actionBar1.setTitle(formatted);
+                actionBar1.setTitle("");
                 actionBar1.setDisplayHomeAsUpEnabled(true);
+
             }
         }
+        textView.setOnClickListener(v -> DateTimeActivity.startInstance(getApplicationContext(), training));
     }
 
     @Override
@@ -204,9 +227,8 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     }
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.fab_add_goal){
-                showAlert("Dodaj cel");
-        }
+        if(view.getId() == R.id.fab_add_goal)
+                showAlert(getString(R.string.add_goal));
     }
 
     @Override
@@ -255,16 +277,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     public void onItemClick(Exercise item) {
 
     }
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("generalExerciseList", generalAdapter.getGoals());
-
-    }
-
     @Override
-    protected void onRestoreInstanceState(Bundle inState){
-        super.onRestoreInstanceState(inState);
-        generalAdapter.setGoals(inState.getParcelableArrayList("generalExerciseList"));
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(TRAINING, training.id);
     }
 
     @Override
@@ -272,13 +288,10 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
 
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_list:
-                detailsDialog = new TrainingList(this);
-                detailsDialog.show(getSupportFragmentManager(), "timePicker");
                 return true;
             case R.id.action_chart:
                 Intent intent = new Intent(this, ChartActivity.class);
@@ -298,11 +311,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
     @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
-        /*if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            this.finish();
-        } else {
-            getSupportFragmentManager().popBackStack();
-        }*/
     }
 
     @Override
@@ -336,25 +344,6 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         String date = String.format(Locale.ENGLISH,"%04d-%02d-%02d", year, month, dayOfMonth);
         dateTxt.setText(date);
         updateTrainingDate();
-    }
-
-    @Override
-    public void onItemClick(Training item) {
-        detailsDialog.dismiss();
-        trainingExerciseJoinViewModel.getExercisesByTrainingId(item.id);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT, Locale.ENGLISH);
-        String stringDate = simpleDateFormat.format(item.date);
-        dateTxt.setText(stringDate);
-        simpleDateFormat = new SimpleDateFormat(Converters.TIME_FORMAT, Locale.ENGLISH);
-        stringDate = simpleDateFormat.format(item.date);
-        timeTxt.setText(stringDate);
-        training = item;
-
-    }
-
-    @Override
-    public void onItemRemove(Training training) {
-        trainingViewModel.delete(training);
     }
 
     @Override
@@ -415,87 +404,7 @@ public class MainActivity extends AppCompatActivity implements MyRecyclerViewAda
         }
     }
 
-    public static class TimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
 
-        TimePickerDialog.OnTimeSetListener listener;
-        TimePickerFragment(TimePickerDialog.OnTimeSetListener listener){
-            this.listener = listener;
-        }
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    android.text.format.DateFormat.is24HourFormat(getActivity()));
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            listener.onTimeSet(view,hourOfDay,minute);
-        }
-    }
-
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-        private DatePickerDialog.OnDateSetListener listener;
-
-        DatePickerFragment(DatePickerDialog.OnDateSetListener listener){
-            this.listener = listener;
-        }
-        @NonNull
-        @Override
-        public Dialog onCreateDialog( Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            return new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            listener.onDateSet(view, year, month, day);
-        }
-    }
-
-    public static class TrainingList extends DialogFragment implements Observer<List<Training>> {
-        private TrainingViewModel trainingViewModel;
-        private RecyclerView trainingListRv;
-        private TrainingListViewAdapter.OnItemClickListener listener;
-
-        TrainingList(TrainingListViewAdapter.OnItemClickListener listener){
-            this.listener = listener;
-        }
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
-
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = inflater.inflate(R.layout.training_list_fragment, container, false);
-
-            trainingListRv = v.findViewById(R.id.training_list_rv);
-            trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
-            trainingViewModel.getAllTrainings().observe(getViewLifecycleOwner(), this);
-            // Do all the stuff to initialize your custom view
-
-            return v;
-        }
-
-        @Override
-        public void onChanged(List<Training> trainings) {
-
-            trainingListRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-            TrainingListViewAdapter generalAdapter = new TrainingListViewAdapter(listener);
-            generalAdapter.setOnItemClickListener(listener);
-            generalAdapter.setTrainings(new ArrayList<>(trainings));
-            trainingListRv.setAdapter(generalAdapter);
-            }
-        }
     private class ActionBarCallback implements ActionMode.Callback {
         private String text;
         ActionBarCallback(String text) {

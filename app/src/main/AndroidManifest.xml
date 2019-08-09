@@ -23,7 +23,8 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
         <activity android:name=".adding_training.adding_exercise.AddExercise" android:theme="@style/Theme.AppCompat">

@@ -44,22 +44,6 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     RecyclerView recyclerView;
     AllTrainingRecyclerViewAdapter adapter;
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public TrainingsApp() {
-    }
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static void startInstance(Context context, int columnCount) {
-            Intent intent = new Intent(context, TrainingsApp.class);
-            Bundle args = new Bundle();
-            args.putInt(ARG_COLUMN_COUNT, columnCount);
-            intent.putExtras(args);
-            context.startActivity(intent);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,14 +105,7 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
 
     @Override
     public void onListFragmentInteraction(Training item) {
-        //trainingGoalViewModel.getAllTrainingGoalJoinsForTraining(item.id);
-
-        Intent intent = new Intent(this,MainActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(MainActivity.TRAINING, item);
-        intent.putExtras(bundle);
-
-        startActivity(intent);
+        MainActivity.startNewInstance(getApplicationContext(), item);
     }
 
     @Override
