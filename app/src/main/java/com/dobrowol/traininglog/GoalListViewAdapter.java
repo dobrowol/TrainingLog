@@ -1,12 +1,10 @@
 package com.dobrowol.traininglog;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -17,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -31,7 +28,6 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescript
 import com.dobrowol.traininglog.adding_training.adding_goal.Goal;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalExercisePair;
 import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +52,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     }
 
     public interface OnItemClickListener extends View.OnClickListener {
-        void onItemClick(Goal item);
+        void onItemClick(Training training, Goal item);
 
         void onItemRemove(Goal goal);
 
@@ -240,9 +236,9 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, MyRecyclerViewAdapter.OnItemClickListener {
 
+
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
-        TextView addExercise;
         OnItemClickListener listener;
         Goal goal;
         View view;
@@ -264,10 +260,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.listener = listener;
             this.descriptionText = view.findViewById(R.id.goalTextView);
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
-            this.addExercise = view.findViewById(R.id.addingExercise);
             this.constraintLayout = view.findViewById(R.id.constraint_layout);
             view.setOnClickListener(this);
-            addExercise.setOnClickListener(this);
             descriptionText.setOnLongClickListener(this);
 
             view.setOnFocusChangeListener((v, hasFocus) -> {
@@ -282,7 +276,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             existingGoalUpdateState = new ExistingGoalUpdateState(view, listener);
             exercisesRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false));
 
-            exerciseAdapter = new MyRecyclerViewAdapter(this);
+            exerciseAdapter = new MyRecyclerViewAdapter(this, context);
             exerciseAdapter.setExerciseDescriptionList(exerciseDescriptions);
             exercisesRecyclerView.setItemAnimator(new DefaultItemAnimator());
             exercisesRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
@@ -335,11 +329,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     setState(existingGoalUpdateState);
                     showAlert("Edytuj cel");
                     break;
-                case R.id.addingExercise:
-                    AddExercise.startNewInstance(view.getContext(), training, goal);
-                    break;
                 case R.id.exercises_rv:
-                    listener.onItemClick(goal);
+                    listener.onItemClick(training, goal);
                     break;
             }
 
@@ -386,7 +377,11 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void onItemClick(Exercise item) {
-            AddExercise.startNewInstance(view.getContext(), training, goal, item);
+        }
+
+        @Override
+        public void addExercise() {
+            AddExercise.startNewInstance(view.getContext(), training, goal);
         }
 
         private class ActionBarCallback implements ActionMode.Callback {

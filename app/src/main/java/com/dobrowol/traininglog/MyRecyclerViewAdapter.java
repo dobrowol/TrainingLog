@@ -1,5 +1,7 @@
 package com.dobrowol.traininglog;
 
+import android.content.Context;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
@@ -21,6 +24,8 @@ import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
+    final static Exercise EMPTY_EXERCISE = new Exercise();
+    final static ExerciseDescription EMPTY_DESCRIPTION= new ExerciseDescription();
     void removeItem(int adapterPosition) {
         exerciseList.remove(adapterPosition);
         notifyDataSetChanged();
@@ -41,13 +46,21 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
+
+        void addExercise();
     }
 
     private List<Exercise> exerciseList;
     private List<ExerciseDescription> exerciseDescriptionList;
     private OnItemClickListener listener;
+    private Context context;
 
-    MyRecyclerViewAdapter(OnItemClickListener listener) {
+    MyRecyclerViewAdapter(OnItemClickListener listener, Context context) {
+        this.context = context;
+        EMPTY_DESCRIPTION.eid="EmptyDescription";
+        EMPTY_DESCRIPTION.description=context.getString(R.string.add_exercise);
+        EMPTY_EXERCISE.exerciseDescriptionId="EmptyDescription";
+        EMPTY_EXERCISE.id=EMPTY_DESCRIPTION.eid;
         exerciseList = new ArrayList<>();
         this.listener = listener;
         exerciseDescriptionList = new ArrayList<>();
@@ -58,10 +71,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             this.exerciseList.clear();
         }
         this.exerciseList = exerciseList;
+        this.exerciseList.add(EMPTY_EXERCISE);
     }
 
     void setExerciseDescriptionList(List<ExerciseDescription> exerciseList){
         this.exerciseDescriptionList = exerciseList;
+        this.exerciseDescriptionList.add(EMPTY_DESCRIPTION);
     }
 
     List<Exercise> getExerciseList(){
@@ -86,7 +101,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public RelativeLayout viewForeground;
-        RelativeLayout viewBackground;
         TextView descriptionText;
 
         CustomViewHolder(View view) {
@@ -107,16 +121,32 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 }
             }
             if(ed != null) {
-                descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) + %s",
-                        textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
-                        ed.description
-                ));
+                if(ed.eid == EMPTY_DESCRIPTION.eid){
+                    viewForeground.setBackgroundResource(R.drawable.edit_text_general_background);
+                    viewForeground.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
+                    descriptionText.setText(EMPTY_DESCRIPTION.description);
+                    descriptionText.setBackgroundResource(R.drawable.edit_text_general_background);
+                    descriptionText.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
+                    descriptionText.setTextColor(ContextCompat.getColor(context, R.color.adding_text_colour));
+                }
+                else {
+                    descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) + %s",
+                            textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
+                            ed.description
+                    ));
+                }
             }
         }
 
         @Override
         public void onClick(View v) {
-            listener.onItemClick(exerciseList.get(getAdapterPosition()));
+            Exercise exercise = exerciseList.get(getAdapterPosition());
+            if(exercise.id == EMPTY_EXERCISE.id){
+                listener.addExercise();
+            }
+            else{
+                listener.onItemClick(exerciseList.get(getAdapterPosition()));
+            }
         }
     }
 
