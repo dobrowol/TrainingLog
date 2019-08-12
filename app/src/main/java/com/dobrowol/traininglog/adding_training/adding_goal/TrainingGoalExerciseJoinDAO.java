@@ -33,6 +33,12 @@ public interface TrainingGoalExerciseJoinDAO {
                 " training_goal_exercise_join.goalId=:goalId")
         LiveData<List<TrainingGoalLoadData>> getTrainingGoalLoadData(String trainingId, String goalId);
 
+        @Query("SELECT  training_goal_exercise_join.trainingJoinId, training_goal_exercise_join.goalId, loadValue, exercise_table.startDate, training_table.date, goal_exercise_join.specificity FROM TRAINING_GOAL_EXERCISE_JOIN "+
+                "INNER JOIN exercise_table ON training_goal_exercise_join.exerciseId=exercise_table.id "+
+                "INNER JOIN goal_exercise_join ON goal_exercise_join.goalId=training_goal_exercise_join.goalId AND goal_exercise_join.exerciseId=training_goal_exercise_join.exerciseId "+
+                "INNER JOIN training_table ON training_table.id == training_goal_exercise_join.trainingJoinId ")
+        LiveData<List<TrainingGoalLoadData>> getTrainingLoadData();
+
         @Query("SELECT training_goal_exercise_join.* FROM training_goal_exercise_join WHERE training_goal_exercise_join.id=:id")
         LiveData<TrainingGoalExerciseJoin> getTrainingGoalExercise(String id);
 

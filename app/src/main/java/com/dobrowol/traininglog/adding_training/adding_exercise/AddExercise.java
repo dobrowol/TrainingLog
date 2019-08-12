@@ -312,8 +312,8 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                 GoalExercise goalExercise = new GoalExercise(UUID.randomUUID().toString(), goal.goalId, exercise.id, getNumber(specificity));
                 goalExerciseJoinViewModel.insert(goalExercise);
                 trainingExerciseJoinViewModel.insert(trainingExerciseJoin);
-                TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad(trainingGoalJoin, trainingGoalJoinViewModel);
-                int exerciseLoad = trainingGoalLoad.update(exercise, goalExercise, training);
+                TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
+                int exerciseLoad = trainingGoalLoad.update(trainingGoalJoin, trainingGoalJoinViewModel, exercise, goalExercise, training);
                 TrainingGoalExerciseJoin trainingGoalExerciseJoin = new TrainingGoalExerciseJoin(UUID.randomUUID().toString(), training.id, goal.goalId, exercise.id, nextExercise, exerciseLoad);
                 trainingGoalExerciseJoinViewModel.insert(trainingGoalExerciseJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                         s1 -> finish());
@@ -322,7 +322,6 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     }
 
     private boolean isNumberInvalid(EditText field, int lowerBound, int upperBound) {
-
         int res = getNumber(field);
         return res < lowerBound || res > upperBound;
     }

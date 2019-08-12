@@ -19,6 +19,7 @@ import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
@@ -86,7 +87,9 @@ public class DateTimeActivity extends AppCompatActivity implements View.OnClickL
         if(training != null){
             timePicker.setCurrentHour(training.date.getHours());
             timePicker.setCurrentMinute(training.date.getMinutes());
-            datePicker.updateDate(training.date.getYear(), training.date.getMonth(), training.date.getDay());
+
+            //datePicker.updateDate(training.date.getYear(), training.date.getMonth(), training.date.getDay());
+            datePicker.setMinDate(training.date.getTime());
         }
     }
 
@@ -104,19 +107,13 @@ public class DateTimeActivity extends AppCompatActivity implements View.OnClickL
                 year = datePicker.getYear();
                 month = datePicker.getMonth();
                 dayOfMonth = datePicker.getDayOfMonth();
-                training = new Training();
-                training.id = UUID.randomUUID().toString();
 
-                String date = String.format(Locale.ENGLISH,"%04d-%02d-%02d %02d:%02d", year, month, dayOfMonth, hour, minutes);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
-                try {
-                    training.date = simpleDateFormat.parse(date);
-                    trainingViewModel.update(training);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth, hour, minutes);
+                training.date = calendar.getTime();
+                trainingViewModel.update(training);
 
-                finish();
+                MainActivity.startNewInstance(getApplicationContext(), training);
         }
     }
 

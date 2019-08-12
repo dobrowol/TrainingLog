@@ -3,7 +3,6 @@ package com.dobrowol.traininglog;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,8 @@ import android.widget.TextView;
 import com.dobrowol.traininglog.adding_training.Training;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalExerciseData;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 import com.dobrowol.traininglog.training_load.displaying.MyValueFormatter;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.YAxis;
@@ -29,8 +30,10 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Training} and makes a call to the
@@ -44,6 +47,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     private List<TrainingGoalExerciseData> trainingGoalExerciseData;
     private Integer maximumLoad;
     private Integer numberOfExercises;
+    private HashMap<String, List<TrainingGoalLoadData>> trainingGoalLoadData;
 
     void setMaximumLoad(int maximumLoad) {
         this.maximumLoad = maximumLoad;
@@ -51,6 +55,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
     AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
         this.mListener = trainingsApp;
+        trainingGoalLoadData = new HashMap<>();
     }
     void setTrainings(List<Training> trainings){
         this.trainings = trainings;
@@ -74,15 +79,27 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         trainings.remove(adapterPosition);
     }
 
+    public void setTrainingLoads(List<TrainingGoalLoadData> trainingGoalLoadData) {
+        if(trainingGoalLoadData != null) {
+            for (TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData) {
+                List<TrainingGoalLoadData> list = this.trainingGoalLoadData.get(trainingGoalLoadData1.trainingJoinId);
+
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+                list.add(trainingGoalLoadData1);
+                this.trainingGoalLoadData.put(trainingGoalLoadData1.trainingJoinId, list);
+            }
+        }
+    }
+
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Training item);
         void onDeleteTraining(Training training);
     }
 
-
     private final OnListFragmentInteractionListener mListener;
-
 
     @NonNull
     @Override
@@ -109,6 +126,10 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
                     loads.add(trainingGoalJoin.goalLoad);
                 }
             }
+        }
+        if(trainingGoalLoadData != null && !trainingGoalLoadData.isEmpty()){
+            TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
+            loads = trainingGoalLoad.calculate(trainingGoalLoadData.get(holder.mItem.id));
         }
 
         holder.mLoads = loads;

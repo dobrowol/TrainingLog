@@ -82,9 +82,9 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
         //trainingGoalViewModel.trainingGoalsForTrainingId.observe(this, trainingGoalJoins -> adapter.setTrainingGoalJoins(trainingGoalJoins));
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalExerciseJoinViewModel.getTrainingGoalExerciseDataAggregated().observe(this, trainingGoalExerciseData -> adapter.setTrainingGoalLoads(trainingGoalExerciseData));
-        FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
-        floatingActionButton.setOnClickListener(this);
+        //trainingGoalExerciseJoinViewModel.getTrainingGoalExerciseDataAggregated().observe(this, trainingGoalExerciseData -> adapter.setTrainingGoalLoads(trainingGoalExerciseData));
+        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, trainingGoalLoadData -> adapter.setTrainingLoads(trainingGoalLoadData));
+
         trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
             if (maximumLoad != null) {
                 adapter.setMaximumLoad(maximumLoad);
@@ -95,6 +95,9 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
                 adapter.setNumberOfExercises(numberOfExercises);
             }
         });
+
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab_add_training);
+        floatingActionButton.setOnClickListener(this);
     }
 
     @Override
@@ -119,12 +122,6 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
                 Intent intent = new Intent(this,MainActivity.class);
                 startActivity(intent);
         }
-    }
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        //When BACK BUTTON is pressed, the activity on the stack is restarted
-        //Do what you want on the refresh procedure here
     }
 
     @Override

@@ -67,6 +67,9 @@ public class TrainingGoalExerciseJoinRepository {
     public LiveData<List<TrainingGoalLoadData>> getTrainingGoalLoadData(String trainingId, String goalId){
         return trainingGoalExerciseJoinDAO.getTrainingGoalLoadData(trainingId, goalId);
     }
+    public LiveData<List<TrainingGoalLoadData>> getTrainingLoadData(){
+        return trainingGoalExerciseJoinDAO.getTrainingLoadData();
+    }
     private static class getAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {
 
         private TrainingGoalExerciseJoinDAO mAsyncTaskDao;
