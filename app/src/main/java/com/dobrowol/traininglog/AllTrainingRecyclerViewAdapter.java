@@ -146,7 +146,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         return trainings.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements OnChartValueSelectedListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements OnChartValueSelectedListener, View.OnClickListener {
         final View mView;
         final TextView mIdView;
         List<Integer> mLoads;
@@ -157,6 +157,8 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         ViewHolder(View view) {
             super(view);
             mView = view;
+
+            mView.setOnClickListener(this);
             viewForeground = view.findViewById(R.id.view_training_foreground);
             mIdView = view.findViewById(R.id.item_number);
 
@@ -204,7 +206,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         void setDataChart(Training training, List<Integer> goalLoads){
             if(goalLoads == null || training == null)
                 return;
-            setListeners(training);
+           // setListeners(training);
 
             ArrayList<BarEntry> values = new ArrayList<>();
 
@@ -277,6 +279,11 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, number);
 
             return colors;
+        }
+
+        @Override
+        public void onClick(View v) {
+            mListener.onListFragmentInteraction(trainings.get(getAdapterPosition()));
         }
     }
 }
