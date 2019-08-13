@@ -1,6 +1,7 @@
 package com.dobrowol.traininglog;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -130,6 +131,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                     descriptionText.setTextColor(ContextCompat.getColor(context, R.color.adding_text_colour));
                 }
                 else {
+                    viewForeground.setBackgroundColor(Color.WHITE);
+                    viewForeground.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                    descriptionText.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                    descriptionText.setBackgroundColor(Color.WHITE);
+                    descriptionText.setTextColor(Color.BLACK);
                     descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) + %s",
                             textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
                             ed.description
