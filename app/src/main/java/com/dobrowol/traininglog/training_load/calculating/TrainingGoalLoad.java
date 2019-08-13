@@ -28,12 +28,15 @@ public class TrainingGoalLoad {
 
     public ArrayList<Integer> calculate(List<TrainingGoalLoadData> trainingGoalLoadData){
         HashMap<String, Integer> goalLoads = calculateGoalLoads(trainingGoalLoadData);
+        if(goalLoads == null)
+            return null;
         return new ArrayList<>(goalLoads.values());
     }
 
     private HashMap<String, Integer> calculateGoalLoads(List<TrainingGoalLoadData> trainingGoalLoadData) {
         HashMap<String, Integer> goalLoads = new HashMap<>();
-
+        if(trainingGoalLoadData == null)
+            return null;
         for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData) {
             Integer load = goalLoads.get(trainingGoalLoadData1.goalId);
 

@@ -202,6 +202,8 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
         }
 
         void setDataChart(Training training, List<Integer> goalLoads){
+            if(goalLoads == null || training == null)
+                return;
             setListeners(training);
 
             ArrayList<BarEntry> values = new ArrayList<>();
