@@ -1,6 +1,8 @@
 package com.dobrowol.traininglog.holt_winters;
 
 
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,5 +89,9 @@ public class HoltWinters {
                 series.add(Double.valueOf(integer));
             }
         }
+    }
+
+    public void setDateLoadSeries(List<TrainingGoalLoad.DateLoad> dateLoads) {
+
     }
 }

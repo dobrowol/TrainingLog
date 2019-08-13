@@ -281,17 +281,10 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_list:
-                return true;
             case R.id.action_chart:
                 Intent intent = new Intent(this, ChartActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.new_training:
-                initializeTraining();
-                exerciseList.clear();
-                Intent dateTimeIntent = new Intent(this, DateTimeActivity.class);
-                startActivity(dateTimeIntent);
             default:
                 return super.onOptionsItemSelected(item);
 

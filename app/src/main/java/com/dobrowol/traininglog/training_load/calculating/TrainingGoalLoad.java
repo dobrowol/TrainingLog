@@ -11,8 +11,10 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,6 +27,11 @@ public class TrainingGoalLoad {
     }
 
     public ArrayList<Integer> calculate(List<TrainingGoalLoadData> trainingGoalLoadData){
+        HashMap<String, Integer> goalLoads = calculateGoalLoads(trainingGoalLoadData);
+        return new ArrayList<>(goalLoads.values());
+    }
+
+    private HashMap<String, Integer> calculateGoalLoads(List<TrainingGoalLoadData> trainingGoalLoadData) {
         HashMap<String, Integer> goalLoads = new HashMap<>();
 
         for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData) {
@@ -35,17 +42,17 @@ public class TrainingGoalLoad {
             }
 
             long diffInMillies = Math.abs(trainingGoalLoadData1.date.getTime() - trainingGoalLoadData1.startDate.getTime());
-            long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            long daysFromFirstOccurrence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
             int neurologicalBoostPeriod = 21;
             int neurologicalBoost = 1;
-            if (daysFromFirstOccurence <= neurologicalBoostPeriod) {
+            if (daysFromFirstOccurrence <= neurologicalBoostPeriod) {
                 neurologicalBoost = 8;
             }
             load += trainingGoalLoadData1.loadValue * trainingGoalLoadData1.specificity * neurologicalBoost;
             goalLoads.put(trainingGoalLoadData1.goalId, load);
         }
-        return new ArrayList<>(goalLoads.values());
+        return goalLoads;
     }
 
     public int update(TrainingGoalJoin trainingGoalJoin,
@@ -70,7 +77,30 @@ public class TrainingGoalLoad {
         return exerciseLoad;
     }
 
+    public class DateLoad{
+        public Date date;
+        public Integer load;
 
-
+        public DateLoad(Date date, Integer load) {
+            this.date = date;
+            this.load = load;
+        }
+    }
+    public HashMap<String, List<DateLoad>> calculate(HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings) {
+        HashMap<String, List<DateLoad>> goalLoads = new HashMap<>();
+        for(List<TrainingGoalLoadData> entry : loadsByTrainings.values()){
+            HashMap<String, Integer> loads = calculateGoalLoads(entry);
+            for(String key : loads.keySet()) {
+                List<DateLoad> list = goalLoads.get(key);
+                if(list == null){
+                    list= new ArrayList<>();
+                }
+                DateLoad dateLoad = new DateLoad(entry.get(0).date, loads.get(key));
+                list.add(dateLoad);
+                goalLoads.put(key, list);
+            }
+        }
+        return goalLoads;
+    }
 }
 

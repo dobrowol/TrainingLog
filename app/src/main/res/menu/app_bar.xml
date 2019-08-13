@@ -6,19 +6,9 @@
 <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/action_chart"
-        android:icon="@drawable/ic_show_chart_white_24dp"
+        android:icon="@drawable/ic_show_chart_black_24dp"
         app:showAsAction="never"
-        android:title="" />
-    <item
-    android:id="@+id/action_list"
-    android:icon="@drawable/ic_list_white_24dp"
-    app:showAsAction="never"
-        android:title="" />
-    <item
-        android:id="@+id/new_training"
-        app:showAsAction="never"
-        android:title="New Training"
-        />
+        android:title="@string/show_chart" />
 
 
 </menu>

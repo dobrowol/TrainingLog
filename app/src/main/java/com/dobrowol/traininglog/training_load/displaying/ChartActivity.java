@@ -20,7 +20,11 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.R;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinDAO;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.holt_winters.HoltWinters;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -36,6 +40,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeListener,
@@ -60,6 +65,11 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
 
         //trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
+        TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
+
+        trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
+        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
+
 
         tvX = findViewById(R.id.tvXMax);
         tvY = findViewById(R.id.tvYMax);
@@ -111,6 +121,8 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
             // vertical grid lines
             xAxis.enableGridDashedLine(10f, 10f, 0f);
+
+            xAxis.setValueFormatter(new DateAxisValueFormatter());
         }
 
         YAxis yAxis;
@@ -178,6 +190,71 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         holtWinters = new HoltWinters(new ArrayList<>(), seasonLength);
     }
 
+    private void setData(List<TrainingGoalLoadData> trainingGoalLoadData) {
+        TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
+        HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings = new HashMap<>();
+        for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData){
+            List<TrainingGoalLoadData> list = loadsByTrainings.get(trainingGoalLoadData1.trainingJoinId);
+            if(list == null){
+                list = new ArrayList<>();
+            }
+            list.add(trainingGoalLoadData1);
+            loadsByTrainings.put(trainingGoalLoadData1.trainingJoinId, list);
+        }
+        HashMap<String, List<TrainingGoalLoad.DateLoad>> goalLoads;
+        goalLoads = trainingGoalLoad.calculate(loadsByTrainings);
+        setData(goalLoads);
+
+    }
+
+    private void setData(HashMap<String, List<TrainingGoalLoad.DateLoad>> goalLoads) {
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+
+        for(String key : goalLoads.keySet()) {
+            ArrayList<Entry> values = new ArrayList<>();
+            ArrayList<Double> forecastValues = new ArrayList<>();
+            ArrayList<Entry> forecastEntries = new ArrayList<>();
+
+            int i = 0;
+            List<TrainingGoalLoad.DateLoad> dateLoads = goalLoads.get(key);
+            if(dateLoads != null) {
+                for (TrainingGoalLoad.DateLoad dateLoad : dateLoads) {
+                    if (dateLoad != null) {
+                        values.add(new Entry(dateLoad.date.getTime(), dateLoad.load, getResources().getDrawable(R.drawable.star)));
+                    }
+                }
+                if (dateLoads.size() >= seasonLength) {
+                    holtWinters.setDateLoadSeries(dateLoads);
+                    forecastValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
+                    for (Double forecast : forecastValues) {
+                        if (forecast != null) {
+                            forecastEntries.add(new Entry(i++, forecast.floatValue(), getResources().getDrawable(R.drawable.star)));
+                        }
+                    }
+                }
+            }
+            LineDataSet set1;
+            LineDataSet forecastSet;
+
+
+            set1 = getLineDataSet(key, values, R.drawable.fade_red);
+
+
+            dataSets.add(set1); // add the data sets
+
+            if (!forecastValues.isEmpty()) {
+                forecastSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
+                dataSets.add(forecastSet);
+            }
+            // create a data object with the data sets
+
+        }
+            // set data
+        LineData data = new LineData(dataSets);
+        chart.setData(data);
+
+    }
+
     private void setData(List<Integer> integers, String load_name) {
 
         ArrayList<Entry> values = new ArrayList<>();
@@ -200,7 +277,7 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
             }
         }
         LineDataSet set1;
-        LineDataSet forecastedSet;
+        LineDataSet forecastSet;
 
         if (chart.getData() != null &&
                 chart.getData().getDataSetCount() > 0) {
@@ -216,8 +293,8 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
             dataSets.add(set1); // add the data sets
 
             if(!forecastValues.isEmpty()){
-                forecastedSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
-                dataSets.add(forecastedSet);
+                forecastSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
+                dataSets.add(forecastSet);
             }
             // create a data object with the data sets
             LineData data = new LineData(dataSets);
