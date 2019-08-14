@@ -65,9 +65,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     protected Typeface tfLight;
 
     private LineChart chart;
-    private SeekBar seekBarX, seekBarY;
-    private TextView tvX, tvY;
-    private TrainingViewModel trainingViewModel;
     private HoltWinters holtWinters;
     private int seasonLength;
 
@@ -80,25 +77,17 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
         setTitle("Training Load");
 
-        trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
-
         //trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
         TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
         trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
 
-
-
-        tvX = findViewById(R.id.tvXMax);
-        tvY = findViewById(R.id.tvYMax);
-
-        seekBarX = findViewById(R.id.seekBar1);
-        seekBarX.setOnSeekBarChangeListener(this);
-
-        seekBarY = findViewById(R.id.seekBar2);
-        seekBarY.setMax(180);
-        seekBarY.setOnSeekBarChangeListener(this);
+        trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
+            if (maximumLoad != null) {
+                setMaximumValue(maximumLoad);
+            } }
+        );
 
 
         {   // // Chart Style // //
@@ -160,7 +149,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         }
 
 
-        {   // // Create Limit Lines // //
+       /* {   // // Create Limit Lines // //
             LimitLine llXAxis = new LimitLine(9f, "Index 10");
             llXAxis.setLineWidth(4f);
             llXAxis.enableDashedLine(10f, 10f, 0f);
@@ -190,11 +179,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             yAxis.addLimitLine(ll1);
             yAxis.addLimitLine(ll2);
             //xAxis.addLimitLine(llXAxis);
-        }
-
-        // add data
-        seekBarX.setProgress(45);
-        seekBarY.setProgress(180);
+        }*/
 
         // draw points over time
         chart.animateX(1500);
@@ -209,6 +194,14 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         holtWinters = new HoltWinters(new ArrayList<>(), seasonLength);
 
         setAppBarTitle();
+    }
+
+    private void setMaximumValue(Integer maximumLoad) {
+        YAxis yAxis = chart.getAxisLeft();
+
+        // axis range
+        yAxis.setAxisMaximum(maximumLoad);
+
     }
 
     private void setAppBarTitle() {
@@ -563,19 +556,13 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         return true;
     }
 
+    protected void saveToGallery() {
+        saveToGallery(chart, "LineChartActivity1");
+    }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-        tvX.setText(String.valueOf(seekBarX.getProgress()));
-        tvY.setText(String.valueOf(seekBarY.getProgress()));
-
-
-        // redraw
-        chart.invalidate();
-    }
-
-    protected void saveToGallery() {
-        saveToGallery(chart, "LineChartActivity1");
     }
 
     @Override
