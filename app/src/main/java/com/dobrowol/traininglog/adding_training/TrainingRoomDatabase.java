@@ -25,7 +25,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinDAO;
 
 @Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class, Goal.class, TrainingGoalExerciseJoin.class,
-        TrainingGoalJoin.class, GoalExercise.class}, version = 20)
+        TrainingGoalJoin.class, GoalExercise.class}, version = 21)
 @TypeConverters({Converters.class})
 public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract ExerciseDescriptionDAO exerciseDescriptionDAO();
@@ -45,14 +45,15 @@ public abstract class TrainingRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             TrainingRoomDatabase.class, "training_database")
-                            .fallbackToDestructiveMigration()
+                            //.fallbackToDestructiveMigration()
+                            .addMigrations(MIGRATION_20_21)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
-    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+    static final Migration MIGRATION_20_21 = new Migration(20, 21) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // Since we didn't alter the table, there's nothing else to do here.

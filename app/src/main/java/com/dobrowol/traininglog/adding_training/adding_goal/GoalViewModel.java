@@ -4,6 +4,8 @@ import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
@@ -29,8 +31,14 @@ public class GoalViewModel extends AndroidViewModel {
 
     public void update(Goal goal) { mRepository.update(goal); }
 
-    public LiveData<Goal> getGoal(String description) {
-        return mRepository.getGoal(description);
+    private MutableLiveData<String> query  = new MutableLiveData<>();
+    public LiveData<Goal> goalByDescription = Transformations.switchMap(query,
+            description ->
+                    mRepository.getGoal(description)
+    );
+
+    public void getGoal(String description) {
+        query.setValue(description);
     }
 
     public LiveData<Goal> getGoalById(String goalId) {

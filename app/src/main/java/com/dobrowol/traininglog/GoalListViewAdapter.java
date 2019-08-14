@@ -54,10 +54,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     public interface OnItemClickListener extends View.OnClickListener {
         void onItemClick(Training training, Goal item);
 
-        void onItemRemove(Goal goal);
-
-        void onExistingGoalEdit(String description);
-
         void insertGoal(Goal goal);
 
         void updateGoal( Goal newGoal);
@@ -68,8 +64,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void deleteGoal(Goal oldGoal);
 
         void removeExercise(Exercise adapterPosition);
-
-        void insertExercise(Exercise deletedItem);
     }
 
     GoalListViewAdapter(OnItemClickListener listener, Context context) {
@@ -425,7 +419,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
             }
         }
-        public void showAlert(String text){
+        void showAlert(String text){
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(view.getContext());
             alertDialog.setTitle("GOAL");
             alertDialog.setMessage(text);

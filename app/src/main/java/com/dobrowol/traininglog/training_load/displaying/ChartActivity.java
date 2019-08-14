@@ -30,6 +30,7 @@ import com.dobrowol.traininglog.TrainingsApp;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinDAO;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
+import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.holt_winters.HoltWinters;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
@@ -86,6 +87,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
         trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
+
 
 
         tvX = findViewById(R.id.tvXMax);
@@ -609,12 +611,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     protected void requestStoragePermission(View view) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Snackbar.make(view, "Write permission is required to save image to gallery", Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ActivityCompat.requestPermissions(ChartActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
-                        }
-                    }).show();
+                    .setAction(android.R.string.ok, v -> ActivityCompat.requestPermissions(ChartActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_STORAGE)).show();
         } else {
             Toast.makeText(getApplicationContext(), "Permission Required!", Toast.LENGTH_SHORT)
                     .show();

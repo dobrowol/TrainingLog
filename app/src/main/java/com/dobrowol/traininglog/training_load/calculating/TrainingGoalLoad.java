@@ -38,7 +38,7 @@ public class TrainingGoalLoad {
         if(trainingGoalLoadData == null)
             return null;
         for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData) {
-            Integer load = goalLoads.get(trainingGoalLoadData1.goalId);
+            Integer load = goalLoads.get(trainingGoalLoadData1.goalDescription);
 
             if(load == null) {
                 load = 0;
@@ -53,7 +53,7 @@ public class TrainingGoalLoad {
                 neurologicalBoost = 8;
             }
             load += trainingGoalLoadData1.loadValue * trainingGoalLoadData1.specificity * neurologicalBoost;
-            goalLoads.put(trainingGoalLoadData1.goalId, load);
+            goalLoads.put(trainingGoalLoadData1.goalDescription, load);
         }
         return goalLoads;
     }
@@ -84,7 +84,7 @@ public class TrainingGoalLoad {
         public Date date;
         public Integer load;
 
-        public DateLoad(Date date, Integer load) {
+        DateLoad(Date date, Integer load) {
             this.date = date;
             this.load = load;
         }

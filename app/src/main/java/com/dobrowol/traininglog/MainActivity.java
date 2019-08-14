@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import androidx.lifecycle.Observer;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
+    private String goalDescription;
 
     public static void startNewInstance(Context context, Training training)
     {
@@ -183,6 +185,19 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
 
+        goalViewModel.goalByDescription.observe(this, goal -> {
+            if(goal == null && goalDescription != null){
+                Toast.makeText(getApplicationContext(), "New goal entered", Toast.LENGTH_SHORT).show();
+                Goal goal1 = new Goal(UUID.randomUUID().toString(),goalDescription);
+                goalDescription = null;
+                insertGoal(goal1);
+            }
+            else if (goal != null){
+                Toast.makeText(getApplicationContext(), "Existing goal entered", Toast.LENGTH_SHORT).show();
+
+                insertTrainingGoal(goal);
+            }
+        });
     }
     private void initializeTraining(){
         training = new Training();
@@ -236,11 +251,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         exerciseViewModel.delete(adapterPosition);
     }
 
-    @Override
-    public void insertExercise(Exercise deletedItem) {
-        exerciseViewModel.insert(deletedItem);
-    }
-
     public void showAlert(String text){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle("GOAL");
@@ -264,16 +274,8 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     private void insertGoal(String goalDescription) {
-        goalViewModel.getGoal(goalDescription).observe(this, goal -> {
-            if(goal == null){
-                Goal goal1 = new Goal(UUID.randomUUID().toString(),goalDescription);
-                insertGoal(goal1);
-            }
-            else{
-                insertTrainingGoal(goal);
-            }
-        });
-
+        this.goalDescription = goalDescription;
+        goalViewModel.getGoal(goalDescription);
     }
 
     private void insertTrainingGoal(Goal goal) {
@@ -343,16 +345,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         AddExercise.startNewInstance(getApplicationContext(), training, item);
     }
 
-    @Override
-    public void onItemRemove(Goal goal) {
-
-    }
-
-    @Override
-    public void onExistingGoalEdit(String description) {
-
-        goalViewModel.getGoal(description).observe(this, goal -> editedGoal = goal);
-    }
 
     @Override
     public void insertGoal(Goal goal) {

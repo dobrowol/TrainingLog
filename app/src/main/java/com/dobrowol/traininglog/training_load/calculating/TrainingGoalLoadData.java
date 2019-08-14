@@ -7,6 +7,7 @@ import java.util.Date;
 public class TrainingGoalLoadData {
     public String trainingJoinId;
     public String goalId;
+    public String goalDescription;
     public int loadValue;
     public Date startDate;
     public Date date;
@@ -21,10 +22,8 @@ public class TrainingGoalLoadData {
         if (getClass() != object.getClass())
             return false;
         TrainingGoalLoadData other = (TrainingGoalLoadData) object;
-        if (goalId.compareTo( other.goalId)== 0 && trainingJoinId.compareTo(other.trainingJoinId) ==0
-        && loadValue == other.loadValue && specificity == other.specificity && startDate.compareTo(other.startDate) == 0
-        && other.date.compareTo(date)==0)
-            return true;
-        return false;
+        return goalId.compareTo(other.goalId) == 0 && trainingJoinId.compareTo(other.trainingJoinId) == 0
+                && loadValue == other.loadValue && specificity == other.specificity && startDate.compareTo(other.startDate) == 0
+                && other.date.compareTo(date) == 0;
     }
 }
