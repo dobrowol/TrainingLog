@@ -5,20 +5,28 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.R;
+import com.dobrowol.traininglog.TrainingsApp;
 import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinDAO;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
@@ -26,6 +34,7 @@ import com.dobrowol.traininglog.holt_winters.HoltWinters;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
 import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LimitLine;
@@ -38,13 +47,21 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
-public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeListener,
-        OnChartValueSelectedListener {
+public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
+        OnChartValueSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static final int PERMISSION_STORAGE = 0;
+
+    protected Typeface tfRegular;
+    protected Typeface tfLight;
 
     private LineChart chart;
     private SeekBar seekBarX, seekBarY;
@@ -188,8 +205,38 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
 
         seasonLength = 12;
         holtWinters = new HoltWinters(new ArrayList<>(), seasonLength);
+
+        setAppBarTitle();
     }
 
+    private void setAppBarTitle() {
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }else{
+            android.app.ActionBar actionBar1 = getActionBar();
+            if(actionBar1 != null){
+                actionBar1.setDisplayHomeAsUpEnabled(true);
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
+        return true;
+    }
+   @Override
+   public boolean onNavigateUp() {
+       finish();
+       return true;
+   }
     private void setData(List<TrainingGoalLoadData> trainingGoalLoadData) {
         TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
         HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings = new HashMap<>();
@@ -505,6 +552,11 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
                 }
                 break;
             }
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -520,7 +572,6 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
         chart.invalidate();
     }
 
-    @Override
     protected void saveToGallery() {
         saveToGallery(chart, "LineChartActivity1");
     }
@@ -542,4 +593,42 @@ public class ChartActivity extends BaseChart implements SeekBar.OnSeekBarChangeL
     public void onNothingSelected() {
         Log.i("Nothing selected", "Nothing selected.");
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_STORAGE) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                saveToGallery();
+            } else {
+                Toast.makeText(getApplicationContext(), "Saving FAILED!", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
+
+    protected void requestStoragePermission(View view) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Snackbar.make(view, "Write permission is required to save image to gallery", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ActivityCompat.requestPermissions(ChartActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
+                        }
+                    }).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Permission Required!", Toast.LENGTH_SHORT)
+                    .show();
+            ActivityCompat.requestPermissions(ChartActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
+        }
+    }
+
+    protected void saveToGallery(Chart chart, String name) {
+        if (chart.saveToGallery(name + "_" + System.currentTimeMillis(), 70))
+            Toast.makeText(getApplicationContext(), "Saving SUCCESSFUL!",
+                    Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(getApplicationContext(), "Saving FAILED!", Toast.LENGTH_SHORT)
+                    .show();
+    }
+
 }

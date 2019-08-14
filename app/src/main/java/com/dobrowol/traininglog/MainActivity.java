@@ -45,6 +45,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExercise
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
+import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -263,8 +264,21 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     private void insertGoal(String goalDescription) {
-        Goal goal = new Goal(UUID.randomUUID().toString(),goalDescription);
-        insertGoal(goal);
+        goalViewModel.getGoal(goalDescription).observe(this, goal -> {
+            if(goal == null){
+                Goal goal1 = new Goal(UUID.randomUUID().toString(),goalDescription);
+                insertGoal(goal1);
+            }
+            else{
+                insertTrainingGoal(goal);
+            }
+        });
+
+    }
+
+    private void insertTrainingGoal(Goal goal) {
+        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
+        trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
     @Override
@@ -279,29 +293,10 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_chart:
-                Intent intent = new Intent(this, ChartActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.app_bar, menu);
-
-        return true;
-    }
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {

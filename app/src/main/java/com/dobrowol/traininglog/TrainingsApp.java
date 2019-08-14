@@ -3,6 +3,8 @@ package com.dobrowol.traininglog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExercise
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.adding_training.deleting_exercise.RecyclerItemTouchHelper;
 import com.dobrowol.traininglog.deleting_training.RecyclerTrainingTouchHelper;
+import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -130,5 +133,25 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
             adapter.removeTraining(viewHolder.getAdapterPosition());
             adapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_chart:
+                Intent intent = new Intent(this, ChartActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.app_bar, menu);
+
+        return true;
     }
 }

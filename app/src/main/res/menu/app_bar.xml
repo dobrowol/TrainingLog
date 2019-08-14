@@ -7,7 +7,7 @@
     <item
         android:id="@+id/action_chart"
         android:icon="@drawable/ic_show_chart_black_24dp"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/show_chart" />
 
 
