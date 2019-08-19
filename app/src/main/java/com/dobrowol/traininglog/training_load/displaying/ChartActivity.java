@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,10 +24,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.R;
 import com.dobrowol.traininglog.TrainingsApp;
-import com.dobrowol.traininglog.adding_training.TrainingViewModel;
-import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinDAO;
+import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
-import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.holt_winters.HoltWinters;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
 import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoadData;
@@ -38,7 +33,6 @@ import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -47,26 +41,24 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Random;
 
 public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
         OnChartValueSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int PERMISSION_STORAGE = 0;
 
-    protected Typeface tfRegular;
-    protected Typeface tfLight;
-
     private LineChart chart;
     private HoltWinters holtWinters;
     private int seasonLength;
+    private Integer numberOfGoals;
+    private List<Integer> colors;
+    private int currentColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,18 +68,8 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         setContentView(R.layout.activity_linechart);
 
         setTitle("Training Load");
-
-        //trainingViewModel.getAllGeneralLoads().observe(this, integers -> setData(integers, "General Load"));
-        TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
-
-        trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
-
-        trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
-            if (maximumLoad != null) {
-                setMaximumValue(maximumLoad);
-            } }
-        );
+        currentColor = 0;
+        initializeObservers();
 
 
         {   // // Chart Style // //
@@ -195,13 +177,42 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
         setAppBarTitle();
     }
+    void generateColors() {
+        colors = new ArrayList<>();
+        Random rnd = new Random();
+        for (int i = 0; i < 360; i += 360 / numberOfGoals) {
+            colors.add(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
+        }
+    }
+    private void initializeObservers() {
+        TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
+
+        trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
+        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
+
+        trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
+            if (maximumLoad != null) {
+                setMaximumValue(maximumLoad);
+            } }
+        );
+
+        GoalViewModel goalViewModel;
+
+        goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
+
+        goalViewModel.getNumberOfGoals().observe(this, this::setNumberOfGoals);
+    }
+
+    private void setNumberOfGoals(Integer integer) {
+        this.numberOfGoals = integer;
+        generateColors();
+    }
 
     private void setMaximumValue(Integer maximumLoad) {
         YAxis yAxis = chart.getAxisLeft();
 
         // axis range
         yAxis.setAxisMaximum(maximumLoad);
-
     }
 
     private void setAppBarTitle() {
@@ -262,7 +273,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             if(dateLoads != null) {
                 for (TrainingGoalLoad.DateLoad dateLoad : dateLoads) {
                     if (dateLoad != null) {
-                        values.add(new Entry(dateLoad.date.getTime(), dateLoad.load, getResources().getDrawable(R.drawable.star)));
+                        values.add(new Entry(dateLoad.date.getTime(), dateLoad.load));
                     }
                 }
                 if (dateLoads.size() >= seasonLength) {
@@ -270,7 +281,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
                     forecastValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
                     for (Double forecast : forecastValues) {
                         if (forecast != null) {
-                            forecastEntries.add(new Entry(i++, forecast.floatValue(), getResources().getDrawable(R.drawable.star)));
+                            forecastEntries.add(new Entry(i++, forecast.floatValue()));
                         }
                     }
                 }
@@ -281,7 +292,9 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
             set1 = getLineDataSet(key, values, R.drawable.fade_red);
 
-
+            set1.setMode(set1.getMode() == LineDataSet.Mode.HORIZONTAL_BEZIER
+                    ? LineDataSet.Mode.LINEAR
+                    :  LineDataSet.Mode.HORIZONTAL_BEZIER);
             dataSets.add(set1); // add the data sets
 
             if (!forecastValues.isEmpty()) {
@@ -306,7 +319,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         int i = 0;
         for (Integer integer : integers) {
             if(integer!=null) {
-                values.add(new Entry(i++, integer, getResources().getDrawable(R.drawable.star)));
+                values.add(new Entry(i++, integer));
             }
         }
         if(integers.size() >= seasonLength){
@@ -314,7 +327,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             forecastValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
             for (Double forecast :  forecastValues) {
                 if(forecast != null) {
-                    forecastEntries.add(new Entry(i++, forecast.floatValue(), getResources().getDrawable(R.drawable.star)));
+                    forecastEntries.add(new Entry(i++, forecast.floatValue()));
                 }
             }
         }
@@ -350,13 +363,12 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         LineDataSet set1;
         set1 = new LineDataSet(values, load_name);
 
-
         // draw dashed line
-        set1.enableDashedLine(10f, 5f, 0f);
+        //set1.enableDashedLine(10f, 5f, 0f);
 
         // black lines and points
-        set1.setColor(Color.BLACK);
-        set1.setCircleColor(Color.BLACK);
+        set1.setColor(colors.get(currentColor));
+        set1.setCircleColor(colors.get(currentColor++));
 
         // line thickness and point size
         set1.setLineWidth(1f);
@@ -377,17 +389,17 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         set1.enableDashedHighlightLine(10f, 5f, 0f);
 
         // set the filled area
-        set1.setDrawFilled(true);
-        set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
+        //set1.setDrawFilled(true);
+        //set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
 
         // set color of filled area
-        if (Utils.getSDKInt() >= 18) {
+        /*if (Utils.getSDKInt() >= 18) {
             // drawables only supported on api level 18 and above
             Drawable drawable = ContextCompat.getDrawable(this, set_colour);
             set1.setFillDrawable(drawable);
         } else {
             set1.setFillColor(Color.BLACK);
-        }
+        }*/
         return set1;
     }
 

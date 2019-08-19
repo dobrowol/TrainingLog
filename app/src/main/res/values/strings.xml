@@ -65,4 +65,6 @@
     <string name="updateBtn">Update</string>
     <string name="add_exercise_text">Add</string>
     <string name="show_chart">Show chart</string>
+    <string name="delete_goal">Delete goal</string>
+    <string name="edit_goal">Edit goal</string>
 </resources>

@@ -50,6 +50,10 @@ public class GoalRepository {
         return goalDAO.getById(goalId);
     }
 
+    public LiveData<Integer> getNumberOfGoals() {
+        return goalDAO.getNumberOfGoals();
+    }
+
     private static class insertAsyncTask extends AsyncTask<Goal, Void, Void> {
 
         private GoalDAO mAsyncTaskDao;

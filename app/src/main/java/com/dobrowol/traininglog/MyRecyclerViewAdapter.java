@@ -136,7 +136,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                     descriptionText.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
                     descriptionText.setBackgroundColor(Color.WHITE);
                     descriptionText.setTextColor(Color.BLACK);
-                    descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) + %s",
+                    descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) %s",
                             textAtPosition.numberOfSetsInSeries, textAtPosition.numberOfRepetitionsInSet, textAtPosition.distance,
                             ed.description
                     ));

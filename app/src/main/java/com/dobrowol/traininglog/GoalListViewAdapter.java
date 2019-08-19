@@ -144,7 +144,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     @Override
     public int getItemCount() {
-        return (null != goals ? goals.size() : 0);
+        return (null != map ? map.size() : 0);
     }
 
     private interface TrainingDetailEnterState{
@@ -321,7 +321,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             switch (v.getId()) {
                 case R.id.goalTextView:
                     setState(existingGoalUpdateState);
-                    showAlert("Edytuj cel");
+                    showAlert(context.getString(R.string.edit_goal));
                     break;
                 case R.id.exercises_rv:
                     listener.onItemClick(training, goal);
@@ -363,7 +363,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         @Override
         public boolean onLongClick(View v) {
             if (v.getId() == R.id.goalTextView){
-                    enableActionMode(v,"Usuń cel");
+                    enableActionMode(v,context.getString(R.string.delete_goal));
                     trainingDetailEnterState = deleteGoalState;
             }
             return true;

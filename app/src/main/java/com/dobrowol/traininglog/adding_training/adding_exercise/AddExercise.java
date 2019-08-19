@@ -354,7 +354,12 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        exerciseDescriptionId = exerciseDescription.get(position).eid;
+        String name = parent.getItemAtPosition(position).toString();
+        for(ExerciseDescription exerciseDescription: this.exerciseDescription){
+            if(exerciseDescription.description.equals(name)){
+                exerciseDescriptionId = exerciseDescription.eid;
+            }
+        }
     }
 
     @Override
@@ -364,7 +369,12 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        exerciseDescriptionId = exerciseDescription.get(position).eid;
+        String name = parent.getItemAtPosition(position).toString();
+        for(ExerciseDescription exerciseDescription: this.exerciseDescription){
+            if(exerciseDescription.description.equals(name)){
+                exerciseDescriptionId = exerciseDescription.eid;
+            }
+        }
     }
 
     @Override

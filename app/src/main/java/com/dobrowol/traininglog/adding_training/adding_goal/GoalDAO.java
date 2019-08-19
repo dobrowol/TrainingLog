@@ -31,5 +31,8 @@ public interface GoalDAO {
 
     @Query("SELECT * FROM goal_table WHERE goalId=:goalId")
     LiveData<Goal> getById(String goalId);
+
+    @Query("SELECT COUNT(*) FROM goal_table")
+    LiveData<Integer> getNumberOfGoals();
 }
 
