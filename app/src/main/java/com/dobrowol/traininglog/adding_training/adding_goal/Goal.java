@@ -45,7 +45,7 @@ public class Goal implements Parcelable, Serializable {
         if (getClass() != object.getClass())
             return false;
         Goal other = (Goal) object;
-        if (goalId.compareTo( other.goalId)!= 0 )
+        if (description.compareTo( other.description)!= 0 )
             return false;
         return true;
     }

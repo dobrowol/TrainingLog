@@ -181,7 +181,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
            View view;
            Goal oldGoal;
            TextView descriptionText;
-          // EditText descriptionEditText;
 
            ExistingGoalUpdateState(View view, OnItemClickListener listener){
                this.listener = listener;
@@ -230,7 +229,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, MyRecyclerViewAdapter.OnItemClickListener {
 
-
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
         OnItemClickListener listener;
@@ -245,7 +243,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         DeleteGoalState deleteGoalState;
         private ActionMode actionMode;
         private MyRecyclerViewAdapter exerciseAdapter;
-        private ConstraintLayout constraintLayout;
 
         CustomViewHolder(View view, OnItemClickListener listener, Context context) {
             super(view);
@@ -254,7 +251,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.listener = listener;
             this.descriptionText = view.findViewById(R.id.goalTextView);
             this.exercisesRecyclerView = view.findViewById(R.id.exercises_rv);
-            this.constraintLayout = view.findViewById(R.id.constraint_layout);
             view.setOnClickListener(this);
             descriptionText.setOnLongClickListener(this);
 
@@ -327,7 +323,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                     listener.onItemClick(training, goal);
                     break;
             }
-
         }
         private void setState(TrainingDetailEnterState newGoalEnterState) {
             if (trainingDetailEnterState != null) {

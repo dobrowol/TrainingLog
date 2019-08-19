@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
-    private String goalDescription;
 
     public static void startNewInstance(Context context, Training training)
     {
@@ -184,20 +183,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
         trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
-
-        goalViewModel.goalByDescription.observe(this, goal -> {
-            if(goal == null && goalDescription != null){
-                Toast.makeText(getApplicationContext(), "New goal entered", Toast.LENGTH_SHORT).show();
-                Goal goal1 = new Goal(UUID.randomUUID().toString(),goalDescription);
-                goalDescription = null;
-                insertGoal(goal1);
-            }
-            else if (goal != null){
-                Toast.makeText(getApplicationContext(), "Existing goal entered", Toast.LENGTH_SHORT).show();
-
-                insertTrainingGoal(goal);
-            }
-        });
     }
     private void initializeTraining(){
         training = new Training();
@@ -274,13 +259,8 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     private void insertGoal(String goalDescription) {
-        this.goalDescription = goalDescription;
-        goalViewModel.getGoal(goalDescription);
-    }
-
-    private void insertTrainingGoal(Goal goal) {
-        TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
-        trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+        Goal goal = new Goal(UUID.randomUUID().toString(),goalDescription);
+        insertGoal(goal);
     }
 
     @Override

@@ -168,7 +168,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
             mChart.getDescription().setEnabled(false);
 
-            mChart.setMaxVisibleValueCount(40);
+           // mChart.setMaxVisibleValueCount(40);
 
             // scaling can now only be done on x- and y-axis separately
             mChart.setPinchZoom(false);
@@ -176,7 +176,9 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mChart.setDrawGridBackground(false);
             mChart.setDrawBarShadow(false);
 
-            mChart.setDrawValueAboveBar(false);
+
+           // mChart.setDrawValueAboveBar(false);
+
             mChart.setHighlightFullBarEnabled(false);
 
             // change the position of the y-labels
@@ -226,6 +228,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
                     mChart.getData().getDataSetCount() > 0) {
                 set1 = (BarDataSet) mChart.getData().getDataSetByIndex(0);
                 set1.setValues(values);
+                set1.setDrawValues(false);
                 mChart.getData().notifyDataChanged();
                 mChart.notifyDataSetChanged();
             } else {
@@ -237,6 +240,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
                 dataSets.add(set1);
 
                 BarData data = new BarData(dataSets);
+                data.setDrawValues(false);
                // data.setValueFormatter(new StackedValueFormatter(false, "", 1));
                // data.setValueTextColor(Color.WHITE);
 
