@@ -126,6 +126,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             xAxixFormatter = new DateAxisValueFormatter();
             xAxis.setValueFormatter(xAxixFormatter);
             xAxis.setDrawLabels(true);
+            xAxis.setLabelRotationAngle(-45);
         }
 
         YAxis yAxis;
