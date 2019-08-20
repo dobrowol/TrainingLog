@@ -54,6 +54,11 @@ public class TrainingRepository {
         return trainingDAO.findTrainingById(trainingId);
     }
 
+    public LiveData<List<Date>> getTrainingDates() {
+
+        return trainingDAO.getTrainingDates();
+    }
+
     private static class insertAsyncTask extends AsyncTask<Training, Void, Void> {
 
         private TrainingDAO mAsyncTaskDao;

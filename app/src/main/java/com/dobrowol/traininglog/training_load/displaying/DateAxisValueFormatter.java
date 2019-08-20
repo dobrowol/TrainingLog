@@ -5,17 +5,23 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 class DateAxisValueFormatter implements IAxisValueFormatter {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd:hh:mm", Locale.ENGLISH);
 
+    List<Date> dates;
     public DateAxisValueFormatter() {
         }
 
+        void setDates(List<Date> dates){
+            this.dates = dates;
+        }
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return sdf.format(new Date((long) value));
+        return sdf.format(dates.get((int)value));
     }
 }
 

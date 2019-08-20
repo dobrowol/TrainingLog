@@ -328,12 +328,15 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     @Override
     public void insertGoal(Goal goal) {
-        goalViewModel.insert(goal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                s -> {
-                TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goal.goalId);
+        goalViewModel.insert(goal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+
+        goalViewModel.goalByDescription.observe(this, goalFound -> {
+            if(goalFound != null){
+                TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goalFound.goalId);
                 trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
             }
-        );
+        });
+        goalViewModel.getGoal(goal.description);
     }
 
     @Override

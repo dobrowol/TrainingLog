@@ -89,7 +89,16 @@ public class TrainingGoalLoad {
             this.load = load;
         }
     }
-    public HashMap<String, List<DateLoad>> calculate(HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings) {
+    public HashMap<String, List<DateLoad>> calculateGoalLoadsForManyTrainings(List<TrainingGoalLoadData> trainingGoalLoadData) {
+        HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings = new HashMap<>();
+        for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData){
+            List<TrainingGoalLoadData> list = loadsByTrainings.get(trainingGoalLoadData1.trainingJoinId);
+            if(list == null){
+                list = new ArrayList<>();
+            }
+            list.add(trainingGoalLoadData1);
+            loadsByTrainings.put(trainingGoalLoadData1.trainingJoinId, list);
+        }
         HashMap<String, List<DateLoad>> goalLoads = new HashMap<>();
         for(List<TrainingGoalLoadData> entry : loadsByTrainings.values()){
             HashMap<String, Integer> loads = calculateGoalLoads(entry);

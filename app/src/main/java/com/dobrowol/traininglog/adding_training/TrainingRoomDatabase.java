@@ -25,7 +25,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinDAO;
 
 @Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class, Goal.class, TrainingGoalExerciseJoin.class,
-        TrainingGoalJoin.class, GoalExercise.class}, version = 22)
+        TrainingGoalJoin.class, GoalExercise.class}, version = 23)
 @TypeConverters({Converters.class})
 public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract ExerciseDescriptionDAO exerciseDescriptionDAO();

@@ -20,7 +20,8 @@ import static androidx.room.ForeignKey.CASCADE;
         parentColumns = "goalId",
         childColumns = "primaryGoalId",
         onDelete = CASCADE),
-        indices = {@Index(value = {"primaryGoalId"})})
+        indices = {@Index(value = {"primaryGoalId"}),
+        @Index(value = {"description"}, unique = true)})
 public class Goal implements Parcelable, Serializable {
     @PrimaryKey
     @NonNull
@@ -37,7 +38,7 @@ public class Goal implements Parcelable, Serializable {
     public Date endDate;
 
     public int hashCode(){
-        return goalId.hashCode();
+        return description.hashCode();
     }
     public boolean equals(Object object){
         if (this == object)

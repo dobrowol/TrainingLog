@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -31,5 +32,8 @@ public interface TrainingDAO {
 
     @Query("SELECT * FROM training_table WHERE id=:trainingId")
     LiveData<Training> findTrainingById(String trainingId);
+
+    @Query("SELECT date FROM training_table ORDER BY date")
+    LiveData<List<Date>> getTrainingDates();
 }
 

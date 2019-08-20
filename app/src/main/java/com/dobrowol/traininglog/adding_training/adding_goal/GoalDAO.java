@@ -21,7 +21,7 @@ public interface GoalDAO {
     @Query("SELECT * FROM goal_table WHERE description=:eDescription LIMIT 1")
     LiveData<Goal> getByDescription(String eDescription);
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Goal goal);
 
     @Delete

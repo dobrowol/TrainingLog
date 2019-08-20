@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.R;
 import com.dobrowol.traininglog.TrainingsApp;
+import com.dobrowol.traininglog.adding_training.TrainingViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.GoalViewModel;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExerciseJoinViewModel;
 import com.dobrowol.traininglog.holt_winters.HoltWinters;
@@ -41,12 +43,16 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
         OnChartValueSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -59,6 +65,9 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     private Integer numberOfGoals;
     private List<Integer> colors;
     private int currentColor;
+    private List<Date> dates;
+    private DateAxisValueFormatter xAxixFormatter;
+    private List<TrainingGoalLoadData> trainingGoalLoadData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +77,8 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         setContentView(R.layout.activity_linechart);
 
         setTitle("Training Load");
+        numberOfGoals=100;
+        generateColors();
         currentColor = 0;
         initializeObservers();
 
@@ -110,9 +121,11 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             xAxis = chart.getXAxis();
 
             // vertical grid lines
-            xAxis.enableGridDashedLine(10f, 10f, 0f);
+            //xAxis.enableGridDashedLine(10f, 10f, 0f);
 
-            xAxis.setValueFormatter(new DateAxisValueFormatter());
+            xAxixFormatter = new DateAxisValueFormatter();
+            xAxis.setValueFormatter(xAxixFormatter);
+            xAxis.setDrawLabels(true);
         }
 
         YAxis yAxis;
@@ -164,7 +177,9 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         }*/
 
         // draw points over time
-        chart.animateX(1500);
+        //chart.animateX(1500);
+
+        chart.invalidate();
 
         // getTrainingGoalExercise the legend (only possible after setting data)
         Legend l = chart.getLegend();
@@ -185,10 +200,13 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         }
     }
     private void initializeObservers() {
+        TrainingViewModel trainingViewModel;
+        trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
+        trainingViewModel.getTrainingDates().observe(this, this::setDates);
         TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
 
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
-        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setData);
+        trainingGoalExerciseJoinViewModel.getTrainingLoadData().observe(this, this::setTrainingGoalLoadData);
 
         trainingGoalExerciseJoinViewModel.getMaximumExerciseLoad().observe(this, maximumLoad -> {
             if (maximumLoad != null) {
@@ -203,6 +221,12 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         goalViewModel.getNumberOfGoals().observe(this, this::setNumberOfGoals);
     }
 
+    synchronized private void setDates(List<Date> date) {
+        this.dates = date;
+        xAxixFormatter.setDates(dates);
+        setData();
+    }
+
     private void setNumberOfGoals(Integer integer) {
         this.numberOfGoals = integer;
         generateColors();
@@ -212,7 +236,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         YAxis yAxis = chart.getAxisLeft();
 
         // axis range
-        yAxis.setAxisMaximum(maximumLoad);
+        yAxis.setAxisMaximum(maximumLoad + maximumLoad/10);
     }
 
     private void setAppBarTitle() {
@@ -243,25 +267,24 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
        finish();
        return true;
    }
-    private void setData(List<TrainingGoalLoadData> trainingGoalLoadData) {
-        TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
-        HashMap<String, List<TrainingGoalLoadData>> loadsByTrainings = new HashMap<>();
-        for(TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData){
-            List<TrainingGoalLoadData> list = loadsByTrainings.get(trainingGoalLoadData1.trainingJoinId);
-            if(list == null){
-                list = new ArrayList<>();
-            }
-            list.add(trainingGoalLoadData1);
-            loadsByTrainings.put(trainingGoalLoadData1.trainingJoinId, list);
-        }
-        HashMap<String, List<TrainingGoalLoad.DateLoad>> goalLoads;
-        goalLoads = trainingGoalLoad.calculate(loadsByTrainings);
-        setData(goalLoads);
+    private void setTrainingGoalLoadData(List<TrainingGoalLoadData> trainingGoalLoadData) {
+        this.trainingGoalLoadData =trainingGoalLoadData;
 
+        setData();
     }
 
-    private void setData(HashMap<String, List<TrainingGoalLoad.DateLoad>> goalLoads) {
+    synchronized private void setData() {
+
+        if(trainingGoalLoadData == null || dates ==null)
+            return;
+
+        TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
+
+        HashMap<String, List<TrainingGoalLoad.DateLoad>> goalLoads;
+        goalLoads = trainingGoalLoad.calculateGoalLoadsForManyTrainings(trainingGoalLoadData);
+
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        Set<Long> dateSet = new HashSet<>();
 
         for(String key : goalLoads.keySet()) {
             ArrayList<Entry> values = new ArrayList<>();
@@ -273,7 +296,11 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             if(dateLoads != null) {
                 for (TrainingGoalLoad.DateLoad dateLoad : dateLoads) {
                     if (dateLoad != null) {
-                        values.add(new Entry(dateLoad.date.getTime(), dateLoad.load));
+                        dateSet.add(dateLoad.date.getTime());
+                        if(dates == null){
+                            try{wait();}catch(Exception e){}
+                        }
+                        values.add(new Entry(dates.indexOf(dateLoad.date), dateLoad.load));
                     }
                 }
                 if (dateLoads.size() >= seasonLength) {
@@ -292,13 +319,14 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
             set1 = getLineDataSet(key, values, R.drawable.fade_red);
 
-            set1.setMode(set1.getMode() == LineDataSet.Mode.HORIZONTAL_BEZIER
+            /*set1.setMode(set1.getMode() == LineDataSet.Mode.HORIZONTAL_BEZIER
                     ? LineDataSet.Mode.LINEAR
-                    :  LineDataSet.Mode.HORIZONTAL_BEZIER);
+                    :  LineDataSet.Mode.HORIZONTAL_BEZIER);*/
+            set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             dataSets.add(set1); // add the data sets
 
             if (!forecastValues.isEmpty()) {
-                forecastSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
+                forecastSet = getLineDataSet("Forecast Load " + key, forecastEntries, R.drawable.fade_blue);
                 dataSets.add(forecastSet);
             }
             // create a data object with the data sets
@@ -308,55 +336,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         LineData data = new LineData(dataSets);
         chart.setData(data);
 
-    }
-
-    private void setData(List<Integer> integers, String load_name) {
-
-        ArrayList<Entry> values = new ArrayList<>();
-        ArrayList<Double> forecastValues = new ArrayList<>();
-        ArrayList<Entry> forecastEntries = new ArrayList<>();
-
-        int i = 0;
-        for (Integer integer : integers) {
-            if(integer!=null) {
-                values.add(new Entry(i++, integer));
-            }
-        }
-        if(integers.size() >= seasonLength){
-            holtWinters.setSeries(integers);
-            forecastValues = holtWinters.triple_exponential_smoothing(0.716, 0.029, 0.993, 12);
-            for (Double forecast :  forecastValues) {
-                if(forecast != null) {
-                    forecastEntries.add(new Entry(i++, forecast.floatValue()));
-                }
-            }
-        }
-        LineDataSet set1;
-        LineDataSet forecastSet;
-
-        if (chart.getData() != null &&
-                chart.getData().getDataSetCount() > 0) {
-            set1 = (LineDataSet) chart.getData().getDataSetByIndex(0);
-            set1.setValues(values);
-            set1.notifyDataSetChanged();
-            chart.getData().notifyDataChanged();
-            chart.notifyDataSetChanged();
-        } else {
-            set1 = getLineDataSet(load_name, values, R.drawable.fade_red);
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(set1); // add the data sets
-
-            if(!forecastValues.isEmpty()){
-                forecastSet = getLineDataSet("Forecast Load", forecastEntries, R.drawable.fade_blue);
-                dataSets.add(forecastSet);
-            }
-            // create a data object with the data sets
-            LineData data = new LineData(dataSets);
-
-            // set data
-            chart.setData(data);
-        }
+        chart.invalidate();
     }
 
     private LineDataSet getLineDataSet(String load_name, ArrayList<Entry> values, int set_colour) {
@@ -364,7 +344,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         set1 = new LineDataSet(values, load_name);
 
         // draw dashed line
-        //set1.enableDashedLine(10f, 5f, 0f);
+        set1.enableDashedLine(10f, 5f, 0f);
 
         // black lines and points
         set1.setColor(colors.get(currentColor));
@@ -386,20 +366,20 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         set1.setValueTextSize(9f);
 
         // draw selection line as dashed
-        set1.enableDashedHighlightLine(10f, 5f, 0f);
+        //set1.enableDashedHighlightLine(10f, 5f, 0f);
 
         // set the filled area
-        //set1.setDrawFilled(true);
-        //set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
+        set1.setDrawFilled(true);
+        set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
 
         // set color of filled area
-        /*if (Utils.getSDKInt() >= 18) {
+        if (Utils.getSDKInt() >= 18) {
             // drawables only supported on api level 18 and above
             Drawable drawable = ContextCompat.getDrawable(this, set_colour);
             set1.setFillDrawable(drawable);
         } else {
             set1.setFillColor(Color.BLACK);
-        }*/
+        }
         return set1;
     }
 
