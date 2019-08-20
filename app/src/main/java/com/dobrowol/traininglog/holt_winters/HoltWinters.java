@@ -69,8 +69,6 @@ public class HoltWinters {
             } else {
                 double val = series.get(i);
                 double last_smooth = smooth;
-                double smmoth1 = alpha * (val - seasonals.get(i % seasonLength));
-                double smooth2 = (1.0 - alpha) * (smooth + trend);
                 smooth = alpha * (val - seasonals.get(i % seasonLength)) + (1.0 - alpha) * (smooth + trend);
                 trend = beta * (smooth - last_smooth) + (1 - beta) * trend;
                 double seasonal = gamma * (val - smooth) + (1.0 - gamma) * seasonals.get(i % seasonLength);

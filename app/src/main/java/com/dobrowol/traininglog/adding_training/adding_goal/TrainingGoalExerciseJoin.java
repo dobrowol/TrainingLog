@@ -2,6 +2,7 @@ package com.dobrowol.traininglog.adding_training.adding_goal;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -12,7 +13,7 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(indices = {@Index(value = {"trainingJoinId", "goalId", "exerciseId"})},
+@Entity(
         tableName = "training_goal_exercise_join",
         foreignKeys = {
                 @ForeignKey(onDelete = CASCADE,
@@ -34,10 +35,13 @@ public class TrainingGoalExerciseJoin {
     @NonNull
     public String id;
     @NonNull
+    @ColumnInfo(index = true)
     public String trainingJoinId;
     @NonNull
+    @ColumnInfo(index = true)
     public String goalId;
     @NonNull
+    @ColumnInfo(index = true)
     public String exerciseId;
     public int order;
     public int exerciseLoad;

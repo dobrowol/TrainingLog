@@ -45,8 +45,8 @@ public class GoalExerciseJoinViewModel extends AndroidViewModel {
 
     private MutableLiveData<GoalExerciseIds> query2  = new MutableLiveData<>();
     public LiveData<GoalExercise> goalExerciseJoin= Transformations.switchMap(query2,
-            goalexerciseIds ->
-                    mRepository.getGoalExerciseJoin(goalexerciseIds.goalId, goalexerciseIds.exerciseId)
+            goalExerciseIds ->
+                    mRepository.getGoalExerciseJoin(goalExerciseIds.goalId, goalExerciseIds.exerciseId)
     );
 
     public void getGoalExerciseJoin( String goalId, String exerciseId){

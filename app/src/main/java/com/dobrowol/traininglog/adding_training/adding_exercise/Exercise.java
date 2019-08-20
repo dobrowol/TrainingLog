@@ -42,12 +42,12 @@ public class Exercise implements Serializable, Parcelable {
     public int loadValue;
     public Date startDate;
 
-    public Exercise(String id, int distance, Intensity intensity, String descritpionId, int numberOfRepetitionsInSet,
+    public Exercise(String id, int distance, Intensity intensity, String descriptionId, int numberOfRepetitionsInSet,
                     int numberOfSetsInSeries, Date startDate){
         this.id = id;
         this.distance = distance;
         this.intensity = intensity;
-        this.exerciseDescriptionId = descritpionId;
+        this.exerciseDescriptionId = descriptionId;
         this.numberOfRepetitionsInSet = numberOfRepetitionsInSet;
         this.numberOfSetsInSeries = numberOfSetsInSeries;
         this.startDate = startDate;

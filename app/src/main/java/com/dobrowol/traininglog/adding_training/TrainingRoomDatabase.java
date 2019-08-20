@@ -25,7 +25,7 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinDAO;
 
 @Database(entities = {ExerciseDescription.class, Exercise.class, Training.class, TrainingExerciseJoin.class, Goal.class, TrainingGoalExerciseJoin.class,
-        TrainingGoalJoin.class, GoalExercise.class}, version = 21)
+        TrainingGoalJoin.class, GoalExercise.class}, version = 22)
 @TypeConverters({Converters.class})
 public abstract class TrainingRoomDatabase extends RoomDatabase {
     public abstract ExerciseDescriptionDAO exerciseDescriptionDAO();
@@ -45,8 +45,8 @@ public abstract class TrainingRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             TrainingRoomDatabase.class, "training_database")
-                            //.fallbackToDestructiveMigration()
-                            .addMigrations(MIGRATION_20_21)
+                            .fallbackToDestructiveMigration()
+                            //.addMigrations(MIGRATION_20_21)
                             .build();
                 }
             }

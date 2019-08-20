@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
@@ -23,11 +24,13 @@ public class Training implements Serializable, Parcelable {
 
     public Date date;
 
+    @Ignore
     public Training(String id, Date date){
         this.id = id;
         this.date = date;
 
     }
+    @Ignore
     protected Training(Parcel in) {
         id = in.readString();
         date = (Date) in.readSerializable();

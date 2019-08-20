@@ -34,10 +34,10 @@ public class ExerciseLoad implements LoadCalculator<Training>{
         exercise.calculateLoad();
         if (trainings != null && trainings.size() > 0 ){
             long diffInMillies = Math.abs(trainings.get(0).date.getTime() - firstDateOfOccurrence.getTime());
-            long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            long daysFromFirstOccurrence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
             int neurologicalBoostPeriod = 21;
-            if (daysFromFirstOccurence <= neurologicalBoostPeriod){
+            if (daysFromFirstOccurrence <= neurologicalBoostPeriod){
                 exercise.neurologicalBoost();
             }
         }

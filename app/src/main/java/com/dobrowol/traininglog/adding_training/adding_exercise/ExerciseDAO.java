@@ -18,11 +18,8 @@ public interface ExerciseDAO {
     List<Exercise> loadAllByIds(int[] eIds);
 
 
-    @Query("SELECT * FROM exercise_description_table WHERE eid LIKE :exerciseDescriptionId LIMIT 1")
-    ExerciseDescription findExerciseDescriptonById( Integer exerciseDescriptionId);
-
     @Query("SELECT * FROM exercise_description_table WHERE description LIKE :exerciseDescription LIMIT 1")
-    LiveData<ExerciseDescription> findExerciseDescriptonByDescription( String exerciseDescription);
+    LiveData<ExerciseDescription> findExerciseDescriptionByDescription(String exerciseDescription);
 
     @Insert
     long insert(Exercise exercise);

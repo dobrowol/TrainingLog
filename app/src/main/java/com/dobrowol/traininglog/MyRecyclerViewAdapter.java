@@ -122,7 +122,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 }
             }
             if(ed != null) {
-                if(ed.eid == EMPTY_DESCRIPTION.eid){
+                if(ed.eid.equals(EMPTY_DESCRIPTION.eid)){
                     viewForeground.setBackgroundResource(R.drawable.edit_text_general_background);
                     viewForeground.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
                     descriptionText.setText(EMPTY_DESCRIPTION.description);
@@ -147,7 +147,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         @Override
         public void onClick(View v) {
             Exercise exercise = exerciseList.get(getAdapterPosition());
-            if(exercise.id == EMPTY_EXERCISE.id){
+            if(exercise.id.equals(EMPTY_EXERCISE.id)){
                 listener.addExercise();
             }
             else{

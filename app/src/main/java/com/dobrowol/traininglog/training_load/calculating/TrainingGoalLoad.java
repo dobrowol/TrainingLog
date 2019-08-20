@@ -63,11 +63,11 @@ public class TrainingGoalLoad {
         int exerciseLoad = 0;
         if(trainingGoalJoin.trainingId.equals(training.id) && trainingGoalJoin.goalId.equals(goalExercise.goalId)) {
             long diffInMillies = Math.abs(training.date.getTime() - exercise.startDate.getTime());
-            long daysFromFirstOccurence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            long daysFromFirstOccurrence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
             int neurologicalBoostPeriod = 21;
             int neurologicalBoost = 1;
-            if (daysFromFirstOccurence <= neurologicalBoostPeriod) {
+            if (daysFromFirstOccurrence <= neurologicalBoostPeriod) {
                 neurologicalBoost = 8;
             }
             exerciseLoad = exercise.loadValue * goalExercise.specificity * neurologicalBoost;

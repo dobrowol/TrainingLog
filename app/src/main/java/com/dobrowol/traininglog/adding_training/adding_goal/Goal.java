@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -18,7 +19,8 @@ import static androidx.room.ForeignKey.CASCADE;
         foreignKeys = @ForeignKey(entity = Goal.class,
         parentColumns = "goalId",
         childColumns = "primaryGoalId",
-        onDelete = CASCADE))
+        onDelete = CASCADE),
+        indices = {@Index(value = {"primaryGoalId"})})
 public class Goal implements Parcelable, Serializable {
     @PrimaryKey
     @NonNull

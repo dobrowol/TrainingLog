@@ -28,7 +28,7 @@ public class ExerciseRepository {
     }
 
     LiveData<ExerciseDescription> getExerciseDescription(String description) {
-        return mExerciseDao.findExerciseDescriptonByDescription(description);
+        return mExerciseDao.findExerciseDescriptionByDescription(description);
     }
 
     public Single<Long> insert (Exercise exercise) {
