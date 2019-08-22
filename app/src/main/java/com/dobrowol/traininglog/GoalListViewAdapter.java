@@ -1,7 +1,6 @@
 package com.dobrowol.traininglog;
 
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
