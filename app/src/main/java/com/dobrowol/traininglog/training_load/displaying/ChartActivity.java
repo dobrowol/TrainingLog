@@ -196,6 +196,9 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     void generateColors() {
         colors = new ArrayList<>();
         Random rnd = new Random();
+        if(numberOfGoals == null || numberOfGoals == 0){
+            numberOfGoals = 100;
+        }
         for (int i = 0; i < 360; i += 360 / numberOfGoals) {
             colors.add(Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
         }
