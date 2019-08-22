@@ -298,9 +298,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
                 for (TrainingGoalLoad.DateLoad dateLoad : dateLoads) {
                     if (dateLoad != null) {
                         dateSet.add(dateLoad.date.getTime());
-                        if(dates == null){
-                            try{wait();}catch(Exception e){}
-                        }
                         values.add(new Entry(dates.indexOf(dateLoad.date), dateLoad.load));
                     }
                 }
@@ -345,11 +342,11 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         set1 = new LineDataSet(values, load_name);
 
         // draw dashed line
-        set1.enableDashedLine(10f, 5f, 0f);
+        //set1.enableDashedLine(10f, 5f, 0f);
 
         // black lines and points
         set1.setColor(colors.get(currentColor));
-        set1.setCircleColor(colors.get(currentColor++));
+        set1.setCircleColor(colors.get(currentColor));
 
         // line thickness and point size
         set1.setLineWidth(1f);
@@ -360,7 +357,7 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
 
         // customize legend entry
         set1.setFormLineWidth(1f);
-        set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
+        //set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
         set1.setFormSize(15.f);
 
         // text size of values
@@ -373,14 +370,16 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         set1.setDrawFilled(true);
         set1.setFillFormatter((dataSet, dataProvider) -> chart.getAxisLeft().getAxisMinimum());
 
+        set1.setFillColor(colors.get(currentColor));
         // set color of filled area
-        if (Utils.getSDKInt() >= 18) {
+        /*if (Utils.getSDKInt() >= 18) {
             // drawables only supported on api level 18 and above
             Drawable drawable = ContextCompat.getDrawable(this, set_colour);
             set1.setFillDrawable(drawable);
         } else {
-            set1.setFillColor(Color.BLACK);
-        }
+
+        }*/
+        currentColor++;
         return set1;
     }
 
