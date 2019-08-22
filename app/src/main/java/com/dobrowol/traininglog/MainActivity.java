@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
             }
         }
-        textView.setOnClickListener(v -> DateTimeActivity.startInstance(getApplicationContext(), training));
+        textView.setOnClickListener(v -> DateTimeActivity.startInstance(MainActivity.this, training));
     }
 
     @Override

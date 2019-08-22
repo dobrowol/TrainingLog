@@ -269,7 +269,7 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
                 if (distance.getText().toString().isEmpty()){errorMessage = "distance cannot be empty";distance.setBackgroundResource(R.drawable.edit_text_error_background);}
                 if (numberOfRepetitions.getText().toString().isEmpty()){errorMessage = "number of repetitions cannot be empty";numberOfRepetitions.setBackgroundResource(R.drawable.edit_text_error_background);}
                 if (description.getText().toString().isEmpty()){errorMessage = "description cannot be empty";description.setBackgroundResource(R.drawable.edit_text_error_background);}
-                if (isNumberInvalid(intensity, 1, 5)){errorMessage = "intensity should be from 1 to 5";intensity.setBackgroundResource(R.drawable.edit_text_error_background);}
+                if (isNumberInvalid(intensity, 1, 20)){errorMessage = "intensity should be from 1 to 20";intensity.setBackgroundResource(R.drawable.edit_text_error_background);}
                 if (isNumberInvalid(specificity, 1, 5)){errorMessage = "specificity should be from 1 to 5";specificity.setBackgroundResource(R.drawable.edit_text_error_background);}
 
                 Toast.makeText(this, errorMessage,Toast.LENGTH_SHORT).show();
@@ -301,6 +301,15 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     private void addExercise() {
         int numOfSets = getNumber(numberOfSets);
 
+        if(exerciseDescriptionId == null || exerciseDescriptionId.equals("")){
+            if(!description.getText().toString().equals("")){
+                ExerciseDescription exerciseDescription = new ExerciseDescription();
+                exerciseDescription.description = description.getText().toString();
+                exerciseDescription.eid = UUID.randomUUID().toString();
+                exerciseDescriptionId = exerciseDescription.eid;
+                exerciseDescriptionViewModel.insert(exerciseDescription);
+            }
+        }
         exercise = new Exercise(UUID.randomUUID().toString(), getNumber(distance), Intensity.values()[getNumber(intensity)-1], exerciseDescriptionId,
                 getNumber(numberOfRepetitions), numOfSets, new Date());
         exercise.calculateLoad();
