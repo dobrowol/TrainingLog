@@ -365,6 +365,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void onItemClick(Exercise item) {
+            AddExercise.startNewInstance(context, training, goal, item);
         }
 
         @Override

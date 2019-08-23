@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
@@ -85,10 +84,8 @@ public class AddExercise extends AppCompatActivity implements View.OnClickListen
     public static final String TRAINING = "training";
     public static final String GOAL = "goal";
     private static final String EXERCISE = "exercise";
-    public static int CREATE_EXERCISE=1;
     Button btnSubmit, btnAddDescription;
     EditText distance, numberOfRepetitions, numberOfSets, intensity;
-    TextView result;
     AutoCompleteTextView description;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;

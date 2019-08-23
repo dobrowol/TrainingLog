@@ -1,7 +1,5 @@
 package com.dobrowol.traininglog;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 
@@ -21,12 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import androidx.lifecycle.Observer;
@@ -34,7 +29,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.dobrowol.traininglog.adding_training.TrainingExerciseJoinViewModel;
 import com.dobrowol.traininglog.adding_training.adding_exercise.AddExercise;
-import com.dobrowol.traininglog.adding_training.adding_exercise.Converters;
 import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 import com.dobrowol.traininglog.adding_training.adding_exercise.ExerciseDescriptionViewModel;
 import com.dobrowol.traininglog.adding_training.Training;
@@ -46,11 +40,8 @@ import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalExercise
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoin;
 import com.dobrowol.traininglog.adding_training.adding_goal.TrainingGoalJoinViewModel;
 import com.dobrowol.traininglog.new_training.DateTimeActivity;
-import com.dobrowol.traininglog.training_load.calculating.TrainingGoalLoad;
-import com.dobrowol.traininglog.training_load.displaying.ChartActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,18 +54,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class MainActivity extends AppCompatActivity implements  View.OnClickListener, TimePickerDialog.OnTimeSetListener,
-        DatePickerDialog.OnDateSetListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements  View.OnClickListener, Observer<List<Exercise>>, GoalListViewAdapter.OnItemClickListener {
 
     public static final String TRAINING = "training";
-    public static final String NUMBER_OF_EXERCISES = "number_of_exercises";
-    public static final String EXERCISE_TYPE = "exercise_type";
     private RecyclerView goalRecyclerView;
 
     private GoalListViewAdapter generalAdapter;
 
-    private TextView dateTxt;
-    private TextView timeTxt;
     ArrayList<Exercise> exerciseList;
     private TrainingViewModel trainingViewModel;
     private GoalViewModel goalViewModel;
@@ -82,11 +68,8 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
     private Training training;
-    private int numberOfExercises;
     private ExerciseDescriptionViewModel exerciseDescriptionViewModel;
     private ExerciseViewModel exerciseViewModel;
-    private TextView generalTextView;
-    private static int oneColumn = 1;
     private ActionMode actionMode;
     private Goal editedGoal;
     private FloatingActionButton fab_add_goal;
@@ -189,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         training.date = new Date();
         training.id = UUID.randomUUID().toString();
 
-        numberOfExercises = 0;
-
         trainingViewModel.insert(training);
     }
 
@@ -281,38 +262,10 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
     }
 
-
-    @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        String time = String.format(Locale.ENGLISH,"%02d:%02d", hourOfDay, minute);
-        timeTxt.setText(time);
-        updateTrainingDate();
-    }
-
-    private void updateTrainingDate() {
-        String date = dateTxt.getText().toString() +" "+ timeTxt.getText().toString();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Converters.DATE_FORMAT + " " + Converters.TIME_FORMAT, Locale.ENGLISH);
-        try {
-            training.date = simpleDateFormat.parse(date);
-            trainingViewModel.update(training);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        String date = String.format(Locale.ENGLISH,"%04d-%02d-%02d", year, month, dayOfMonth);
-        dateTxt.setText(date);
-        updateTrainingDate();
-    }
-
     @Override
     public void onChanged(List<Exercise> exercises) {
         if (exercises != null) {
             ArrayList<Exercise> array = new ArrayList<>(exercises);
-            numberOfExercises = array.size();
             setExercises(array);
         }
     }
