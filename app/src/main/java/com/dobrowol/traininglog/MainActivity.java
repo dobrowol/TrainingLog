@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     private void insertGoal(String goalDescription) {
-        if(goalDescription != null && goalDescription != "") {
+        if(goalDescription != null && !goalDescription.equals("")) {
             Goal goal = new Goal(UUID.randomUUID().toString(), goalDescription);
             insertGoal(goal);
         }
