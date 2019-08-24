@@ -23,7 +23,9 @@
         </activity>
         <activity android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".TrainingsApp" />
         </activity>
         <activity android:name=".adding_training.adding_exercise.AddExercise" android:theme="@style/Theme.AppCompat">
 

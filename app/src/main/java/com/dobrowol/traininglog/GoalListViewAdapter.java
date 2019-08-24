@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapter.CustomViewHolder> {
 
@@ -119,9 +118,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
     }
 
-    ArrayList<Goal> getGoals(){
-        return goals;
-    }
     @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -316,7 +312,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
                 trainingDetailEnterState.discardStatus();
             }
             trainingDetailEnterState = newState;
-            trainingDetailEnterState.start();
+            if(trainingDetailEnterState != null)
+                trainingDetailEnterState.start();
         }
 
         private void enableActionMode(View v, String text) {

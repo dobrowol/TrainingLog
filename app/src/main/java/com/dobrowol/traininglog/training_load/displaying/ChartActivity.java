@@ -256,16 +256,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
-        return true;
-    }
    @Override
    public boolean onNavigateUp() {
        finish();
@@ -396,12 +386,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.viewGithub: {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/LineChartActivity1.java"));
-                startActivity(i);
-                break;
-            }
             case R.id.actionToggleValues: {
                 List<ILineDataSet> sets = chart.getData()
                         .getDataSets();

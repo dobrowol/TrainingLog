@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
 
@@ -133,12 +134,30 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
                 training = (Training) savedInstanceState.getSerializable(TRAINING);
             }
             if(training == null) {
-                initializeTraining();
+                SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                if (sharedPref.contains(TRAINING))
+                {
+                    String trainingId = "";
+                    trainingId = sharedPref.getString(TRAINING, trainingId);
+                    trainingViewModel.getTraining(trainingId).observe(this, training1 -> {
+                        if(training1 != null){
+                            training = training1;
+                            generalAdapter.setTraining(training);
+                            initializeObservers();
+                            setAppBarTitle();
+                        }
+                    });
+                }
+                else{
+                    initializeTraining();
+                }
             }
         }
-        generalAdapter.setTraining(training);
-        initializeObservers();
-        setAppBarTitle();
+        if(training != null) {
+            generalAdapter.setTraining(training);
+            initializeObservers();
+            setAppBarTitle();
+        }
         exerciseList = new ArrayList<>();
         editedGoal = null;
     }
@@ -197,11 +216,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-    @Override
     public void onClick(View view) {
         if(view.getId() == R.id.fab_add_goal)
                 showAlert(getString(R.string.add_goal));
@@ -253,18 +267,23 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable(TRAINING, training);
         super.onSaveInstanceState(outState);
-        outState.putString(TRAINING, training.id);
+
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(TRAINING, training.id);
+        editor.apply();
+        super.onPause();
     }
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), TrainingsApp.class));
     }
 
     @Override

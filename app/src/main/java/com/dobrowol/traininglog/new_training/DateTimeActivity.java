@@ -73,7 +73,7 @@ public class DateTimeActivity extends AppCompatActivity implements View.OnClickL
             }
         }
     }
-    @Override
+    /*@Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
@@ -81,7 +81,7 @@ public class DateTimeActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onBackPressed() {
         MainActivity.startNewInstance(getApplicationContext(), training);
-    }
+    }*/
 
     private void setDateAndTime() {
         if(training != null){
@@ -113,7 +113,7 @@ public class DateTimeActivity extends AppCompatActivity implements View.OnClickL
                 training.date = calendar.getTime();
                 trainingViewModel.update(training);
 
-                MainActivity.startNewInstance(getApplicationContext(), training);
+                finish();
         }
     }
 

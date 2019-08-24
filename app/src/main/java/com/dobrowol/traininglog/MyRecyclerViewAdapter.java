@@ -25,25 +25,13 @@ import java.util.Locale;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.CustomViewHolder> {
 
-    final static Exercise EMPTY_EXERCISE = new Exercise();
-    final static ExerciseDescription EMPTY_DESCRIPTION= new ExerciseDescription();
-    void removeItem(int adapterPosition) {
+    private final static Exercise EMPTY_EXERCISE = new Exercise();
+    private final static ExerciseDescription EMPTY_DESCRIPTION= new ExerciseDescription();
+
+    void removeItemTemporarily(int adapterPosition) {
         exerciseList.remove(adapterPosition);
         notifyDataSetChanged();
     }
-
-    void restoreItem(Exercise deletedItem, int deletedIndex) {
-        exerciseList.add(deletedIndex, deletedItem);
-        notifyDataSetChanged();
-    }
-
-    public void removeItemTemporarily(int adapterPosition) {
-        exerciseList.remove(adapterPosition);
-        notifyDataSetChanged();
-    }
-     public void removeItemPermanently(int adapterPosition){
-
-     }
 
     public interface OnItemClickListener {
         void onItemClick(Exercise item);
@@ -70,14 +58,17 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     void setExerciseList(List<Exercise> exerciseList){
         if(this.exerciseList != null) {
             this.exerciseList.clear();
+            this.exerciseList = exerciseList;
+            this.exerciseList.add(EMPTY_EXERCISE);
         }
-        this.exerciseList = exerciseList;
-        this.exerciseList.add(EMPTY_EXERCISE);
+
     }
 
     void setExerciseDescriptionList(List<ExerciseDescription> exerciseList){
-        this.exerciseDescriptionList = exerciseList;
-        this.exerciseDescriptionList.add(EMPTY_DESCRIPTION);
+        if(exerciseList != null) {
+            this.exerciseDescriptionList = exerciseList;
+            this.exerciseDescriptionList.add(EMPTY_DESCRIPTION);
+        }
     }
 
     List<Exercise> getExerciseList(){
@@ -132,8 +123,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
                 }
                 else {
                     viewForeground.setBackgroundColor(Color.WHITE);
-                    viewForeground.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-                    descriptionText.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                    viewForeground.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+                    descriptionText.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
                     descriptionText.setBackgroundColor(Color.WHITE);
                     descriptionText.setTextColor(Color.BLACK);
                     descriptionText.setText(String.format(Locale.ENGLISH, "%dx( %d x %dm) %s",
