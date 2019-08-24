@@ -217,6 +217,11 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         exerciseViewModel.delete(adapterPosition);
     }
 
+    @Override
+    public void onUpdateGoal(Goal oldGoal) {
+        editedGoal = oldGoal;
+    }
+
     public void showAlert(String text){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle("GOAL");

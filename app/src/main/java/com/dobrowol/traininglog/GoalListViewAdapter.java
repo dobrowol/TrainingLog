@@ -63,6 +63,8 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         void deleteGoal(Goal oldGoal);
 
         void removeExercise(Exercise adapterPosition);
+
+        void onUpdateGoal(Goal oldGoal);
     }
 
     GoalListViewAdapter(OnItemClickListener listener, Context context) {
@@ -149,85 +151,74 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
     private interface TrainingDetailEnterState{
         void saveStatus(String name);
         void discardStatus();
+        void start();
     }
 
-    private class NewGoalEnterState implements TrainingDetailEnterState {
-       OnItemClickListener listener;
-       View view;
 
-       // EditText descriptionEditText;
-
-       NewGoalEnterState(View view, OnItemClickListener listener) {
-           this.listener = listener;
-           this.view = view;
-       }
-       @Override
-       public void saveStatus(String name) {
-
-           if (name != null && name.compareTo("") != 0) {
-               Goal goal = new Goal(UUID.randomUUID().toString(), name);
-               goal.goalStartDate = new Date();
-               listener.insertGoal(goal);
-           }
-       }
-
-       @Override
-       public void discardStatus() {
-       }
-   }
-       private class ExistingGoalUpdateState implements TrainingDetailEnterState{
-           OnItemClickListener listener;
-           View view;
-           Goal oldGoal;
-           TextView descriptionText;
-
-           ExistingGoalUpdateState(View view, OnItemClickListener listener){
-               this.listener = listener;
-               this.view = view;
-               descriptionText = view.findViewById(R.id.goalTextView);
-               oldGoal = new Goal(null, descriptionText.getText().toString());
-           }
-
-           @Override
-           public void saveStatus(String name) {
-
-              if (name != null && name.compareTo("")!=0) {
-                  Goal newGoal = new Goal(null, name);
-                  listener.updateGoal(newGoal);
-
-                  descriptionText.setText(name);
-               }
-           }
-
-           @Override
-           public void discardStatus() {
-           }
-    }
-    private class DeleteGoalState implements TrainingDetailEnterState{
-        OnItemClickListener listener;
-        View view;
-        Goal oldGoal;
-        TextView descriptionText;
-
-        DeleteGoalState(View view, OnItemClickListener listener, Goal goal) {
-            this.listener = listener;
-            this.view = view;
-            descriptionText = view.findViewById(R.id.goalTextView);
-            oldGoal = goal;
-        }
-
-        @Override
-        public void saveStatus(String name) {
-            listener.deleteGoal(oldGoal);
-        }
-
-        @Override
-        public void discardStatus() {
-        }
-    }
 
     class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener, MyRecyclerViewAdapter.OnItemClickListener {
 
+        private class ExistingGoalUpdateState implements TrainingDetailEnterState{
+            OnItemClickListener listener;
+            View view;
+            Goal oldGoal;
+            TextView descriptionText;
+
+            ExistingGoalUpdateState(Goal goal, View view, OnItemClickListener listener){
+                this.listener = listener;
+                this.view = view;
+                descriptionText = view.findViewById(R.id.goalTextView);
+                oldGoal = goal;
+            }
+
+            @Override
+            public void start(){
+                listener.onUpdateGoal(oldGoal);
+                showAlert(context.getString(R.string.edit_goal));
+
+            }
+            @Override
+            public void saveStatus(String name) {
+
+                if (name != null && name.compareTo("")!=0) {
+                    Goal newGoal = new Goal(null, name);
+                    listener.updateGoal(newGoal);
+
+                    descriptionText.setText(name);
+                }
+            }
+
+            @Override
+            public void discardStatus() {
+            }
+        }
+        private class DeleteGoalState implements TrainingDetailEnterState{
+            OnItemClickListener listener;
+            View view;
+            Goal oldGoal;
+            TextView descriptionText;
+
+            DeleteGoalState(View view, OnItemClickListener listener, Goal goal) {
+                this.listener = listener;
+                this.view = view;
+                descriptionText = view.findViewById(R.id.goalTextView);
+                oldGoal = goal;
+            }
+
+            @Override
+            public void start(){
+                enableActionMode(view,context.getString(R.string.delete_goal));
+            }
+            @Override
+            public void saveStatus(String name) {
+                listener.deleteGoal(oldGoal);
+            }
+
+            @Override
+            public void discardStatus() {
+                disableActionMode();
+            }
+        }
         TextView descriptionText;
         RecyclerView exercisesRecyclerView;
         OnItemClickListener listener;
@@ -237,7 +228,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         Context context;
 
         TrainingDetailEnterState trainingDetailEnterState;
-        NewGoalEnterState newGoalEnterState;
         ExistingGoalUpdateState existingGoalUpdateState;
         DeleteGoalState deleteGoalState;
         private ActionMode actionMode;
@@ -261,8 +251,6 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             });
             descriptionText.setOnClickListener(this);
             trainingDetailEnterState = null;
-            newGoalEnterState = new NewGoalEnterState(view, listener);
-            existingGoalUpdateState = new ExistingGoalUpdateState(view, listener);
             exercisesRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false));
 
             exerciseAdapter = new MyRecyclerViewAdapter(this, context);
@@ -281,6 +269,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             this.exercises = exercises;
             descriptionText.setText(goal.description);
             deleteGoalState = new DeleteGoalState(view, listener, this.goal);
+            existingGoalUpdateState = new ExistingGoalUpdateState(goal, view, listener);
             exerciseAdapter.setExerciseList(exercises);
             exerciseAdapter.notifyDataSetChanged();
         }
@@ -316,18 +305,18 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
             switch (v.getId()) {
                 case R.id.goalTextView:
                     setState(existingGoalUpdateState);
-                    showAlert(context.getString(R.string.edit_goal));
                     break;
                 case R.id.exercises_rv:
                     listener.onItemClick(training, goal);
                     break;
             }
         }
-        private void setState(TrainingDetailEnterState newGoalEnterState) {
+        private void setState(TrainingDetailEnterState newState) {
             if (trainingDetailEnterState != null) {
                 trainingDetailEnterState.discardStatus();
             }
-            trainingDetailEnterState = newGoalEnterState;
+            trainingDetailEnterState = newState;
+            trainingDetailEnterState.start();
         }
 
         private void enableActionMode(View v, String text) {
@@ -357,8 +346,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         @Override
         public boolean onLongClick(View v) {
             if (v.getId() == R.id.goalTextView){
-                    enableActionMode(v,context.getString(R.string.delete_goal));
-                    trainingDetailEnterState = deleteGoalState;
+                    setState(deleteGoalState);
             }
             return true;
         }
