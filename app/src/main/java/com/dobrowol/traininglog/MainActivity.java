@@ -134,23 +134,8 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
                 training = (Training) savedInstanceState.getSerializable(TRAINING);
             }
             if(training == null) {
-                SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-                if (sharedPref.contains(TRAINING))
-                {
-                    String trainingId = "";
-                    trainingId = sharedPref.getString(TRAINING, trainingId);
-                    trainingViewModel.getTraining(trainingId).observe(this, training1 -> {
-                        if(training1 != null){
-                            training = training1;
-                            generalAdapter.setTraining(training);
-                            initializeObservers();
-                            setAppBarTitle();
-                        }
-                    });
-                }
-                else{
                     initializeTraining();
-                }
+
             }
         }
         if(training != null) {
@@ -272,15 +257,26 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     }
 
-    @Override
+   /* @Override
+    protected void onNewIntent(Intent intent) {
+
+        super.onNewIntent(intent);
+        if(intent != null) {
+            if (intent.hasExtra(MainActivity.TRAINING)) {
+                training = (Training) Objects.requireNonNull(intent.getExtras()).getSerializable(MainActivity.TRAINING);
+            }
+        }
+        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
+        trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
+    }*/
+    /*@Override
     public void onPause() {
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(TRAINING, training.id);
         editor.apply();
         super.onPause();
-    }
-
+    }*/
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 

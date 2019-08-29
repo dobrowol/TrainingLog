@@ -111,7 +111,7 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
 
     @Override
     public void onListFragmentInteraction(Training item) {
-        MainActivity.startNewInstance(getApplicationContext(), item);
+        MainActivity.startNewInstance(this, item);
     }
 
     @Override
@@ -123,6 +123,7 @@ public class TrainingsApp extends AppCompatActivity implements Observer<List<Tra
     public void onClick(View v) {
         if(v.getId() == R.id.fab_add_training){
                 Intent intent = new Intent(this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
         }
     }

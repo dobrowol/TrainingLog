@@ -228,6 +228,8 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
     synchronized private void setDates(List<Date> date) {
         this.dates = date;
         xAxixFormatter.setDates(dates);
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setLabelCount(dates.size());
         setData();
     }
 
@@ -263,7 +265,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
    }
     private void setTrainingGoalLoadData(List<TrainingGoalLoadData> trainingGoalLoadData) {
         this.trainingGoalLoadData =trainingGoalLoadData;
-
         setData();
     }
 
@@ -306,7 +307,6 @@ public class ChartActivity extends AppCompatActivity implements SeekBar.OnSeekBa
             }
             LineDataSet set1;
             LineDataSet forecastSet;
-
 
             set1 = getLineDataSet(key, values, R.drawable.fade_red);
 
