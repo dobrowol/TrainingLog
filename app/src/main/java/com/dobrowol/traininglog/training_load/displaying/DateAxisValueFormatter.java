@@ -21,7 +21,10 @@ class DateAxisValueFormatter implements IAxisValueFormatter {
         }
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
+        if(value >=0)
         return sdf.format(dates.get((int)value));
+
+        return "";
     }
 }
 

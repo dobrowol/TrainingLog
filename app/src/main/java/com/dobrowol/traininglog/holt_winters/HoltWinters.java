@@ -90,6 +90,11 @@ public class HoltWinters {
     }
 
     public void setDateLoadSeries(List<TrainingGoalLoad.DateLoad> dateLoads) {
+        for(TrainingGoalLoad.DateLoad integer : dateLoads){
+            if(integer != null) {
+                series.add(Double.valueOf(integer.load));
+            }
+        }
 
     }
 }

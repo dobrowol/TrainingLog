@@ -47,7 +47,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     private List<TrainingGoalExerciseData> trainingGoalExerciseData;
     private Integer maximumLoad;
     private Integer numberOfExercises;
-    private HashMap<String, List<TrainingGoalLoadData>> trainingGoalLoadData;
+    private ArrayList<ArrayList<Integer>> listOfLoads;
 
     void setMaximumLoad(int maximumLoad) {
         this.maximumLoad = maximumLoad;
@@ -55,7 +55,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
 
     AllTrainingRecyclerViewAdapter(OnListFragmentInteractionListener trainingsApp) {
         this.mListener = trainingsApp;
-        trainingGoalLoadData = new HashMap<>();
+        listOfLoads = new ArrayList<>();
     }
     void setTrainings(List<Training> trainings){
         this.trainings = trainings;
@@ -80,18 +80,13 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     }
 
     public void setTrainingLoads(List<TrainingGoalLoadData> trainingGoalLoadData) {
-        if(trainingGoalLoadData != null) {
-            for (TrainingGoalLoadData trainingGoalLoadData1 : trainingGoalLoadData) {
-                List<TrainingGoalLoadData> list = this.trainingGoalLoadData.get(trainingGoalLoadData1.trainingJoinId);
 
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
-                list.add(trainingGoalLoadData1);
-                this.trainingGoalLoadData.put(trainingGoalLoadData1.trainingJoinId, list);
-            }
-        }
     }
+
+    public void setListOfLoads(ArrayList<ArrayList<Integer>> listOfLoads) {
+        this.listOfLoads = listOfLoads;
+    }
+
 
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
@@ -112,27 +107,9 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.mItem = trainings.get(position);
-        List<Integer> loads = new ArrayList<>();
-        if(trainingGoalJoins != null) {
-            for (TrainingGoalJoin trainingGoalJoin : trainingGoalJoins) {
-                if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
-                    loads.add(trainingGoalJoin.load);
-                }
-            }
-        }
-        if(trainingGoalExerciseData != null) {
-            for (TrainingGoalExerciseData trainingGoalJoin : trainingGoalExerciseData) {
-                if (trainingGoalJoin.trainingId.equals(holder.mItem.id)) {
-                    loads.add(trainingGoalJoin.goalLoad);
-                }
-            }
-        }
-        if(trainingGoalLoadData != null && !trainingGoalLoadData.isEmpty()){
-            TrainingGoalLoad trainingGoalLoad = new TrainingGoalLoad();
-            loads = trainingGoalLoad.calculate(trainingGoalLoadData.get(holder.mItem.id));
-        }
 
-        holder.mLoads = loads;
+        if ( position < listOfLoads.size())
+            holder.mLoads = listOfLoads.get(position);
         holder.setDate(holder.mItem.date);
 
         holder.setDataChart(holder.mItem, holder.mLoads);
@@ -185,13 +162,7 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             YAxis leftAxis = mChart.getAxisLeft();
             leftAxis.setValueFormatter(new MyValueFormatter("K"));
             leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-            if(maximumLoad == null || numberOfExercises == null)
-            {
-                leftAxis.setAxisMaximum(0.0f);
-            }
-            else {
-                leftAxis.setAxisMaximum(maximumLoad * numberOfExercises);
-            }
+
             mChart.getAxisRight().setEnabled(false);
             mChart.getAxisLeft().setEnabled(false);
 
@@ -199,6 +170,11 @@ public class AllTrainingRecyclerViewAdapter extends RecyclerView.Adapter<AllTrai
             mChart.getLegend().setEnabled(false);
         }
 
+        public void setAxisMaximum(int maximum){
+            YAxis leftAxis = mChart.getAxisLeft();
+            leftAxis.setAxisMaximum(maximum);
+
+        }
         public void setDate(Date date){
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMM, dd", Locale.ENGLISH);
             String formatted = sdf.format(date);

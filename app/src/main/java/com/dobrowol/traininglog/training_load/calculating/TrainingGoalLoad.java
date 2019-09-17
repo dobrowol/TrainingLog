@@ -26,11 +26,11 @@ public class TrainingGoalLoad {
 
     }
 
-    public ArrayList<Integer> calculate(List<TrainingGoalLoadData> trainingGoalLoadData){
+    public HashMap<String, Integer> calculate(List<TrainingGoalLoadData> trainingGoalLoadData){
         HashMap<String, Integer> goalLoads = calculateGoalLoads(trainingGoalLoadData);
         if(goalLoads == null)
             return null;
-        return new ArrayList<>(goalLoads.values());
+        return goalLoads;
     }
 
     private HashMap<String, Integer> calculateGoalLoads(List<TrainingGoalLoadData> trainingGoalLoadData) {
@@ -58,27 +58,6 @@ public class TrainingGoalLoad {
         return goalLoads;
     }
 
-    public int update(TrainingGoalJoin trainingGoalJoin,
-                      TrainingGoalJoinViewModel trainingGoalJoinViewModel, Exercise exercise, GoalExercise goalExercise, Training training){
-        int exerciseLoad = 0;
-        if(trainingGoalJoin.trainingId.equals(training.id) && trainingGoalJoin.goalId.equals(goalExercise.goalId)) {
-            long diffInMillies = Math.abs(training.date.getTime() - exercise.startDate.getTime());
-            long daysFromFirstOccurrence = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-            int neurologicalBoostPeriod = 21;
-            int neurologicalBoost = 1;
-            if (daysFromFirstOccurrence <= neurologicalBoostPeriod) {
-                neurologicalBoost = 8;
-            }
-            exerciseLoad = exercise.loadValue * goalExercise.specificity * neurologicalBoost;
-        }
-        trainingGoalJoin.load += exerciseLoad;
-
-        trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                s -> {
-                });
-        return exerciseLoad;
-    }
 
     public class DateLoad{
         public Date date;

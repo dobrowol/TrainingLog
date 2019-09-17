@@ -22,12 +22,19 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         return mRepository.getAllTrainingGoals();
     }
 
+    public LiveData<List<TrainingGoalJoin>> getAllGroupedByGoal(){
+        return mRepository.getAllGroupedByGoal();
+    }
     public void update(TrainingGoalJoin trainingGoalJoin) {
         mRepository.update(trainingGoalJoin);
     }
 
     public void getAllTrainingGoalJoinsForTraining(String id) {
         query2.setValue(id);
+    }
+
+    public void deleteGoal(String trainingId, String goalId) {
+        mRepository.deleteGoal(trainingId, goalId);
     }
 
     private class TrainingGoal{
@@ -61,7 +68,7 @@ public class TrainingGoalJoinViewModel extends AndroidViewModel {
         super(application);
         mRepository = new TrainingGoalJoinRepository(application);
     }
-    public Single<Long> insert(TrainingGoalJoin trainingGoalJoin) { return mRepository.insert(trainingGoalJoin); }
+    public void insert(TrainingGoalJoin trainingGoalJoin) { mRepository.insert(trainingGoalJoin); }
 
     private MutableLiveData<String> query2 = new MutableLiveData<>();
     public LiveData<List<TrainingGoalJoin>> trainingGoalsForTrainingId = Transformations.switchMap(query2,

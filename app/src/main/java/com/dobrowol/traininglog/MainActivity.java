@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     ArrayList<Exercise> exerciseList;
     private TrainingViewModel trainingViewModel;
     private GoalViewModel goalViewModel;
-    private TrainingExerciseJoinViewModel trainingExerciseJoinViewModel;
     private TrainingGoalExerciseJoinViewModel trainingGoalExerciseJoinViewModel;
     private TrainingGoalJoinViewModel trainingGoalJoinViewModel;
     private Training training;
@@ -95,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
         trainingViewModel = ViewModelProviders.of(this).get(TrainingViewModel.class);
         goalViewModel = ViewModelProviders.of(this).get(GoalViewModel.class);
-        trainingExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingExerciseJoinViewModel.class);
         trainingGoalExerciseJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalExerciseJoinViewModel.class);
 
         trainingGoalJoinViewModel = ViewModelProviders.of(this).get(TrainingGoalJoinViewModel.class);
@@ -148,16 +146,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     }
 
     private void initializeObservers(){
-        trainingExerciseJoinViewModel.trainingExercises.observe(this,this);
-
-        trainingGoalJoinViewModel.goalsForTraining.observe(this, goals -> {
-            if (goals != null) {
-                // Update the cached copy of the exercises in the adapter.
-                ArrayList<Goal> array = new ArrayList<>(goals);
-                generalAdapter.setGoals(array);
-                generalAdapter.notifyDataSetChanged();
-            }
-        });
 
         trainingGoalExerciseJoinViewModel.goalExercisesForTraining.observe(this, goalExercises -> {
             if(goalExercises != null){
@@ -168,8 +156,14 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
         exerciseDescriptionViewModel.getAllExercisesDescriptions().observe(this, exerciseDescriptions -> generalAdapter.setExerciseDescriptions(exerciseDescriptions));
 
-        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
         trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
+
+        goalViewModel.goalByDescription.observe(this, goal -> {
+            if(goal != null){
+                generalAdapter.addGoal(goal);
+                generalAdapter.notifyDataSetChanged();
+            }
+        });
     }
     private void initializeTraining(){
         training = new Training();
@@ -208,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     @Override
     public void deleteGoal(Goal oldGoal) {
-        goalViewModel.delete(oldGoal);
+        trainingGoalExerciseJoinViewModel.deleteGoal(training.id, oldGoal.goalId);
     }
 
     @Override
@@ -247,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
         if(goalDescription != null && !goalDescription.equals("")) {
             Goal goal = new Goal(UUID.randomUUID().toString(), goalDescription);
             insertGoal(goal);
+
         }
     }
 
@@ -257,26 +252,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     }
 
-   /* @Override
-    protected void onNewIntent(Intent intent) {
-
-        super.onNewIntent(intent);
-        if(intent != null) {
-            if (intent.hasExtra(MainActivity.TRAINING)) {
-                training = (Training) Objects.requireNonNull(intent.getExtras()).getSerializable(MainActivity.TRAINING);
-            }
-        }
-        trainingGoalJoinViewModel.getAllGoalsForTraining(training.id);
-        trainingGoalExerciseJoinViewModel.getGoalExercisesForTraining(training.id);
-    }*/
-    /*@Override
-    public void onPause() {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(TRAINING, training.id);
-        editor.apply();
-        super.onPause();
-    }*/
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
@@ -284,14 +259,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
 
     @Override
     public void onChanged(List<Exercise> exercises) {
-        if (exercises != null) {
-            ArrayList<Exercise> array = new ArrayList<>(exercises);
-            setExercises(array);
-        }
-    }
 
-    private void setExercises(ArrayList<Exercise> ex) {
-            generalAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -305,12 +273,6 @@ public class MainActivity extends AppCompatActivity implements  View.OnClickList
     public void insertGoal(Goal goal) {
         goalViewModel.insert(goal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
 
-        goalViewModel.goalByDescription.observe(this, goalFound -> {
-            if(goalFound != null){
-                TrainingGoalJoin trainingGoalJoin = new TrainingGoalJoin(UUID.randomUUID().toString(), training.id, goalFound.goalId);
-                trainingGoalJoinViewModel.insert(trainingGoalJoin).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
-            }
-        });
         goalViewModel.getGoal(goal.description);
     }
 

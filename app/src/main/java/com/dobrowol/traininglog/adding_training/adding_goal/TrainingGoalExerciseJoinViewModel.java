@@ -19,8 +19,6 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
 
     private TrainingGoalExerciseJoinRepository mRepository;
 
-
-
     private class TrainingGoal{
         public String trainingId;
         public String goalId;
@@ -72,17 +70,17 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
          query3.setValue(trainingGoalExerciseJoin);
     }
 
-    public LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated(){
+   /* public LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated(){
         return mRepository.getTrainingGoalExerciseDataAggregated();
-    }
+    }*/
     public TrainingGoalExerciseJoinViewModel(Application application) {
         super(application);
         mRepository = new TrainingGoalExerciseJoinRepository(application);
     }
 
-    public LiveData<Integer> getMaximumExerciseLoad(){
+   /* public LiveData<Integer> getMaximumExerciseLoad(){
         return mRepository.getMaximumExerciseLoad();
-    }
+    }*/
 
     public LiveData<Integer> getMaximumNumberOfExercisesForTraining(){
         return mRepository.getMaximumNumberOfExercisesForTraining();
@@ -91,6 +89,10 @@ public class TrainingGoalExerciseJoinViewModel extends AndroidViewModel {
 
     public LiveData<List<TrainingGoalLoadData>> getTrainingLoadData(){
         return mRepository.getTrainingLoadData();
+    }
+
+    public void deleteGoal(String trainingId, String goalId) {
+        mRepository.deleteGoal(trainingId, goalId);
     }
 }
 

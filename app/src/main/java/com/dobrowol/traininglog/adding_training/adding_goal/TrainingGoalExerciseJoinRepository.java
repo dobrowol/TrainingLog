@@ -27,14 +27,14 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getExercisesForTrainingAndGoal(trainingId, goalId);
     }
 
-    LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated()
+    /*LiveData<List<TrainingGoalExerciseData>> getTrainingGoalExerciseDataAggregated()
     {
-        return trainingGoalExerciseJoinDAO.getTrainingGoalExerciseDataAggregated();
-    }
+       // return trainingGoalExerciseJoinDAO.getTrainingGoalExerciseDataAggregated();
+    }*/
     public Single<Long> insert (TrainingGoalExerciseJoin exercise) {
         return Single.fromCallable(() -> trainingGoalExerciseJoinDAO.insert(exercise));
 
-       // new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);
+        //new insertAsyncTask(trainingGoalExerciseJoinDAO).execute(exercise);
     }
 
     public LiveData<List<GoalExercisePair>> getGoalsAndExercisesForTraining(String trainingId) {
@@ -49,6 +49,31 @@ public class TrainingGoalExerciseJoinRepository {
         return trainingGoalExerciseJoinDAO.getMaximumNumberOfExercisesForTraining();
     }
 
+    public void deleteGoal(String trainingId, String goalId) {
+        new deleteAsyncTask(trainingGoalExerciseJoinDAO).execute(new TrainingGoalIds(trainingId, goalId));
+    }
+    private class TrainingGoalIds{
+        String trainingId;
+        String goalId;
+        TrainingGoalIds(String trainingId, String goalId){
+            this.trainingId = trainingId;
+            this.goalId = goalId;
+        }
+    }
+    private static class deleteAsyncTask extends AsyncTask<TrainingGoalIds, Void, Void> {
+
+        private TrainingGoalExerciseJoinDAO mAsyncTaskDao;
+
+        deleteAsyncTask(TrainingGoalExerciseJoinDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final TrainingGoalIds ... params) {
+            mAsyncTaskDao.deleteByGoalIdTrainingId(params[0].trainingId, params[0].goalId);
+            return null;
+        }
+    }
     private static class insertAsyncTask extends AsyncTask<TrainingGoalExerciseJoin, Void, Void> {
 
         private TrainingGoalExerciseJoinDAO mAsyncTaskDao;
@@ -58,7 +83,7 @@ public class TrainingGoalExerciseJoinRepository {
         }
 
         @Override
-        protected Void doInBackground(final TrainingGoalExerciseJoin... params) {
+        protected Void doInBackground(final TrainingGoalExerciseJoin ... params) {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
@@ -85,7 +110,7 @@ public class TrainingGoalExerciseJoinRepository {
         }
     }
 
-    public LiveData<Integer> getMaximumExerciseLoad(){
-        return trainingGoalExerciseJoinDAO.getMaximumExerciseLoad();
-    }
+   /* public LiveData<Integer> getMaximumExerciseLoad(){
+       // return trainingGoalExerciseJoinDAO.getMaximumExerciseLoad();
+    }*/
 }

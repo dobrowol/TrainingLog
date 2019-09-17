@@ -32,5 +32,8 @@ public interface ExerciseDAO {
 
     @Query("SELECT * FROM exercise_table WHERE id IN (:id)")
     LiveData<Exercise> getExerciseById(String id);
+
+    @Query("SELECT MAX(loadValue) FROM exercise_table")
+    LiveData<Integer> getMaximumLoad();
 }
 

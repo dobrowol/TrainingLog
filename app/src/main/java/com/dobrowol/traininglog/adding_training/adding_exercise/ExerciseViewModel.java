@@ -36,5 +36,7 @@ public class ExerciseViewModel extends AndroidViewModel {
     public void delete(Exercise deletedItem) {
         mRepository.delete(deletedItem);
     }
+
+    public LiveData<Integer> getMaximumLoad(){return mRepository.getMaximumLoad();}
 }
 

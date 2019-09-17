@@ -44,14 +44,16 @@ public class TrainingGoalExerciseJoin {
     @ColumnInfo(index = true)
     public String exerciseId;
     public int order;
-    public int exerciseLoad;
+    public int specificity;
+    public int load;
 
-    public TrainingGoalExerciseJoin(@NonNull String id, @NonNull String trainingJoinId, @NonNull String goalId, @NonNull String exerciseId, int order, int exerciseLoad) {
+    public TrainingGoalExerciseJoin(@NonNull String id, @NonNull String trainingJoinId, @NonNull String goalId, @NonNull String exerciseId, int order, int specificity) {
         this.id = id;
         this.trainingJoinId = trainingJoinId;
         this.goalId = goalId;
         this.exerciseId = exerciseId;
         this.order = order;
-        this.exerciseLoad = exerciseLoad;
+        this.specificity = specificity;
+        this.load = 0;
     }
 }

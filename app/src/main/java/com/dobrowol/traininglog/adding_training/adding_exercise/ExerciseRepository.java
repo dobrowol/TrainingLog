@@ -47,6 +47,11 @@ public class ExerciseRepository {
         new deleteAsyncTask(mExerciseDao).execute(deletedItem);
     }
 
+    public LiveData<Integer> getMaximumLoad() {
+
+        return mExerciseDao.getMaximumLoad();
+    }
+
     private static class deleteAsyncTask extends AsyncTask<Exercise, Void, Void> {
 
         private ExerciseDAO mAsyncTaskDao;

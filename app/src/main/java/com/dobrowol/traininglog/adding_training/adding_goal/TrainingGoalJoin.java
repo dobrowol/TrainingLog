@@ -11,17 +11,14 @@ import com.dobrowol.traininglog.adding_training.adding_exercise.Exercise;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(indices = {@Index("trainingId"), @Index("goalId")},
+@Entity(indices = {
+        @Index(value = {"trainingId","goal"}, unique = true)},
         tableName = "training_goal_join",
         foreignKeys = {
                 @ForeignKey(onDelete = CASCADE,
                         entity = Training.class,
                         parentColumns = "id",
-                        childColumns = "trainingId"),
-                @ForeignKey(onDelete = CASCADE,
-                        entity = Goal.class,
-                        parentColumns = "goalId",
-                        childColumns = "goalId")
+                        childColumns = "trainingId")
         })
 
 public class TrainingGoalJoin {
@@ -31,14 +28,14 @@ public class TrainingGoalJoin {
     @NonNull
     public String trainingId;
     @NonNull
-    public String goalId;
+    public String goal;
     public int load;
 
-    public TrainingGoalJoin(String id, String trainingId, String goalId) {
+
+    public TrainingGoalJoin(String id, String trainingId, String goal, Integer load){
         this.id = id;
         this.trainingId = trainingId;
-        this.goalId = goalId;
-        load = 0;
-
+        this.goal = goal;
+        this.load = load;
     }
 }

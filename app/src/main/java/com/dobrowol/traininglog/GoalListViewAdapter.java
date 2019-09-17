@@ -49,6 +49,11 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         viewHolder.discardStatus();
     }
 
+    public void addGoal(Goal goal) {
+        goals.add(goal);
+        setMap();
+    }
+
     public interface OnItemClickListener extends View.OnClickListener {
         void onItemClick(Training training, Goal item);
 
@@ -70,6 +75,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
         this.listener = listener;
         this.context = context;
         goals = new ArrayList<>();
+
     }
     void saveStatus(){
         viewHolder.saveStatus();
@@ -355,7 +361,7 @@ public class GoalListViewAdapter extends RecyclerView.Adapter<GoalListViewAdapte
 
         @Override
         public void addExercise() {
-            AddExercise.startNewInstance(view.getContext(), training, goal);
+            AddExercise.startNewInstance(context, training, goal);
         }
 
         private class ActionBarCallback implements ActionMode.Callback {

@@ -17,6 +17,15 @@ public class TrainingGoalJoinRepository {
 
     private TrainingGoalJoinDAO trainingGoalJoinDAO;
 
+    private class TrainingGoalIds{
+        String trainingId;
+        String goalId;
+
+        public TrainingGoalIds(String trainingId, String goalId) {
+            this.trainingId = trainingId;
+            this.goalId = goalId;
+        }
+    }
     TrainingGoalJoinRepository(Application application) {
         TrainingRoomDatabase db = TrainingRoomDatabase.getDatabase(application);
         trainingGoalJoinDAO = db.trainingGoalJoinDAO();
@@ -34,8 +43,8 @@ public class TrainingGoalJoinRepository {
         return trainingGoalJoinDAO.getMaximumLoad();
     }
 
-    public Single<Long> insert (TrainingGoalJoin trainingGoalJoin) {
-        return Single.fromCallable(() -> trainingGoalJoinDAO.insert(trainingGoalJoin));
+    public void insert (TrainingGoalJoin trainingGoalJoin) {
+        new insertAsyncTask(trainingGoalJoinDAO).execute(trainingGoalJoin);
     }
 
     public void update(TrainingGoalJoin trainingGoalJoin) {
@@ -54,6 +63,13 @@ public class TrainingGoalJoinRepository {
         return trainingGoalJoinDAO.getTrainingGoal(trainingId, goalId);
     }
 
+    public void deleteGoal(String trainingId, String goalId) {
+        new deleteAsyncTask(trainingGoalJoinDAO).execute(new TrainingGoalIds(trainingId, goalId));
+    }
+
+    public LiveData<List<TrainingGoalJoin>> getAllGroupedByGoal(){
+        return trainingGoalJoinDAO.getAllGroupedByGoal();
+    }
     private static class insertAsyncTask extends AsyncTask<TrainingGoalJoin, Void, Void> {
 
         private TrainingGoalJoinDAO mAsyncTaskDao;
@@ -79,6 +95,20 @@ public class TrainingGoalJoinRepository {
         @Override
         protected Void doInBackground(final TrainingGoalJoin... params) {
             mAsyncTaskDao.update(params[0]);
+            return null;
+        }
+    }
+    private static class deleteAsyncTask extends AsyncTask<TrainingGoalIds, Void, Void> {
+
+        private TrainingGoalJoinDAO mAsyncTaskDao;
+
+        deleteAsyncTask(TrainingGoalJoinDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final TrainingGoalIds... params) {
+            mAsyncTaskDao.delete(params[0].trainingId, params[0].goalId);
             return null;
         }
     }
